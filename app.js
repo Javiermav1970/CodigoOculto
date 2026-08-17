@@ -263,6 +263,6 @@ function recibirNotificacionAtaque(ataque) {
   }
 }function agregarALog(texto) {
   const box = document.getElementById('log-terminal');
-  box.innerHTML += <p>${texto}</p>;
+  box.innerHTML += `<p>${texto}</p>`;
   box.scrollTop = box.scrollHeight; // Auto-scroll al final
 }
