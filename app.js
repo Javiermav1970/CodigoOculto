@@ -1,7 +1,18 @@
 // Configura aquí tus credenciales públicas de Supabase
 const SUPABASE_URL = "https://khvtshqmwklfcdrgjqqf.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtodnRzaHFtd2tsZmNkcmdqcXFmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY4ODM0OTMsImV4cCI6MjEwMjQ1OTQ5M30.p_RgbkcO-Y_a-ZeOMQwbCpP7RRE2viyYhkci2NY6qoY";
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+// Declaramos la variable globalmente
+let supabase;
+
+// Esta función se ejecutará automáticamente cuando Supabase termine de cargar en el HTML
+window.inicializarSupabase = function() {
+  if (window.supabase && window.supabase.createClient) {
+    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    console.log("[SISTEMA] Conexión con Supabase establecida con éxito.");
+  } else {
+    console.error("[ERROR] No se pudo encontrar la librería de Supabase en el objeto global.");
+  }
+};
 
 const elementosValidos = ['0','1','2','3','4','5','6','7','8','9','★','▲','■','●','◆','▼'];
 
@@ -9,12 +20,6 @@ const elementosValidos = ['0','1','2','3','4','5','6','7','8','9','★','▲','�
 let estadoJuego = {
   modo: null, // 'pc' o 'multi'
   longitud: 4,
-  salaId: null,
-  miJugadorId: null,
-  miCodigo: null,
-  esMiTurno: false,
-  listaJugadores: []
-};
 
 // Navegación Básica
 function cambiarPantalla(id) {
