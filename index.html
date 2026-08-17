@@ -1,601 +1,94 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Descifra el Código</title>
-    <!-- Cargamos Socket.io y la biblioteca oficial de Supabase -->
-    <script src="https://socket.io"></script>
-    <script src="https://unpkg.com"></script>
-    <style>
-        :root {
-            --primary: #00ff66;       /* Verde Neón para aciertos y acciones */
-            --primary-glow: rgba(0, 255, 102, 0.4);
-            --secondary: #00ffff;     /* Cian Neón para elementos interactivos */
-            --secondary-glow: rgba(0, 255, 255, 0.3);
-            --danger: #ff0055;        /* Rosa/Rojo Neón para errores o abandonar */
-            --danger-glow: rgba(255, 0, 85, 0.4);
-            --dark: #0a0f1d;          /* Fondo espacial profundo */
-            --panel-bg: #131a30;      /* Fondo de los contenedores */
-            --text: #e2e8f0;
-        }
-
-        body {
-            font-family: 'Courier New', Courier, monospace;
-            background-color: var(--dark);
-            color: var(--text);
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            background-image: radial-gradient(circle at 50% 50%, #1a2342 0%, var(--dark) 80%);
-        }
-
-        .container {
-            max-width: 600px;
-            width: 100%;
-            background: var(--panel-bg);
-            padding: 25px;
-            border-radius: 16px;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.6), 0 0 15px var(--secondary-glow);
-            border: 2px solid #1e294b;
-            box-sizing: border-box;
-        }
-
-        .screen { display: none; }
-        .screen.active { display: block; }
-
-        h1 {
-            font-size: 2rem;
-            color: #fff;
-            text-shadow: 0 0 10px var(--secondary), 0 0 20px var(--secondary);
-            text-align: center;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-bottom: 30px;
-        }
-
-        h2, h3 {
-            color: #fff;
-            text-shadow: 0 0 8px var(--primary-glow);
-            text-align: center;
-            text-transform: uppercase;
-        }
-
-        button {
-            width: 100%;
-            padding: 14px;
-            background-color: transparent;
-            color: var(--primary);
-            border: 2px solid var(--primary);
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: bold;
-            font-family: inherit;
-            text-transform: uppercase;
-            cursor: pointer;
-            margin-top: 15px;
-            transition: all 0.2s ease;
-            box-shadow: inset 0 0 8px var(--primary-glow), 0 0 8px var(--primary-glow);
-        }
-
-        button:hover:not(:disabled) {
-            background-color: var(--primary);
-            color: var(--dark);
-            box-shadow: 0 0 15px var(--primary), inset 0 0 10px rgba(255,255,255,0.5);
-            transform: scale(1.01);
-        }
-
-        button:disabled {
-            border-color: #334155;
-            color: #475569;
-            box-shadow: none;
-            cursor: not-allowed;
-        }
-
-        .btn-danger {
-            color: var(--danger);
-            border-color: var(--danger);
-            box-shadow: inset 0 0 8px var(--danger-glow), 0 0 8px var(--danger-glow);
-        }
-
-        .btn-danger:hover:not(:disabled) {
-            background-color: var(--danger);
-            color: #fff;
-            box-shadow: 0 0 15px var(--danger);
-        }
-
-        .btn-menu {
-            color: #94a3b8;
-            border-color: #475569;
-            box-shadow: none;
-        }
-
-        .btn-menu:hover {
-            background-color: #475569;
-            color: #fff;
-            box-shadow: 0 0 10px rgba(71, 85, 105, 0.5);
-        }
-
-        input, select {
-            width: 100%;
-            padding: 12px;
-            margin: 10px 0;
-            background-color: #0f172a;
-            border: 2px solid #334155;
-            border-radius: 8px;
-            color: #fff;
-            font-family: inherit;
-            box-sizing: border-box;
-        }
-
-        input:focus, select:focus {
-            outline: none;
-            border-color: var(--secondary);
-            box-shadow: 0 0 10px var(--secondary-glow);
-        }
-
-        .pool-container {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-            margin: 20px 0;
-        }
-
-        .pool-item {
-            padding: 12px;
-            background: #0f172a;
-            color: var(--secondary);
-            text-align: center;
-            border-radius: 8px;
-            border: 1px solid #1e294b;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 1.2rem;
-            user-select: none;
-            transition: all 0.15s ease;
-        }
-
-        .pool-item:hover {
-            border-color: var(--secondary);
-            box-shadow: 0 0 8px var(--secondary-glow);
-            transform: translateY(-2px);
-        }
-
-        .pool-item.selected {
-            background: var(--secondary);
-            color: var(--dark);
-            border-color: #fff;
-            box-shadow: 0 0 12px var(--secondary);
-        }
-
-        .code-preview {
-            display: flex;
-            gap: 12px;
-            justify-content: center;
-            font-size: 28px;
-            min-height: 50px;
-            margin: 20px 0;
-            background: #090d16;
-            border: 2px dashed #334155;
-            align-items: center;
-            border-radius: 8px;
-            box-shadow: inset 0 0 10px rgba(0,0,0,0.8);
-        }
-
-        .badge-turno {
-            padding: 12px;
-            border-radius: 8px;
-            text-align: center;
-            font-weight: bold;
-            margin-bottom: 20px;
-            text-transform: uppercase;
-            border: 2px solid transparent;
-        }
-
-        .turno-propio {
-            background-color: rgba(0, 255, 102, 0.1);
-            color: var(--primary);
-            border-color: var(--primary);
-            box-shadow: 0 0 10px var(--primary-glow);
-        }
-
-        .turno-ajeno {
-            background-color: rgba(255, 0, 85, 0.1);
-            color: var(--danger);
-            border-color: var(--danger);
-            box-shadow: 0 0 10px var(--danger-glow);
-        }
-
-        .log-box {
-            max-height: 200px;
-            overflow-y: auto;
-            border: 2px solid #1e294b;
-            padding: 12px;
-            background: #090d16;
-            border-radius: 8px;
-            font-family: inherit;
-            margin-top: 20px;
-            color: #a7f3d0;
-        }
-
-        .log-box div {
-            padding: 4px 0;
-            border-bottom: 1px solid #111827;
-        }
-
-        /* Personalización de la barra de desplazamiento */
-        .log-box::-webkit-scrollbar { width: 6px; }
-        .log-box::-webkit-scrollbar-track { background: #090d16; }
-        .log-box::-webkit-scrollbar-thumb { background: #1e294b; border-radius: 3px; }
-        .log-box::-webkit-scrollbar-thumb:hover { background: var(--secondary); }
-
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ARCADE CODEBREAKER</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- Fuente Retro de Google Fonts -->
+  <link href="https://googleapis.com" rel="stylesheet">
+  <!-- CDN Oficial de Supabase JS -->
+  <script src="https://jsdelivr.net"></script>
 </head>
 <body>
+  <div class="arcade-container">
+    <header class="arcade-header">
+      <h1 class="neon-text-green">⚡ CODEBREAKER ⚡</h1>
+      <button id="btn-salir" class="btn btn-red">❌ SALIR / MENÚ</button>
+    </header>
 
-<div class="container">
-    <!-- MENU PRINCIPAL -->
-    <div id="screen-menu" class="screen active">
-        <h1>Código Oculto</h1>
-        <input type="text" id="player-name" placeholder="Tu Nombre o Alias" value="Jugador1">
-        <button onclick="changeScreen('screen-pc-config')">Modo Contra PC</button>
-        <button onclick="changeScreen('screen-mp-config')">Modo Multijugador (Online)</button>
+    <!-- PANTALLA 1: MENÚ PRINCIPAL -->
+    <div id="pantalla-menu" class="pantalla active">
+      <h2 class="neon-text-magenta">SELECCIONA MODO</h2>
+      <button id="btn-modo-pc" class="btn btn-neon">VS COMPUTADORA</button>
+      <button id="btn-modo-multi" class="btn btn-neon">MULTIJUGADOR (REALTIME)</button>
     </div>
 
-    <!-- CONFIGURACIÓN CONTRA PC -->
-    <div id="screen-pc-config" class="screen">
-        <h2>Configurar Partida PC</h2>
-        <label>Dificultad:</label>
-        <select id="pc-difficulty" onchange="toggleCustomLength('pc')">
-            <option value="4">Fácil (4 elementos)</option>
-            <option value="6">Medio (6 elementos)</option>
-            <option value="8">Difícil (8 elementos)</option>
-            <option value="custom">Personalizado</option>
-        </select>
-        <input type="number" id="pc-custom-len" placeholder="Longitud (3-10)" min="3" max="10" style="display:none;">
-        <button onclick="startPcGame()">Comenzar Partida</button>
-        <button class="btn-menu" onclick="goToMenu()">Volver al Menú</button>
+    <!-- PANTALLA 2: AJUSTES / DIFICULTAD -->
+    <div id="pantalla-config" class="pantalla">
+      <h2 class="neon-text-magenta">CONFIGURACIÓN</h2>
+      <label>DIFICULTAD:</label>
+      <select id="select-dificultad" class="arcade-input">
+        <option value="3">FÁCIL (3 ELEMENTOS)</option>
+        <option value="4" selected>MEDIA (4 ELEMENTOS)</option>
+        <option value="5">DIFÍCIL (5 ELEMENTOS)</option>
+        <option value="custom">PERSONALIZADA</option>
+      </select>
+      
+      <div id="wrapper-custom" class="oculto">
+        <label>LONGITUD (3-8):</label>
+        <input type="number" id="input-custom-long" class="arcade-input" min="3" max="8" value="4">
+      </div>
+
+      <div id="wrapper-multi-sala" class="oculto">
+        <label>TU NOMBRE:</label>
+        <input type="text" id="input-nombre" class="arcade-input" placeholder="PLAYER 1">
+        <label>CÓDIGO DE SALA (Para unirse o crear):</label>
+        <input type="text" id="input-sala-id" class="arcade-input" placeholder="SALAXYZ">
+      </div>
+
+      <button id="btn-iniciar-juego" class="btn btn-green">🕹️ EMPEZAR</button>
     </div>
 
-    <!-- CONFIGURACIÓN MULTIJUGADOR -->
-    <div id="screen-mp-config" class="screen">
-        <h2>Unirse o Crear Sala</h2>
-        <input type="text" id="mp-room-id" placeholder="Código de la Sala (Ej: SALA123)">
-        <label>Longitud de Código (Solo si creas sala):</label>
-        <select id="mp-difficulty" onchange="toggleCustomLength('mp')">
-            <option value="4">Fácil (4 elementos)</option>
-            <option value="6">Medio (6 elementos)</option>
-            <option value="8">Difícil (8 elementos)</option>
-            <option value="custom">Personalizado</option>
-        </select>
-        <input type="number" id="mp-custom-len" placeholder="Longitud (3-10)" min="3" max="10" style="display:none;">
-        <button onclick="joinMpRoom()">Conectarse a Sala</button>
-        <button class="btn-menu" onclick="goToMenu()">Volver al Menú</button>
-    </div>
+    <!-- PANTALLA 3: TABLERO DE JUEGO -->
+    <div id="pantalla-juego" class="pantalla">
+      <!-- Indicador de Turno LED -->
+      <div id="indicador-turno" class="led-banner">
+        >> ESPERANDO JUGADORES <<
+      </div>
 
-    <!-- SALA DE ESPERA / SELECCIÓN DE CÓDIGO SECRETO MULTIJUGADOR -->
-    <div id="screen-mp-lobby" class="screen">
-        <h2>Preparación de Código Secreto</h2>
-        <div id="lobby-status">Esperando jugadores...</div>
-        <p>Selecciona tu código secreto sin repetir caracteres:</p>
-        <div class="code-preview" id="secret-preview"></div>
-        <div class="pool-container" id="secret-pool"></div>
-        <button id="btn-confirm-secret" onclick="confirmSecretCode()">Confirmar mi Código</button>
-        <button class="btn-danger btn-menu" onclick="leaveMatch()">Salir de la Sala</button>
-    </div>
+      <div class="juego-grid">
+        <!-- Panel de Ataque -->
+        <div class="panel-interaccion">
+          <div id="seccion-definir-codigo">
+            <h3 class="neon-text-green">CONFIGURA TU CÓDIGO SECRETO</h3>
+            <p>Elementos disponibles: 0-9 y ★, ▲, ■, ●, ◆, ▼</p>
+            <input type="text" id="input-mi-codigo" class="arcade-input" placeholder="Ej: 1,A,★,4">
+            <button id="btn-guardar-codigo" class="btn btn-neon">GUARDAR</button>
+          </div>
 
-    <!-- PANTALLA DE JUEGO (MECÁNICA COMÚN COMPARTIDA) -->
-    <div id="screen-game" class="screen">
-        <h2 id="game-title">Partida en Curso</h2>
-        
-        <!-- Indicador visual del sistema de turnos -->
-        <div id="turn-indicator" class="badge-turn" style="display:none;"></div>
+          <div id="seccion-combate" class="oculto">
+            <h3 class="neon-text-magenta">ENTREGA TU HIPÓTESIS</h3>
+            <label>SELECCIONA VÍCTIMA:</label>
+            <select id="select-objetivo" class="arcade-input"></select>
 
-        <!-- Selección de Objetivo para Multijugador -->
-        <div id="target-selection-area" style="display:none;">
-            <label>¿A quién vas a atacar?:</label>
-            <select id="attack-target"></select>
+            <label>TU APUESTA:</label>
+            <input type="text" id="input-ataque" class="arcade-input" placeholder="Tu hipótesis">
+            <button id="btn-enviar-ataque" class="btn btn-green">💥 ENVIAR ATAQUE</button>
+          </div>
         </div>
 
-        <p>Ingresa tu hipótesis de ataque:</p>
-        <div class="code-preview" id="guess-preview"></div>
-        <div class="pool-container" id="guess-pool"></div>
-        
-        <button id="btn-submit-attack" onclick="submitAttack()">Enviar Ataque</button>
-        
-        <h3>Historial de Intentos</h3>
-        <div class="log-box" id="game-log"></div>
-        
-        <button class="btn-danger btn-menu" onclick="leaveMatch()">Salir / Abandonar</button>
+        <!-- Historial Tipo Terminal -->
+        <div class="panel-historial">
+          <h3 class="neon-text-green">>_ HISTORIAL DE INTENTOS</h3>
+          <div id="log-terminal" class="terminal-box">
+            <p class="system-msg">[SISTEMA] Consola iniciada correctamente...</p>
+          </div>
+        </div>
+      </div>
     </div>
-</div>
+  </div>
 
-<script>
-    // ===== CONFIGURACIÓN DE APIS PRINCIPALES =====
-    const SUPABASE_URL = "https://khvtshqmwklfcdrgjqqf.supabase.co"; 
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtodnRzaHFtd2tsZmNkcmdqcXFmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY4ODM0OTMsImV4cCI6MjEwMjQ1OTQ5M30.p_RgbkcO-Y_a-ZeOMQwbCpP7RRE2viyYhkci2NY6qoY";
-    const SOCKET_URL = "https://codigooculto.onrender.com"; 
-
-    // Inicializamos Supabase de forma nativa
-    const supabaseClient = netlify = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
-    let socket = null;
-
-    // Banco de 16 elementos únicos exigidos (10 números + 6 figuras/emojis representativos)
-    const ELEMENT_POOL = ['0','1','2','3','4','5','6','7','8','9','⭐','🔮','🍀','💎','🔥','🚀'];
-
-    // Variables de Estado de la Partida
-    let gameMode = 'pc'; // 'pc' o 'mp'
-    let currentRoomId = '';
-    let myPlayerName = '';
-    let activeCodeLength = 4;
-    
-    let pcSecretCode = []; 
-    let selectedSecretElements = [];
-    let selectedGuessElements = [];
-    let myId = '';
-
-    // Mapeo básico de navegación entre pantallas
-    function changeScreen(screenId) {
-        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-        document.getElementById(screenId).classList.add('active');
-    }
-
-    function toggleCustomLength(prefix) {
-        const select = document.getElementById(`${prefix}-difficulty`).value;
-        document.getElementById(`${prefix}-custom-len`).style.display = (select === 'custom') ? 'block' : 'none';
-    }
-
-    function goToMenu() {
-        changeScreen('screen-menu');
-    }
-
-    // Inicializador dinámico de paneles de botones interactivos
-    function renderPool(containerId, selectionArray, previewId) {
-        const container = document.getElementById(containerId);
-        container.innerHTML = '';
-        ELEMENT_POOL.forEach(el => {
-            const div = document.createElement('div');
-            div.className = 'pool-item';
-            div.innerText = el;
-            if(selectionArray.includes(el)) div.classList.add('selected');
-            
-            div.onclick = () => {
-                const index = selectionArray.indexOf(el);
-                if(index > -1) {
-                    selectionArray.splice(index, 1);
-                } else {
-                    if(selectionArray.length >= activeCodeLength) return; // Límite de longitud
-                    selectionArray.push(el);
-                }
-                renderPool(containerId, selectionArray, previewId);
-                document.getElementById(previewId).innerText = selectionArray.join(' ');
-            };
-            container.appendChild(div);
-        });
-    }
-
-    // ===== LÓGICA MODO CONTRA PC =====
-    function startPcGame() {
-        myPlayerName = document.getElementById('player-name').value.trim() || 'Jugador';
-        gameMode = 'pc';
-        const diffSelect = document.getElementById('pc-difficulty').value;
-        activeCodeLength = diffSelect === 'custom' ? parseInt(document.getElementById('pc-custom-len').value) : parseInt(diffSelect);
-        
-        if (!activeCodeLength || activeCodeLength < 3 || activeCodeLength > 10) {
-            return alert("Elige una longitud válida entre 3 y 10 elementos.");
-        }
-
-        // Generar código oculto único de la PC sin elementos repetidos
-        let poolCopy = [...ELEMENT_POOL];
-        pcSecretCode = [];
-        for (let i = 0; i < activeCodeLength; i++) {
-            const randIndex = Math.floor(Math.random() * poolCopy.length);
-            pcSecretCode.push(poolCopy.splice(randIndex, 1)[0]);
-        }
-
-        document.getElementById('game-title').innerText = `Contra PC (Código de ${activeCodeLength} elementos)`;
-        document.getElementById('target-selection-area').style.display = 'none';
-        document.getElementById('turn-indicator').style.display = 'none';
-        document.getElementById('game-log').innerHTML = '';
-        selectedGuessElements = [];
-        
-        renderPool('guess-pool', selectedGuessElements, 'guess-preview');
-        document.getElementById('guess-preview').innerText = '';
-        changeScreen('screen-game');
-    }
-
-    // ===== LÓGICA MODO MULTIJUGADOR (SOCKET.IO) =====
-    function joinMpRoom() {
-        myPlayerName = document.getElementById('player-name').value.trim() || 'Jugador';
-        currentRoomId = document.getElementById('mp-room-id').value.trim().toUpperCase();
-        if (!currentRoomId) return alert("Introduce un código de sala.");
-
-        gameMode = 'mp';
-        const diffSelect = document.getElementById('mp-difficulty').value;
-        activeCodeLength = diffSelect === 'custom' ? parseInt(document.getElementById('mp-custom-len').value) : parseInt(diffSelect);
-
-        if (!socket) {
-            socket = io(SOCKET_URL);
-            setupSocketEvents();
-        }
-        
-        socket.emit('joinRoom', { roomId: currentRoomId, playerName: myPlayerName, codeLength: activeCodeLength });
-    }
-
-    function setupSocketEvents() {
-        myId = socket.id;
-
-        socket.on('connect', () => { myId = socket.id; });
-
-        socket.on('roomUpdate', ({ room, roomId }) => {
-            myId = socket.id;
-            activeCodeLength = room.codeLength;
-            const count = Object.keys(room.players).length;
-            document.getElementById('lobby-status').innerText = `Sala: ${roomId} | Conectados: ${count}/6 jugadores.`;
-            
-            selectedSecretElements = [];
-            renderPool('secret-pool', selectedSecretElements, 'secret-preview');
-            changeScreen('screen-mp-lobby');
-        });
-
-        socket.on('playerReady', ({ playerId }) => {
-            if (playerId === socket.id) {
-                document.getElementById('lobby-status').innerText = "Tu código está listo. Esperando que los demás elijan...";
-                document.getElementById('btn-confirm-secret').disabled = true;
-            }
-        });
-
-        socket.on('gameStarted', (room) => {
-            document.getElementById('game-title').innerText = `Multijugador Online (Sala: ${currentRoomId})`;
-            document.getElementById('game-log').innerHTML = '';
-            document.getElementById('btn-confirm-secret').disabled = false;
-            
-            updateTurnDisplay(room);
-            changeScreen('screen-game');
-        });
-
-        socket.on('attemptResult', ({ room, playerId, lastAttempt, nextTurnPlayerId }) => {
-            const log = document.getElementById('game-log');
-            log.innerHTML += `<div><strong>${room.players[playerId].name}</strong> atacó a ${lastAttempt.targetName}: ${lastAttempt.guess} ➔ ${lastAttempt.aciertos} Aciertos, ${lastAttempt.coincidencias} Coincidencias</div>`;
-            log.scrollTop = log.scrollHeight;
-            
-            updateTurnDisplay(room);
-        });
-
-        socket.on('playerWon', ({ winnerName }) => {
-            alert(`¡Fin del juego! El ganador absoluto es: ${winnerName}`);
-            cleanExitState();
-        });
-
-        socket.on('errorMsg', (msg) => { alert(msg); });
-    }
-
-    function confirmSecretCode() {
-        if (selectedSecretElements.length !== activeCodeLength) {
-            return alert(`Tu código secreto debe tener exactamente ${activeCodeLength} elementos.`);
-        }
-        socket.emit('setSecretCode', { roomId: currentRoomId, secretCode: selectedSecretElements });
-    }
-
-    // Gestiona los turnos dinámicamente y la selección selectiva del rival
-    function updateTurnDisplay(room) {
-        myId = socket.id;
-        const currentTurnId = room.turnOrder[room.currentTurnIndex];
-        const activePlayerName = room.players[currentTurnId].name;
-        
-        const indicator = document.getElementById('turn-indicator');
-        indicator.style.display = 'block';
-
-        const btnAttack = document.getElementById('btn-submit-attack');
-        const targetArea = document.getElementById('target-selection-area');
-
-        if (currentTurnId === myId) {
-            indicator.innerText = "¡Es tu turno! Elige un rival y lanza tu ataque.";
-            indicator.className = "badge-turno turno-propio";
-            btnAttack.disabled = false;
-            targetArea.style.display = 'block';
-
-            // Cargar select de contrincantes vivos/existentes en la sala
-            const targetSelect = document.getElementById('attack-target');
-            targetSelect.innerHTML = '';
-            Object.values(room.players).forEach(p => {
-                if (p.id !== myId) {
-                    const opt = document.createElement('option');
-                    opt.value = p.id;
-                    opt.innerText = p.name;
-                    targetSelect.appendChild(opt);
-                }
-            });
-        } else {
-            indicator.innerText = `Esperando el turno de: ${activePlayerName}...`;
-            indicator.className = "badge-turno turno-ajeno";
-            btnAttack.disabled = true;
-            targetArea.style.display = 'none';
-        }
-
-        selectedGuessElements = [];
-        renderPool('guess-pool', selectedGuessElements, 'guess-preview');
-        document.getElementById('guess-preview').innerText = '';
-    }
-
-    // ===== EJECUCIÓN Y VALIDACIÓN DE ATAQUES =====
-    async function submitAttack() {
-        if (selectedGuessElements.length !== activeCodeLength) {
-            return alert(`Completa tu código de ataque con ${activeCodeLength} elementos.`);
-        }
-
-        const hypothesis = [...selectedGuessElements];
-
-        if (gameMode === 'pc') {
-            // Cálculo contra Inteligencia Artificial
-            let aciertos = 0;
-            let coincidencias = 0;
-
-            for (let i = 0; i < hypothesis.length; i++) {
-                if (hypothesis[i] === pcSecretCode[i]) aciertos++;
-                else if (pcSecretCode.includes(hypothesis[i])) coincidencias++;
-            }
-
-            // Registrar inmediatamente en el historial local visual
-            const log = document.getElementById('game-log');
-            log.innerHTML += `<div>Tú contra PC: ${hypothesis.join('')} ➔ ${aciertos} Aciertos, ${coincidencias} Coincidencias</div>`;
-            log.scrollTop = log.scrollHeight;
-
-            // Enviar al servicio en la nube de Supabase (Asíncrono)
-            await registrarEnSupabase(myPlayerName, 'pc', 'PC', 'PC', hypothesis.join(''), aciertos, coincidencias);
-
-            if (aciertos === activeCodeLength) {
-                alert("¡Felicidades! Has descifrado el código secreto de la Computadora.");
-                cleanExitState();
-            } else {
-                // Resetear panel de entrada para el próximo intento
-                selectedGuessElements = [];
-                renderPool('guess-pool', selectedGuessElements, 'guess-preview');
-                document.getElementById('guess-preview').innerText = '';
-            }
-
-        } else if (gameMode === 'mp') {
-            // Flujo Multijugador por red
-            const targetSelect = document.getElementById('attack-target');
-            const targetId = targetSelect.value;
-            const targetName = targetSelect.options[targetSelect.selectedIndex].text;
-
-            if (!targetId) return alert("No hay objetivos válidos seleccionables.");
-
-            // El cálculo de aciertos se realiza de forma segura en el servidor
-            socket.emit('submitGuess', { roomId: currentRoomId, targetPlayerId: targetId, guess: hypothesis });
-
-            // Enviamos copia analítica al Supabase del creador
-            await registrarEnSupabase(myPlayerName, 'mp', currentRoomId, targetName, hypothesis.join(''), 0, 0);
-        }
-    }
-
-    // Envío persistente mediante fetch/api nativa hacia Supabase
-    async function registrarEnSupabase(jugador, modo, sala, objetivo, intento, aciertos, coincidencias) {
-        if (!supabaseClient) return; // Si no configuraste claves, continúa operando localmente
-        try {
-            await supabaseClient.from('historial_intentos').insert([{
-                jugador, modo, sala_id: sala, objetivo, intento, aciertos, coincidencias
-            }]);
-        } catch (e) {
-            console.error("Error guardando traza en Supabase: ", e);
-        }
-    }
-
-    // ===== GESTIÓN DE SALIDA SEGURA Y REINICIOS =====
-    function leaveMatch() {
-        if (gameMode === 'mp' && socket) {
-            socket.emit('leaveRoom', { roomId: currentRoomId });
-        }
-        cleanExitState();
-    }
-
-    function cleanExitState() {
-        currentRoomId = '';
-        pcSecretCode = [];
-        selectedSecretElements = [];
-        selectedGuessElements = [];
-        changeScreen('screen-menu');
-    }
+  <script src="app.js"></script>
+</body>
+</html>
