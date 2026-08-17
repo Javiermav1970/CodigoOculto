@@ -97,8 +97,17 @@ function evaluarCodigo(intento, secreto) {
 // MODO MULTIJUGADOR (SUPABASE REALTIME)
 // ==========================================
 async function inicializarModoMultiplayer() {
+  // CORRECCIÓN DE SEGURIDAD: Si por alguna razón está vacío, lo forzamos con el objeto de la ventana
+  if (!supabase && window.supabase && window.supabase.createClient) {
+    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  }
+  // Si sigue vacío después de esto, significa que las credenciales o la red fallaron por completo
+  if (!supabase) {
+    return alert("Error del Sistema: La conexión con el servidor Supabase no está lista. Por favor, recarga la página.");
+  }
   const nombre = document.getElementById('input-nombre').value.trim() || "PLAYER";
   const codSala = document.getElementById('input-sala-id').value.trim().toUpperCase();
+
 
   if(!codSala) return alert("Ingresa un código de sala válido");
 
