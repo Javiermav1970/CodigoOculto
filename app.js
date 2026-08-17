@@ -1,14 +1,30 @@
 // Configura aquí tus credenciales públicas de Supabase
 const SUPABASE_URL = "https://khvtshqmwklfcdrgjqqf.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtodnRzaHFtd2tsZmNkcmdqcXFmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY4ODM0OTMsImV4cCI6MjEwMjQ1OTQ5M30.p_RgbkcO-Y_a-ZeOMQwbCpP7RRE2viyYhkci2NY6qoY";
-// Declaramos la variable globalmente
+
+// Declaramos e inicializamos la variable buscando el objeto global nativo
 let supabase = null;
 
-// Esta función se ejecutará automáticamente cuando Supabase termine de cargar en el HTML
+try {
+  // Intentamos detectar la librería en cualquiera de sus nombres globales del navegador
+  const libSupabase = window.supabase || window.supabaseJS || supabase;
+  
+  if (libSupabase && libSupabase.createClient) {
+    supabase = libSupabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    console.log("[SISTEMA] Motor de Supabase encendido correctamente.");
+  }
+} catch (e) {
+  console.log("[INFO] Esperando inicialización diferida...");
+}
+
+// Función de respaldo por si el navegador carga los archivos en desorden
 window.inicializarSupabase = function() {
-  if (window.supabase && window.supabase.createClient) {
-    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-    console.log("[SISTEMA] Conexión con Supabase establecida localmente con éxito.");
+  if (!supabase) {
+    const lib = window.supabase || window.supabaseJS;
+    if (lib && lib.createClient) {
+      supabase = lib.createClient(SUPABASE_URL, SUPABASE_KEY);
+      console.log("[SISTEMA] Conexión establecida mediante disparador diferido.");
+    }
   }
 };
 
@@ -23,7 +39,7 @@ let estadoJuego = {
   miCodigo: null,
   esMiTurno: false,
   listaJugadores: []
-}; 
+};
 // Navegación Básica
 function cambiarPantalla(id) {
   document.querySelectorAll('.pantalla').forEach(p => p.classList.remove('active'));
@@ -95,14 +111,19 @@ function evaluarCodigo(intento, secreto) {
 // MODO MULTIJUGADOR (SUPABASE REALTIME)
 // ==========================================
 async function inicializarModoMultiplayer() {
-  // CORRECCIÓN DE SEGURIDAD: Si por alguna razón está vacío, lo forzamos con el objeto de la ventana
-  if (!supabase && window.supabase && window.supabase.createClient) {
-    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-  }
-  // Si sigue vacío después de esto, significa que las credenciales o la red fallaron por completo
+  
+  // Intento de rescate de última hora antes de lanzar la alerta
   if (!supabase) {
-    return alert("Error del Sistema: La conexión con el servidor Supabase no está lista. Por favor, recarga la página.");
+    const libRescate = window.supabase || window.supabaseJS;
+    if (libRescate && libRescate.createClient) {
+      supabase = libRescate.createClient(SUPABASE_URL, SUPABASE_KEY);
+    }
   }
+  // Si definitivamente no se encuentra la librería en ningún rincón de la memoria:
+  if (!supabase) {
+    return alert("Error del Sistema: La librería externa de Supabase no ha sido detectada por el navegador. Asegúrate de estar usando Live Server o revisa la consola de desarrollador (F12).");
+  }
+
   const nombre = document.getElementById('input-nombre').value.trim() || "PLAYER";
   const codSala = document.getElementById('input-sala-id').value.trim().toUpperCase();
 
