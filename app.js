@@ -1,7 +1,7 @@
 // Configura aquí tus credenciales públicas de Supabase
 const SUPABASE_URL = "https://khvtshqmwklfcdrgjqqf.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtodnRzaHFtd2tsZmNkcmdqcXFmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY4ODM0OTMsImV4cCI6MjEwMjQ1OTQ5M30.p_RgbkcO-Y_a-ZeOMQwbCpP7RRE2viyYhkci2NY6qoY";
-const supabase = supabaseJS.createClient(SUPABASE_URL, SUPABASE_KEY);
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const elementosValidos = ['0','1','2','3','4','5','6','7','8','9','★','▲','■','●','◆','▼'];
 
