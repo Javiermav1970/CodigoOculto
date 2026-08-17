@@ -20,7 +20,12 @@ const elementosValidos = ['0','1','2','3','4','5','6','7','8','9','★','▲','�
 let estadoJuego = {
   modo: null, // 'pc' o 'multi'
   longitud: 4,
-
+  salaId: null,
+  miJugadorId: null,
+  miCodigo: null,
+  esMiTurno: false,
+  listaJugadores: []
+}; 
 // Navegación Básica
 function cambiarPantalla(id) {
   document.querySelectorAll('.pantalla').forEach(p => p.classList.remove('active'));
