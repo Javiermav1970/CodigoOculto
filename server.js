@@ -6,9 +6,11 @@ const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
 const cors = require('cors');
-
+const path = require('path');
 const app = express();
 app.use(cors()); // Permitir conexiones desde cualquier URL (importante para hosting gratuitos)
+
+app.use(express.static(path.join(__dirname, 'public')));  
 
 const server = http.createServer(app);
 // Configurar los WebSockets para aceptar tráficos remotos
