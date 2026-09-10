@@ -189,7 +189,7 @@ io.on('connection', (socket) => {
   sala.currentPlayerIndex = siguienteIndex;
 
   // OBTENER EL NOMBRE DEL JUGADOR QUE RECIBE EL TURNO
-  const proximoJugadorId de = sala.connectedPlayers[siguienteIndex].name;
+  const proximoJugadorId = sala.connectedPlayers[siguienteIndex].name;
   
   // RESET RESERVA: Limpiamos los bloqueos de objetivos para su nueva fase de ataques
   sala.playerTargetBlocks[proximoJugadorId] = [];
