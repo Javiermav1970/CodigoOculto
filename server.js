@@ -94,7 +94,7 @@ io.on('connection', (socket) => {
 
     // Notificar a todos en la sala que se enlazó un nuevo terminal
     io.to(roomCode).emit('actualizar_sala_jugadores', sala.connectedPlayers);
-    socket.emit('union_exitosa', { multiLength: sala.multiLength, limit: sala.limit });
+    socket.emit('unirse_sala', { roomCode: state.selectedRoomCode, username: state.username });
     console.log(`📡 Jugador [${username}] enlazado correctamente al nodo [${roomCode}]`);
   });
 
