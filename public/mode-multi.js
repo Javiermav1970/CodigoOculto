@@ -109,6 +109,10 @@ function configurarEscuchadoresRed() {
   if (!socket) return;
 
   // A. El servidor confirma que la sala del Host fue creada con éxito
+     // RECIBIR SALAS REALES DEL SERVIDOR
+  socket.on('lista_salas_actualizada', (salasReales) => {
+    import('./rooms.js').then(modulo => modulo.renderRoomsList(salasReales));
+  });
   socket.on('sala_creada_ok', (sala) => {
     state.connectedPlayers = sala.connectedPlayers;
     el.roomLiveCode.textContent = `SALA: ${sala.code}`;
