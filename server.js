@@ -66,7 +66,7 @@ io.on('connection', (socket) => {
     console.log(`🏢 Sala [${roomCode}] publicada con éxito por el Host [${username}]`);
   });
 
-  // 2. EVENTO: UNIRSE A SALA (Ejecutado por los Invitados)
+  // 2. EVENTO: UNIRSE A SALA (Ejecutado por los Invitados) - CORREGIDO
   socket.on('unirse_sala', (datos) => {
     const { roomCode, username } = datos;
     const sala = salasActivas[roomCode];
@@ -94,9 +94,12 @@ io.on('connection', (socket) => {
 
     // Notificar a todos en la sala que se enlazó un nuevo terminal
     io.to(roomCode).emit('actualizar_sala_jugadores', sala.connectedPlayers);
-    socket.emit('unirse_sala', { roomCode: state.selectedRoomCode, username: state.username });
+    
+    // CORRECCIÓN CRÍTICA: Enviar la confirmación correcta al invitado con los parámetros de la sala
+    socket.emit('union_exitosa', { multiLength: sala.multiLength, limit: sala.limit });
     console.log(`📡 Jugador [${username}] enlazado correctamente al nodo [${roomCode}]`);
   });
+
 
    // 3. EVENTO: BLOQUEAR CÓDIGO SECRETO (Actualizado)
   socket.on('confirmar_codigo_secreto', (datos) => {
