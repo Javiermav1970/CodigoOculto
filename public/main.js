@@ -200,18 +200,22 @@ el.connectSelectedBtn.addEventListener('click', () => {
   state.tipoPanel = "lobbyPanel"; 
   state.currentPlayerIndex = 0;  
 
-  // Buscar los datos de la sala real que seleccionó el invitado
+  // 1. CARGAR DATOS DE LA SALA SELECCIONADA
+  // Buscamos la sala real dentro del listado
   const salaSeleccionada = MOCK_ROOMS.find(r => r.code === state.selectedRoomCode);
   if (salaSeleccionada) {
-    state.multiLength = salaSeleccionada.len; 
-    // Si tu servidor envía también el límite de tiempo en la lista, lo asignamos aquí:
-    state.limit = salaSeleccionada.limit || 0; 
+    // Forzamos al estado global a tomar la longitud exacta de la sala
+    state.multiLength = parseInt(salaSeleccionada.len, 10); 
+    state.limit = parseInt(salaSeleccionada.limit, 10) || 0; 
     el.roomNameInput.value = `SERVER_${salaSeleccionada.host.toUpperCase()}`;
+  } else {
+    // Respaldo de seguridad si por red la sala demora en mapearse
+    state.multiLength = state.multiLength || 3;
   }
 
   state.mySecretCode = [];
 
-  // Bloquear campos de texto de la sala
+  // Bloquear e inhabilitar los campos de texto informativos de la sala
   el.roomNameInput.disabled = true;
   el.roomMaxPlayersInput.type = 'text';
   el.roomMaxPlayersInput.value = state.username.toUpperCase();
@@ -220,31 +224,52 @@ el.connectSelectedBtn.addEventListener('click', () => {
   const etiquetaMax = document.querySelector('label[for="roomMaxPlayersInput"]');
   if (etiquetaMax) etiquetaMax.textContent = "CODENAME DE RED:";
 
-  // 1 y 2. OCULTAR Y COMPORTAMIENTO DE SELECCIÓN (Dificultad y Límite de Tiempo)
-  // Ocultamos las filas de botones para que el invitado no pueda hacer clic ni cambiarlos
-  const diffContainer = document.querySelector('.diff-row') || el.multiDiffBtns[0]?.parentElement;
-  if (diffContainer) diffContainer.style.display = 'none';
-  if (el.multiCustomDiffBtn) el.multiCustomDiffBtn.style.display = 'none';
-
-  // Si tienes un contenedor para los botones de límite de tiempo en el HTML, lo ocultamos:
-  const limitContainer = el.multiLimitBtns[0]?.parentElement;
-  if (limitContainer) limitContainer.style.display = 'none';
-
-  // Opcional: Resaltar visualmente el botón que corresponde a la dificultad de la sala
-  el.multiDiffBtns.forEach(b => {
-    b.classList.toggle('active', parseInt(b.dataset.len, 10) === state.multiLength);
-  });
-  // Resaltar visualmente el botón del límite de tiempo elegido por el creador
-  if (el.multiLimitBtns) {
-    el.multiLimitBtns.forEach(b => {
-      b.classList.toggle('active', (parseInt(b.dataset.limit, 10) || 0) === state.limit);
+  // 2. FORZAR RESALTADO Y BLOQUEO TOTAL DE LOS BOTONES DE DIFICULTAD
+  if (el.multiDiffBtns) {
+    el.multiDiffBtns.forEach(b => {
+      const botonLen = parseInt(b.dataset.len, 10);
+      
+      if (botonLen === state.multiLength) {
+        b.classList.add('active'); // Resalta únicamente la dificultad de la sala
+      } else {
+        b.classList.remove('active');
+      }
+      
+      // DESHABILITAR CLIC: Bloqueamos los botones para que el invitado no pueda alterarlos
+      b.disabled = true;
+      b.style.pointerEvents = 'none'; 
+      b.style.opacity = '0.6';
     });
   }
 
-  // 3. GENERAR AUTOMÁTICAMENTE LOS SLOTS DE ACUERDO A LA SALA
+  // Deshabilitar e inactivar también el botón personalizado multijugador por seguridad
+  if (el.multiCustomDiffBtn) {
+    el.multiCustomDiffBtn.classList.remove('active');
+    el.multiCustomDiffBtn.disabled = true;
+    el.multiCustomDiffBtn.style.pointerEvents = 'none';
+    el.multiCustomDiffBtn.style.opacity = '0.5';
+  }
+  
+  if (el.multiCustomLenInput) {
+    el.multiCustomLenInput.disabled = true;
+  }
+
+  // 3. BLOQUEAR LOS BOTONES DE LÍMITE DE TIEMPO
+  if (el.multiLimitBtns) {
+    el.multiLimitBtns.forEach(b => {
+      const botonLimit = parseInt(b.dataset.limit, 10) || 0;
+      b.classList.toggle('active', botonLimit === state.limit);
+      
+      b.disabled = true;
+      b.style.pointerEvents = 'none';
+      b.style.opacity = '0.6';
+    });
+  }
+
+  // 4. DIBUJAR AUTOMÁTICAMENTE LOS SLOTS CON LA DIFICULTAD COMPARTIDA
   setMultiSetupMessage('Establece tu cifrado de acceso para ingresar a la terminal.', false);
-  crearSlots(); // Esta función leerá el state.multiLength heredado de la sala y creará los candados exactos
- 
+  
+  // Llamamos a crearSlots() asegurando que state.multiLength ya almacena la dificultad del creador
   el.multiLockCodeBtn.textContent = "🔒 INGRESO A RED";
   el.multiLockCodeBtn.disabled = false;
 
@@ -252,8 +277,10 @@ el.connectSelectedBtn.addEventListener('click', () => {
 
   el.lobbyPanel.classList.add('hidden');
   el.createRoomPanel.classList.remove('hidden');
+  crearSlots();
   buildKeypad(); 
 });
+
 
 
 el.vsIaBtn.addEventListener('click', () => {
