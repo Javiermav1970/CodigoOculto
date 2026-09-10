@@ -197,96 +197,68 @@ function timeUp() {
 el.connectSelectedBtn.addEventListener('click', () => {
   if (!state.selectedRoomCode) return;
 
+  // Buscar el elemento visual seleccionado en el menú para extraer su longitud real
+  const itemSeleccionadoHTML = el.roomsList.querySelector('.room-item.selected');
+  const salaSeleccionada = MOCK_ROOMS.find(r => r.code === state.selectedRoomCode);
+
+  if (itemSeleccionadoHTML) {
+    // 1. HEREDAR DIFICULTAD REAL DE FORMA ESTRICTA
+    state.multiLength = parseInt(itemSeleccionadoHTML.dataset.len, 10);
+    state.limit = salaSeleccionada ? parseInt(salaSeleccionada.limit, 10) || 0 : 0;
+  } else {
+    state.multiLength = salaSeleccionada ? parseInt(salaSeleccionada.len, 10) : 3;
+  }
+
   state.multiplayerHistory = [];
   state.selectedTargetFilter = null;
   state.decryptedPlayers = [];
   state.playerTargetBlocks = {};
   state.botMemory = {};
-  
   state.isHost = false; 
   state.tipoPanel = "lobbyPanel"; 
   state.currentPlayerIndex = 0;  
-
-  // 1. CARGAR DATOS DE LA SALA SELECCIONADA
-  // Buscamos la sala real dentro del listado
-  const salaSeleccionada = MOCK_ROOMS.find(r => r.code === state.selectedRoomCode);
-  if (salaSeleccionada) {
-    // Forzamos al estado global a tomar la longitud exacta de la sala
-    state.multiLength = parseInt(salaSeleccionada.len, 10); 
-    state.limit = parseInt(salaSeleccionada.limit, 10) || 0; 
-    el.roomNameInput.value = `SERVER_${salaSeleccionada.host.toUpperCase()}`;
-  } else {
-    // Respaldo de seguridad si por red la sala demora en mapearse
-    state.multiLength = state.multiLength || 3;
-  }
-
   state.mySecretCode = [];
 
-  // Bloquear e inhabilitar los campos de texto informativos de la sala
+  // Bloqueo estético de configuraciones de sala
   el.roomNameInput.disabled = true;
   el.roomMaxPlayersInput.type = 'text';
   el.roomMaxPlayersInput.value = state.username.toUpperCase();
   el.roomMaxPlayersInput.disabled = true; 
-  
-  const etiquetaMax = document.querySelector('label[for="roomMaxPlayersInput"]');
-  if (etiquetaMax) etiquetaMax.textContent = "CODENAME DE RED:";
 
-  // 2. FORZAR RESALTADO Y BLOQUEO TOTAL DE LOS BOTONES DE DIFICULTAD
+  // 2. CONGELAR VISUALMENTE LOS BOTONES DE DIFICULTAD MULTIJUGADOR
   if (el.multiDiffBtns) {
     el.multiDiffBtns.forEach(b => {
       const botonLen = parseInt(b.dataset.len, 10);
-      
-      if (botonLen === state.multiLength) {
-        b.classList.add('active'); // Resalta únicamente la dificultad de la sala
-      } else {
-        b.classList.remove('active');
-      }
-      
-      // DESHABILITAR CLIC: Bloqueamos los botones para que el invitado no pueda alterarlos
+      // Resalta únicamente el botón que coincide con la dificultad heredada
+      b.classList.toggle('active', botonLen === state.multiLength);
       b.disabled = true;
       b.style.pointerEvents = 'none'; 
       b.style.opacity = '0.6';
     });
   }
 
-  // Deshabilitar e inactivar también el botón personalizado multijugador por seguridad
   if (el.multiCustomDiffBtn) {
     el.multiCustomDiffBtn.classList.remove('active');
     el.multiCustomDiffBtn.disabled = true;
     el.multiCustomDiffBtn.style.pointerEvents = 'none';
     el.multiCustomDiffBtn.style.opacity = '0.5';
   }
-  
-  if (el.multiCustomLenInput) {
-    el.multiCustomLenInput.disabled = true;
-  }
 
-  // 3. BLOQUEAR LOS BOTONES DE LÍMITE DE TIEMPO
-  if (el.multiLimitBtns) {
-    el.multiLimitBtns.forEach(b => {
-      const botonLimit = parseInt(b.dataset.limit, 10) || 0;
-      b.classList.toggle('active', botonLimit === state.limit);
-      
-      b.disabled = true;
-      b.style.pointerEvents = 'none';
-      b.style.opacity = '0.6';
-    });
-  }
-
-  // 4. DIBUJAR AUTOMÁTICAMENTE LOS SLOTS CON LA DIFICULTAD COMPARTIDA
+  // 3. GENERAR SLOTS AUTOMÁTICOS BASADOS EN LA HERENCIA
   setMultiSetupMessage('Establece tu cifrado de acceso para ingresar a la terminal.', false);
   
-  // Llamamos a crearSlots() asegurando que state.multiLength ya almacena la dificultad del creador
+  // Ejecutamos la función: ahora que state.multiLength es el correcto (ej. 4), dibujará 4 slots exactos
+  
   el.multiLockCodeBtn.textContent = "🔒 INGRESO A RED";
   el.multiLockCodeBtn.disabled = false;
 
   if (el.forceStartMultiBtn) el.forceStartMultiBtn.classList.add('hidden');
-
   el.lobbyPanel.classList.add('hidden');
   el.createRoomPanel.classList.remove('hidden');
-  crearSlots();
+  crearSlots(); 
   buildKeypad(); 
 });
+
 
 
 
