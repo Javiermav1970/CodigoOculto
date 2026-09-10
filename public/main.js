@@ -398,57 +398,72 @@ el.sendBtn.addEventListener('click', submitGuess);
 el.StatusMultisendBtn.addEventListener('click', submitGuessMulti);
 
 el.backToLobbyFromCreateBtn.addEventListener('click', () => {
+  // 1. NOTIFICAR DESCONEXIÓN A LA RED (Si aplica)
+  // Si el usuario ya se había enlazado o bloqueado, cortamos de forma limpia el canal activo
+  if (socket && typeof abandonarPartidaMultijugador === 'function') {
+    abandonarPartidaMultijugador();
+  }
+
+  // 2. RESTAURAR CONFIGURACIÓN DE INPUTS MAESTROS
   el.roomNameInput.disabled = false;
   el.roomNameInput.value = '';
   el.roomMaxPlayersInput.type = 'number';
   el.roomMaxPlayersInput.disabled = false;
+  el.roomMaxPlayersInput.value = '2'; // Resetear al mínimo por defecto
   
-  etiquetaMax = document.querySelector('label[for="roomMaxPlayersInput"]');
-  if (etiquetaMax) etiquetaMax.textContent = "Límite de Hackers en partida";
+  // Corregir etiqueta de capacidad sin duplicar variables
+  let etiquetaMax = document.querySelector('label[for="roomMaxPlayersInput"]');
+  if (etiquetaMax) {
+    etiquetaMax.textContent = "Límite de Hackers en partida";
+  }
 
+  // 3. RESTAURAR BOTONES DE DIFICULTAD OCULTOS (Para el Modo Creación)
   const diffContainer = document.querySelector('.diff-row') || el.multiDiffBtns[0]?.parentElement;
   if (diffContainer) diffContainer.style.display = 'flex';
 
   if (el.multiCustomDiffBtn) el.multiCustomDiffBtn.style.display = 'block';
   
-  el.multiLockCodeBtn.textContent = "🔒 INICIAR PARTIDA";
-
-  if (el.forceStartMultiBtn) el.forceStartMultiBtn.classList.remove('hidden');
-  
-  el.createRoomPanel.classList.add('hidden');
-  el.lobbyPanel.classList.remove('hidden');
-
-    // RESTAURAR BOTONES DE DIFICULTAD PARA EL MODO CREACIÓN
   if (el.multiDiffBtns) {
     el.multiDiffBtns.forEach(b => {
       b.style.display = 'block'; // Volver a mostrarlos todos
+      b.classList.remove('active'); // Limpiar selecciones previas
       b.disabled = false;
       b.style.pointerEvents = 'auto';
       b.style.opacity = '1';
+      b.style.border = ''; // Quitar el borde de resalte informativo
     });
+    // Re-activar por defecto el primer botón de dificultad (Principiante/Estándar)
+    if (el.multiDiffBtns[0]) el.multiDiffBtns[0].classList.add('active');
   }
-  if (el.multiCustomDiffBtn) el.multiCustomDiffBtn.style.display = 'block';
-  if (el.multiCustomLenInput) el.multiCustomLenInput.style.display = 'block';
+  if (el.multiCustomLenInput) el.multiCustomLenInput.disabled = false;
 
-  // RESTAURAR BOTONES DE TIEMPO PARA EL MODO CREACIÓN
+  // 4. RESTAURAR BOTONES DE TIEMPO OCULTOS
   if (el.multiLimitBtns) {
     el.multiLimitBtns.forEach(b => {
-      b.style.display = 'block'; // Volver a mostrarlos todos
+      b.style.style.display = 'block'; // Volver a mostrarlos todos
+      b.classList.remove('active');
       b.disabled = false;
       b.style.pointerEvents = 'auto';
       b.style.opacity = '1';
     });
+    // Re-activar por defecto el primer límite de tiempo
+    if (el.multiLimitBtns[0]) el.multiLimitBtns[0].classList.add('active');
   }
 
-    // RESTAURAR LA CASILLA DE NÚMERO DE JUGADORES PARA EL MODO CREACIÓN
-  el.roomMaxPlayersInput.type = 'number';
-  el.roomMaxPlayersInput.value = '2'; // Valor por defecto al crear
-  el.roomMaxPlayersInput.disabled = false;
+  // 5. RESTABLECER LEYENDAS Y REDIRECCIÓN DE PANELES
+  el.multiLockCodeBtn.textContent = "🔒 INICIAR PARTIDA";
+  el.multiLockCodeBtn.disabled = false;
+  el.multiLockCodeBtn.style.pointerEvents = 'auto';
+  el.multiLockCodeBtn.style.opacity = '1';
+
+  if (el.forceStartMultiBtn) el.forceStartMultiBtn.classList.remove('hidden');
   
-  etiquetaMax = document.querySelector('label[for="roomMaxPlayersInput"]');
-  if (etiquetaMax) {
-    etiquetaMax.textContent = "Límite de Hackers en partida";
-  }
+  // Transición de regreso al menú de salas (Lobby)
+  el.createRoomPanel.classList.add('hidden');
+  el.lobbyPanel.classList.remove('hidden');
+
+  // Solicitar inmediatamente la lista actualizada de salas al servidor
+  if (socket) socket.emit('solicitar_lista_salas');
 });
 
   /* ---------- CAPTURA DE TECLADO FÍSICO ---------- */
