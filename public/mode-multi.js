@@ -173,6 +173,27 @@ function configurarEscuchadoresRed() {
     
     lanzarPartidaMultijugador("Conexión en tiempo real establecida.");
   });
+   
+  // El servidor le avisa al Host que los presentes ya guardaron sus claves y puede forzar el inicio
+  socket.on('habilitar_inicio_forzado', () => {
+    if (state.isHost && el.forceStartMultiBtn) {
+      el.forceStartMultiBtn.disabled = false;
+      el.forceStartMultiBtn.classList.remove('hidden'); // Asegurar que sea visible
+    }
+  });
+  if (el.forceStartMultiBtn) {
+     // Asegurarnos de que empiece desactivado hasta que el invitado configure su contraseña
+     el.forceStartMultiBtn.disabled = true; 
+
+     el.forceStartMultiBtn.addEventListener('click', () => {
+       if (!state.isHost || !socket) return;
+    
+       let roomName = el.roomNameInput.value.trim().toUpperCase() || `SERVER_${state.username.toUpperCase()}`;
+    
+       // Emitir la orden de arranque forzado a la nube
+       socket.emit('forzar_inicio_partida', { roomCode: roomName });
+     });
+   }
 }
 
 /**
