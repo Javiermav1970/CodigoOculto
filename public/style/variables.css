@@ -1,1 +1,51 @@
+/* =========================================================
+   CÓDIGO OCULTO - Capa de Variables y Configuración Global
+   ========================================================= */
+:root {
+  --bg: #0a0e14;
+  --bg-panel: #101720;
+  --bg-panel-2: #0d131b;
+  --border: #1e2a38;
+  --neon: #00f5d4;      /* Cian neón - principal */
+  --neon-2: #f637ec;    /* Magenta neón - acento */
+  --text: #d7e0ea;
+  --text-dim: #6b7c8f;
+  --ok: #00f5d4;        /* Posición correcta */
+  --warn: #ffb703;      /* Posición incorrecta */
+  --danger: #ff4d6d;
+  --radius: 12px;
+}
 
+* { 
+  box-sizing: border-box; 
+  margin: 0; 
+  padding: 0; 
+}
+
+html, body { 
+  background: var(--bg); 
+}
+
+body {
+  font-family: 'Courier New', ui-monospace, monospace;
+  color: var(--text);
+  min-height: 100vh;
+  padding: 16px;
+  display: flex;
+  justify-content: center;
+  background-image:
+    radial-gradient(circle at 15% 10%, rgba(0,245,212,0.08), transparent 40%),
+    radial-gradient(circle at 85% 90%, rgba(246,55,236,0.08), transparent 40%);
+}
+
+.app {
+  width: 100%;
+  max-width: 720px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.hidden { 
+  display: none !important; 
+}
