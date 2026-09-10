@@ -21,6 +21,10 @@ export function vincularEventosGraficosDeRed() {
   if (!socket) return;
 
   // A. Escuchar popups flotantes de ataques síncronos enviados por otros terminales
+     // RECIBIR SALAS REALES DEL SERVIDOR
+  socket.on('lista_salas_actualizada', (salasReales) => {
+    import('./rooms.js').then(modulo => modulo.renderRoomsList(salasReales));
+  });
   socket.on('popup_ataque_recibido', (datos) => {
     mostrarVentanaFlotanteAtaque(datos.emisor, datos.receptor, datos.codigo);
   });
