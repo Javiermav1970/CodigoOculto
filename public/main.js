@@ -39,15 +39,27 @@ export function vincularEventosGraficosDeRed() {
   // B. Sincronizar el historial de la bitácora unificada calculada en la nube
   socket.on('actualizar_bitacora_global', (datos) => {
     state.multiplayerHistory = datos.multiplayerHistory;
-    state.currentPlayerIndex = datos.currentPlayerIndex; // <--- Añadir esta línea para recibir el turno del servidor
+    state.currentPlayerIndex = datos.currentPlayerIndex;
   
-    // Refrescar paneles de espera/transmisión de inmediato
+    // CORRECCIÓN CLIENTE: Si el servidor indica que se deben limpiar los bloqueos de un jugador
+    if (datos.limpiarBloqueosPara) {
+      state.playerTargetBlocks[datos.limpiarBloqueosPara] = [];
+    }
+
+    // Si resulta que ahora es NUESTRO turno de transmisión, nos aseguramos de limpiar nuestros propios bloqueos locales
+    const jugadorActual = state.connectedPlayers[state.currentPlayerIndex];
+    if (jugadorActual && jugadorActual.name === state.username) {
+      state.playerTargetBlocks[state.username] = [];
+    }
+
+    // Refrescar paneles de espera/transmisión de inmediato con los nuevos estados de desbloqueo
     actualizarVisualSalaJugadores(); 
 
     if (state.selectedTargetFilter === datos.target) {
       renderizarBitacoraFiltrada();
     }
   });
+
 
   // C. Recibir notificaciones de vulnerabilidades críticas (Nodos quebrados)
   socket.on('nodo_comprometido_alerta', (datos) => {
