@@ -23,8 +23,15 @@ export function vincularEventosGraficosDeRed() {
   // A. Escuchar popups flotantes de ataques síncronos enviados por otros terminales
      // RECIBIR SALAS REALES DEL SERVIDOR
   socket.on('lista_salas_actualizada', (salasReales) => {
-    import('./rooms.js').then(modulo => modulo.renderRoomsList(salasReales));
-  });
+     // CORRECCIÓN CRÍTICA: Forzamos a que MOCK_ROOMS se actualice con los datos reales en memoria
+     import('./config.js').then(config => {
+       config.MOCK_ROOMS.length = 0; // Vaciamos el arreglo viejo de forma segura
+       salasReales.forEach(sala => config.MOCK_ROOMS.push(sala)); // Inyectamos las salas de Render
+     });
+
+     // Una vez actualizados los datos del juego, llamamos al dibujo de la interfaz
+     import('./rooms.js').then(modulo => modulo.renderRoomsList(salasReales));
+   });
   socket.on('popup_ataque_recibido', (datos) => {
     mostrarVentanaFlotanteAtaque(datos.emisor, datos.receptor, datos.codigo);
   });
