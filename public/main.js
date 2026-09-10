@@ -215,24 +215,31 @@ el.connectSelectedBtn.addEventListener('click', () => {
   // 1. HEREDAR NOMBRE DE LA SALA DE FORMA ESTRICTA Y VISIBLE
   const salaSeleccionada = MOCK_ROOMS.find(r => r.code === state.selectedRoomCode);
   if (salaSeleccionada) {
-    state.multiLength = parseInt(salaSeleccionada.len, 10); 
-    state.limit = parseInt(salaSeleccionada.limit, 10) || 0; 
-    
-    // CORRECCIÓN: Forzar a que el input muestre el nombre del servidor al que te estás enlazando
+    state.multiLength = parseInt(salaSeleccionada.len, 10);
+    state.limit = parseInt(salaSeleccionada.limit, 10) || 0;
+    // Guardamos también el límite máximo de la sala en el estado del invitado
+    state.maxPlayersAllowed = parseInt(salaSeleccionada.maxPlayers, 10) || 2; 
+
     el.roomNameInput.value = `SERVER_${salaSeleccionada.host.toUpperCase()}`;
+    
+    // CORRECCIÓN: En lugar de inyectar el nombre del invitado, mostramos la capacidad real heredada
+    el.roomMaxPlayersInput.type = 'text';
+    el.roomMaxPlayersInput.value = `${state.maxPlayersAllowed} HACKERS EN RED`;
   } else {
     state.multiLength = 3;
     el.roomNameInput.value = `SERVER_${state.selectedRoomCode}`;
+    el.roomMaxPlayersInput.value = `2 HACKERS EN RED`;
   }
 
-  // Bloquear e inhabilitar los campos para que no sean editables
+  // Congelar por completo ambos campos en modo lectura para el invitado
   el.roomNameInput.disabled = true;
-  el.roomMaxPlayersInput.type = 'text';
-  el.roomMaxPlayersInput.value = state.username.toUpperCase();
   el.roomMaxPlayersInput.disabled = true; 
 
+  // Ajustar la etiqueta lateral para que el texto sea coherente con el dato numérico
   const etiquetaMax = document.querySelector('label[for="roomMaxPlayersInput"]');
-  if (etiquetaMax) etiquetaMax.textContent = "CODENAME DE RED:";
+  if (etiquetaMax) {
+    etiquetaMax.textContent = "CAPACIDAD DEL NODO:";
+  }
 
 
   if (itemSeleccionadoHTML) {
@@ -260,16 +267,6 @@ el.connectSelectedBtn.addEventListener('click', () => {
   el.roomMaxPlayersInput.disabled = true; 
 
   // 3. CONGELAR VISUALMENTE LOS BOTONES DE DIFICULTAD MULTIJUGADOR
-  /*if (el.multiDiffBtns) {
-    el.multiDiffBtns.forEach(b => {
-      const botonLen = parseInt(b.dataset.len, 10);
-      // Resalta únicamente el botón que coincide con la dificultad heredada
-      b.classList.toggle('active', botonLen === state.multiLength);
-      b.disabled = true;
-      b.style.pointerEvents = 'none'; 
-      b.style.opacity = '0.6';
-    });
-  }*/
   if (el.multiDiffBtns) {
     el.multiDiffBtns.forEach(b => {
       const botonLen = parseInt(b.dataset.len, 10);
@@ -288,32 +285,11 @@ el.connectSelectedBtn.addEventListener('click', () => {
       }
     });
   }
-  /*if (el.multiCustomDiffBtn) {
-    el.multiCustomDiffBtn.classList.remove('active');
-    el.multiCustomDiffBtn.disabled = true;
-    el.multiCustomDiffBtn.style.pointerEvents = 'none';
-    el.multiCustomDiffBtn.style.opacity = '0.5';
-  }*/
   // Ocultar también el botón de dificultad personalizada y su input por completo
   if (el.multiCustomDiffBtn) el.multiCustomDiffBtn.style.display = 'none';
   if (el.multiCustomLenInput) el.multiCustomLenInput.style.display = 'none';
 
-// >> INYECTA ESTE NUEVO BLOQUE JUSTO AQUÍ <<
-  // 4. CONGELAR VISUALMENTE LOS BOTONES DE LÍMITE DE TIEMPO PARA EL INVITADO
-  /*if (el.multiLimitBtns) {
-    el.multiLimitBtns.forEach(b => {
-      const botonLimit = parseInt(b.dataset.limit, 10) || 0;
-      
-      // Resalta visualmente de forma fija el botón exacto que configuró el creador
-      b.classList.toggle('active', botonLimit === state.limit);
-      
-      // Apagamos la interacción por completo
-      b.disabled = true;
-      b.style.pointerEvents = 'none';
-      b.style.opacity = '0.5'; // Tonalidad opaca estilo "bloqueado"
-    });
-  }*/
-  // 3. PURIFICACIÓN VISUAL DE LÍMITE DE TIEMPO PARA EL INVITADO
+  // 4. PURIFICACIÓN VISUAL DE LÍMITE DE TIEMPO PARA EL INVITADO
   if (el.multiLimitBtns) {
     el.multiLimitBtns.forEach(b => {
       const botonLimit = parseInt(b.dataset.limit, 10) || 0;
@@ -444,7 +420,7 @@ el.backToLobbyFromCreateBtn.addEventListener('click', () => {
   el.roomMaxPlayersInput.type = 'number';
   el.roomMaxPlayersInput.disabled = false;
   
-  const etiquetaMax = document.querySelector('label[for="roomMaxPlayersInput"]');
+  etiquetaMax = document.querySelector('label[for="roomMaxPlayersInput"]');
   if (etiquetaMax) etiquetaMax.textContent = "Límite de Hackers en partida";
 
   const diffContainer = document.querySelector('.diff-row') || el.multiDiffBtns[0]?.parentElement;
@@ -479,6 +455,16 @@ el.backToLobbyFromCreateBtn.addEventListener('click', () => {
       b.style.pointerEvents = 'auto';
       b.style.opacity = '1';
     });
+  }
+
+    // RESTAURAR LA CASILLA DE NÚMERO DE JUGADORES PARA EL MODO CREACIÓN
+  el.roomMaxPlayersInput.type = 'number';
+  el.roomMaxPlayersInput.value = '2'; // Valor por defecto al crear
+  el.roomMaxPlayersInput.disabled = false;
+  
+  etiquetaMax = document.querySelector('label[for="roomMaxPlayersInput"]');
+  if (etiquetaMax) {
+    etiquetaMax.textContent = "Límite de Hackers en partida";
   }
 });
 
