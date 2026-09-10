@@ -20,8 +20,9 @@ export function renderRoomsList(rooms) {
     return;
   }
 
+  // AGREGAMOS data-len="${room.len}" AL DIV CONTENEDOR
   el.roomsList.innerHTML = rooms.map(room => `
-    <div class="room-item" data-code="${room.code}"> 
+    <div class="room-item" data-code="${room.code}" data-len="${room.len}"> 
       <span class="room-host">${room.host} <span class="room-details">(${room.code})</span></span> 
       <span class="room-details">Dificultad: ${room.len} el.</span> 
     </div>
