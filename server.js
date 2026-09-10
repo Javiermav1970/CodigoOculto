@@ -98,7 +98,7 @@ io.on('connection', (socket) => {
     console.log(`📡 Jugador [${username}] enlazado correctamente al nodo [${roomCode}]`);
   });
 
-  // 3. EVENTO: BLOQUEAR CÓDIGO SECRETO
+   // 3. EVENTO: BLOQUEAR CÓDIGO SECRETO (Actualizado)
   socket.on('confirmar_codigo_secreto', (datos) => {
     const { roomCode, username, secretCode } = datos;
     const sala = salasActivas[roomCode];
@@ -110,19 +110,44 @@ io.on('connection', (socket) => {
       console.log(`🔒 Cifrado establecido para [${username}] en sala [${roomCode}]`);
     }
 
-    // Verificar si TODOS los jugadores reales conectados ya guardaron su clave secreta
+    // Verificar si TODOS los jugadores que están actualmente en la sala ya guardaron su clave
     const todosListos = sala.connectedPlayers.every(p => p.secretCode !== null);
     
-    // Si es una sala de 2 y ya están ambos listos, o si el Host decide forzar con el mínimo configurado
+    // CONDICIÓN A: Si la sala ya se llenó al límite programado Y todos están listos -> ARRANCAR AUTOMÁTICAMENTE
+    if (todosListos && sala.connectedPlayers.length >= sala.maxPlayers) {
+      io.to(roomCode).emit('partida_lista_para_lanzar', {
+        connectedPlayers: sala.connectedPlayers,
+        currentPlayerIndex: sala.currentPlayerIndex
+      });
+      console.log(`🎮 PARTIDA AUTO-INICIADA: Sala [${roomCode}] completa y sincronizada.`);
+    } else if (todosListos) {
+      // Si están listos pero aún faltan jugadores para llenar la sala, le avisamos al Host 
+      // que ya puede presionar su botón de inicio forzado de manera segura.
+      const host = sala.connectedPlayers.find(p => p.isHost);
+      if (host) {
+        io.to(host.id).emit('habilitar_inicio_forzado');
+      }
+    }
+  });
+
+  // NUEVO EVENTO: INICIO FORZADO POR EL HOST
+  socket.on('forzar_inicio_partida', (datos) => {
+    const { roomCode } = datos;
+    const sala = salasActivas[roomCode];
+    if (!sala) return;
+
+    // Verificar que al menos estén listos el Host y un invitado (mínimo 2 jugadores)
+    const todosListos = sala.connectedPlayers.every(p => p.secretCode !== null);
+
     if (todosListos && sala.connectedPlayers.length >= 2) {
       io.to(roomCode).emit('partida_lista_para_lanzar', {
         connectedPlayers: sala.connectedPlayers,
         currentPlayerIndex: sala.currentPlayerIndex
       });
-      console.log(`🎮 PROTOCOLO DE JUEGO ACTIVADO: Todos los terminales de la sala [${roomCode}] están sincronizados.`);
+      console.log(`⚡ PARTIDA INICIADA FORZOSAMENTE por el Host en la sala [${roomCode}].`);
     }
   });
-
+   
   // 4. EVENTO: PROCESAR INTENTO DE ATAQUE EN TIEMPO REAL
   socket.on('inyectar_ataque', (datos) => {
   const { roomCode, atacante, objetivo, guess } = datos;
