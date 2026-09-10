@@ -108,29 +108,26 @@ el.multiLockCodeBtn.addEventListener('click', () => {
 function configurarEscuchadoresRed() {
   if (!socket) return;
 
-  // A. El servidor confirma que la sala del Host fue creada con éxito
-     // RECIBIR SALAS REALES DEL SERVIDOR
-   socket.on('lista_salas_actualizada', (salasReales) => {
-     // CORRECCIÓN CRÍTICA: Forzamos a que MOCK_ROOMS se actualice con los datos reales en memoria
-     import('./config.js').then(config => {
-       config.MOCK_ROOMS.length = 0; // Vaciamos el arreglo viejo de forma segura
-       salasReales.forEach(sala => config.MOCK_ROOMS.push(sala)); // Inyectamos las salas de Render
-     });
+  // A. Sincronizar listado de salas
+  socket.on('lista_salas_actualizada', (salasReales) => {
+    import('./config.js').then(config => {
+      config.MOCK_ROOMS.length = 0;
+      salasReales.forEach(sala => config.MOCK_ROOMS.push(sala));
+    });
+    import('./rooms.js').then(modulo => modulo.renderRoomsList(salasReales));
+  });
 
-     // Una vez actualizados los datos del juego, llamamos al dibujo de la interfaz
-     import('./rooms.js').then(modulo => modulo.renderRoomsList(salasReales));
-   });
+  // B. Confirmación de creación para el Host
   socket.on('sala_creada_ok', (sala) => {
     state.connectedPlayers = sala.connectedPlayers;
     el.roomLiveCode.textContent = `SALA: ${sala.code}`;
-    setMultiSetupMessage("✔ SALA PUBLICADA. Esperando conexiones de adversarios...", false);
+    setMultiSetupMessage("✔ SALA PUBLICADA. Esperando cifrados adversarios...", false);
     
     buildKeypad();
     crearSlots();
     refreshKeypad();
     renderConnectedPlayers();
 
-    // Notificar al servidor tu código secreto inmediatamente
     socket.emit('confirmar_codigo_secreto', {
       roomCode: sala.code,
       username: state.username,
@@ -138,13 +135,13 @@ function configurarEscuchadoresRed() {
     });
   });
 
-  // B. El servidor confirma al Invitado que el acceso fue concedido
+  // C. Confirmación de acceso concedido para el Invitado
   socket.on('union_exitosa', (datos) => {
     state.multiLength = datos.multiLength;
     state.limit = datos.limit;
-    setMultiSetupMessage("✔ ENLAZADO. Esperando confirmaciones de cifrado...", false);
+    setMultiSetupMessage("✔ ENLAZADO. Transmitiendo clave de acceso...", false);
 
-    // Enviar tu código secreto para que el servidor valide de forma segura
+    // Al recibir esta señal, el invitado envía inmediatamente su contraseña elegida
     socket.emit('confirmar_codigo_secreto', {
       roomCode: state.selectedRoomCode,
       username: state.username,
@@ -152,49 +149,55 @@ function configurarEscuchadoresRed() {
     });
   });
 
-  // C. El servidor actualiza la lista de jugadores conectados en tiempo real
+  // D. Sincronizar hackers conectados
   socket.on('actualizar_sala_jugadores', (jugadores) => {
     state.connectedPlayers = jugadores;
     renderConnectedPlayers();
     actualizarVisualSalaJugadores();
   });
 
-  // D. Ocurrió un error de red (Sala llena, no existe, etc.)
   socket.on('error_red', (mensaje) => {
     alert(mensaje);
     state.isCodeLocked = false;
     setMultiSetupMessage(mensaje, true);
   });
 
-  // E. El servidor da la orden de arranque cuando todos los clientes ingresaron sus claves
+  // E. ACTIVACIÓN GLOBAL DE LA PARTIDA (Automático o Forzado)
   socket.on('partida_lista_para_lanzar', (datos) => {
     state.connectedPlayers = datos.connectedPlayers;
     state.currentPlayerIndex = datos.currentPlayerIndex;
-    
-    lanzarPartidaMultijugador("Conexión en tiempo real establecida.");
+    lanzarPartidaMultijugador("Conexión establecida.");
   });
    
-  // El servidor le avisa al Host que los presentes ya guardaron sus claves y puede forzar el inicio
+  // F. Permitir al Host forzar el inicio
   socket.on('habilitar_inicio_forzado', () => {
     if (state.isHost && el.forceStartMultiBtn) {
       el.forceStartMultiBtn.disabled = false;
-      el.forceStartMultiBtn.classList.remove('hidden'); // Asegurar que sea visible
+      el.forceStartMultiBtn.classList.remove('hidden');
     }
   });
-  if (el.forceStartMultiBtn) {
-     // Asegurarnos de que empiece desactivado hasta que el invitado configure su contraseña
-     el.forceStartMultiBtn.disabled = true; 
 
-     el.forceStartMultiBtn.addEventListener('click', () => {
-       if (!state.isHost || !socket) return;
+  // ASOCIACIÓN GARANTIZADA DEL BOTÓN DE INICIO FORZADO
+  if (el.forceStartMultiBtn) {
+    // Limpiar cualquier escuchador antiguo clonando el botón para evitar doble envío
+    const clonBoton = el.forceStartMultiBtn.cloneNode(true);
+    el.forceStartMultiBtn.parentNode.replaceChild(clonBoton, el.forceStartMultiBtn);
+    el.forceStartMultiBtn = clonBoton;
+
+    el.forceStartMultiBtn.disabled = !state.isHost; 
     
-       let roomName = el.roomNameInput.value.trim().toUpperCase() || `SERVER_${state.username.toUpperCase()}`;
-    
-       // Emitir la orden de arranque forzado a la nube
-       socket.emit('forzar_inicio_partida', { roomCode: roomName });
-     });
-   }
+    el.forceStartMultiBtn.addEventListener('click', () => {
+      if (!state.isHost || !socket) return;
+      // Extraer el código activo de la sala directamente del elemento de interfaz
+      let roomName = el.roomLiveCode.textContent.replace('SALA:', '').trim();
+      if (!roomName || roomName === "PENDIENTE") {
+         roomName = el.roomNameInput.value.trim().toUpperCase() || `SERVER_${state.username.toUpperCase()}`;
+      }
+      socket.emit('forzar_inicio_partida', { roomCode: roomName });
+    });
+  }
 }
+
 
 /**
  * Remueve al jugador de la transmisión y cierra la conexión del terminal de forma limpia
