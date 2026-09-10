@@ -255,8 +255,24 @@ el.connectSelectedBtn.addEventListener('click', () => {
     el.multiCustomDiffBtn.style.pointerEvents = 'none';
     el.multiCustomDiffBtn.style.opacity = '0.5';
   }
+  
+// >> INYECTA ESTE NUEVO BLOQUE JUSTO AQUÍ <<
+  // 3. CONGELAR VISUALMENTE LOS BOTONES DE LÍMITE DE TIEMPO PARA EL INVITADO
+  if (el.multiLimitBtns) {
+    el.multiLimitBtns.forEach(b => {
+      const botonLimit = parseInt(b.dataset.limit, 10) || 0;
+      
+      // Resalta visualmente de forma fija el botón exacto que configuró el creador
+      b.classList.toggle('active', botonLimit === state.limit);
+      
+      // Apagamos la interacción por completo
+      b.disabled = true;
+      b.style.pointerEvents = 'none';
+      b.style.opacity = '0.5'; // Tonalidad opaca estilo "bloqueado"
+    });
+  }
 
-  // 3. GENERAR SLOTS AUTOMÁTICOS BASADOS EN LA HERENCIA
+  // 4. GENERAR SLOTS AUTOMÁTICOS BASADOS EN LA HERENCIA
   setMultiSetupMessage('Establece tu cifrado de acceso para ingresar a la terminal.', false);
   
   // Ejecutamos la función: ahora que state.multiLength es el correcto (ej. 4), dibujará 4 slots exactos
@@ -270,9 +286,6 @@ el.connectSelectedBtn.addEventListener('click', () => {
   crearSlots(); 
   buildKeypad(); 
 });
-
-
-
 
 el.vsIaBtn.addEventListener('click', () => {
   state.username = el.usernameInput.value.trim() || 'Hacker';

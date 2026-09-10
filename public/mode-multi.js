@@ -198,7 +198,6 @@ function configurarEscuchadoresRed() {
   }
 }
 
-
 /**
  * Remueve al jugador de la transmisión y cierra la conexión del terminal de forma limpia
  */
@@ -215,11 +214,13 @@ export function abandonarPartidaMultijugador() {
   actualizarVisualSalaJugadores();
 }
 
-// Vincular los selectores de límite de tiempo para el modo multijugador
+// Vincular los selectores de límite de tiempo para el modo multijugador (ACTUALIZADO)
 if (el.multiLimitBtns) {
   el.multiLimitBtns.forEach(btn => {
     btn.addEventListener('click', () => {
-      if (state.isCodeLocked) return;
+      // MEDIDA DE SEGURIDAD ESTRICTA: Si la clave ya está bloqueada o NO eres el creador, abortar
+      if (state.isCodeLocked || !state.isHost) return;
+      
       el.multiLimitBtns.forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       
@@ -234,3 +235,4 @@ if (el.multiLimitBtns) {
     });
   });
 }
+
