@@ -260,7 +260,7 @@ el.connectSelectedBtn.addEventListener('click', () => {
   el.roomMaxPlayersInput.disabled = true; 
 
   // 3. CONGELAR VISUALMENTE LOS BOTONES DE DIFICULTAD MULTIJUGADOR
-  if (el.multiDiffBtns) {
+  /*if (el.multiDiffBtns) {
     el.multiDiffBtns.forEach(b => {
       const botonLen = parseInt(b.dataset.len, 10);
       // Resalta únicamente el botón que coincide con la dificultad heredada
@@ -269,18 +269,38 @@ el.connectSelectedBtn.addEventListener('click', () => {
       b.style.pointerEvents = 'none'; 
       b.style.opacity = '0.6';
     });
+  }*/
+  if (el.multiDiffBtns) {
+    el.multiDiffBtns.forEach(b => {
+      const botonLen = parseInt(b.dataset.len, 10);
+      
+      // Si el botón coincide con la dificultad heredada, lo dejamos visible y estilizado
+      if (botonLen === state.multiLength) {
+        b.style.display = 'block'; // Aseguramos que sea visible
+        b.classList.add('active');
+        b.disabled = true;
+        b.style.pointerEvents = 'none';
+        b.style.opacity = '1'; // Opacidad total porque es un dato informativo real
+        b.style.border = '1px solid var(--neon)'; // Opcional: un toque estético de resalte
+      } else {
+        // ¡OCULTACIÓN TOTAL! Si no corresponde, desaparece de la pantalla
+        b.style.display = 'none';
+      }
+    });
   }
-
-  if (el.multiCustomDiffBtn) {
+  /*if (el.multiCustomDiffBtn) {
     el.multiCustomDiffBtn.classList.remove('active');
     el.multiCustomDiffBtn.disabled = true;
     el.multiCustomDiffBtn.style.pointerEvents = 'none';
     el.multiCustomDiffBtn.style.opacity = '0.5';
-  }
+  }*/
+  // Ocultar también el botón de dificultad personalizada y su input por completo
+  if (el.multiCustomDiffBtn) el.multiCustomDiffBtn.style.display = 'none';
+  if (el.multiCustomLenInput) el.multiCustomLenInput.style.display = 'none';
 
 // >> INYECTA ESTE NUEVO BLOQUE JUSTO AQUÍ <<
   // 4. CONGELAR VISUALMENTE LOS BOTONES DE LÍMITE DE TIEMPO PARA EL INVITADO
-  if (el.multiLimitBtns) {
+  /*if (el.multiLimitBtns) {
     el.multiLimitBtns.forEach(b => {
       const botonLimit = parseInt(b.dataset.limit, 10) || 0;
       
@@ -292,8 +312,25 @@ el.connectSelectedBtn.addEventListener('click', () => {
       b.style.pointerEvents = 'none';
       b.style.opacity = '0.5'; // Tonalidad opaca estilo "bloqueado"
     });
+  }*/
+  // 3. PURIFICACIÓN VISUAL DE LÍMITE DE TIEMPO PARA EL INVITADO
+  if (el.multiLimitBtns) {
+    el.multiLimitBtns.forEach(b => {
+      const botonLimit = parseInt(b.dataset.limit, 10) || 0;
+      
+      // Si coincide con el límite real de la sala, lo dejamos visible
+      if (botonLimit === state.limit) {
+        b.style.display = 'block';
+        b.classList.add('active');
+        b.disabled = true;
+        b.style.pointerEvents = 'none';
+        b.style.opacity = '1';
+      } else {
+        // ¡OCULTACIÓN TOTAL! Los demás tiempos desaparecen
+        b.style.display = 'none';
+      }
+    });
   }
-
   // 5. GENERAR SLOTS AUTOMÁTICOS BASADOS EN LA HERENCIA
   setMultiSetupMessage('Establece tu cifrado de acceso para ingresar a la terminal.', false);
   
@@ -421,6 +458,28 @@ el.backToLobbyFromCreateBtn.addEventListener('click', () => {
   
   el.createRoomPanel.classList.add('hidden');
   el.lobbyPanel.classList.remove('hidden');
+
+    // RESTAURAR BOTONES DE DIFICULTAD PARA EL MODO CREACIÓN
+  if (el.multiDiffBtns) {
+    el.multiDiffBtns.forEach(b => {
+      b.style.display = 'block'; // Volver a mostrarlos todos
+      b.disabled = false;
+      b.style.pointerEvents = 'auto';
+      b.style.opacity = '1';
+    });
+  }
+  if (el.multiCustomDiffBtn) el.multiCustomDiffBtn.style.display = 'block';
+  if (el.multiCustomLenInput) el.multiCustomLenInput.style.display = 'block';
+
+  // RESTAURAR BOTONES DE TIEMPO PARA EL MODO CREACIÓN
+  if (el.multiLimitBtns) {
+    el.multiLimitBtns.forEach(b => {
+      b.style.display = 'block'; // Volver a mostrarlos todos
+      b.disabled = false;
+      b.style.pointerEvents = 'auto';
+      b.style.opacity = '1';
+    });
+  }
 });
 
   /* ---------- CAPTURA DE TECLADO FÍSICO ---------- */
