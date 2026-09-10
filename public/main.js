@@ -517,7 +517,7 @@ import { inicializarConexionSocket } from './mode-multi.js';
 
 // Conectarse de forma local al puerto 3000 de Node.js
 // Nota: Cuando subamos el servidor a Render.com, solo cambiaremos esta URL por la pública gratuita.
-const urlServidorPruebas = "http://localhost:3000";
+const urlServidorPruebas = "https://codigooculto-v1kw.onrender.com";
 const instanciaSocket = io(urlServidorPruebas);
 
 // Compartir el canal activo e inicializar los escuchadores gráficos que acabamos de configurar
