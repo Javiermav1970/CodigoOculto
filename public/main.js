@@ -253,6 +253,8 @@ el.vsPlayerBtn.addEventListener('click', () => {
   el.modePanel.classList.add('hidden');
   el.lobbyPanel.classList.remove('hidden');
   renderRoomsList(MOCK_ROOMS);
+  renderRoomsList([]); // Limpia la lista vieja primero
+  if (socket) socket.emit('solicitar_lista_salas'); // <--- Pide las salas reales al servidor de inmediato
 });
 
 el.createRoomBtn.addEventListener('click', () => {
