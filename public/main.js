@@ -209,47 +209,22 @@ function timeUp() {
 el.connectSelectedBtn.addEventListener('click', () => {
   if (!state.selectedRoomCode) return;
 
-  // Buscar el elemento visual seleccionado en el menú para extraer su longitud real
+  // 1. EXTRAER DE FORMA ESTRICTA LOS DATOS REALES DE LA SALA SELECCIONADA
   const itemSeleccionadoHTML = el.roomsList.querySelector('.room-item.selected');
-  
-  // 1. HEREDAR NOMBRE DE LA SALA DE FORMA ESTRICTA Y VISIBLE
   const salaSeleccionada = MOCK_ROOMS.find(r => r.code === state.selectedRoomCode);
-  if (salaSeleccionada) {
-    state.multiLength = parseInt(salaSeleccionada.len, 10);
-    state.limit = parseInt(salaSeleccionada.limit, 10) || 0;
-    // Guardamos también el límite máximo de la sala en el estado del invitado
-    state.maxPlayersAllowed = parseInt(salaSeleccionada.maxPlayers, 10) || 2; 
-
-    el.roomNameInput.value = `SERVER_${salaSeleccionada.host.toUpperCase()}`;
-    
-    // CORRECCIÓN: En lugar de inyectar el nombre del invitado, mostramos la capacidad real heredada
-    el.roomMaxPlayersInput.type = 'text';
-    el.roomMaxPlayersInput.value = `${state.maxPlayersAllowed} HACKERS EN RED`;
-  } else {
-    state.multiLength = 3;
-    el.roomNameInput.value = `SERVER_${state.selectedRoomCode}`;
-    el.roomMaxPlayersInput.value = `2 HACKERS EN RED`;
-  }
-
-  // Congelar por completo ambos campos en modo lectura para el invitado
-  el.roomNameInput.disabled = true;
-  el.roomMaxPlayersInput.disabled = true; 
-
-  // Ajustar la etiqueta lateral para que el texto sea coherente con el dato numérico
-  const etiquetaMax = document.querySelector('label[for="roomMaxPlayersInput"]');
-  if (etiquetaMax) {
-    etiquetaMax.textContent = "CAPACIDAD DEL NODO:";
-  }
-
 
   if (itemSeleccionadoHTML) {
-    // 2. HEREDAR DIFICULTAD REAL DE FORMA ESTRICTA
     state.multiLength = parseInt(itemSeleccionadoHTML.dataset.len, 10);
     state.limit = salaSeleccionada ? parseInt(salaSeleccionada.limit, 10) || 0 : 0;
   } else {
     state.multiLength = salaSeleccionada ? parseInt(salaSeleccionada.len, 10) : 3;
+    state.limit = salaSeleccionada ? parseInt(salaSeleccionada.limit, 10) || 0 : 0;
   }
 
+  // Guardar la capacidad máxima real configurada en la nube
+  state.maxPlayersAllowed = salaSeleccionada ? (parseInt(salaSeleccionada.maxPlayers, 10) || 2) : 2;
+
+  // Resetear estados del cliente para la nueva sesión de red
   state.multiplayerHistory = [];
   state.selectedTargetFilter = null;
   state.decryptedPlayers = [];
@@ -260,32 +235,43 @@ el.connectSelectedBtn.addEventListener('click', () => {
   state.currentPlayerIndex = 0;  
   state.mySecretCode = [];
 
-  // Bloqueo estético de configuraciones de sala
-  el.roomNameInput.disabled = true;
+  // 2. INYECTAR DATOS HEREDADOS EN LOS CAMPOS DE LA INTERFAZ
+  if (salaSeleccionada) {
+    el.roomNameInput.value = `SERVER_${salaSeleccionada.host.toUpperCase()}`;
+  } else {
+    el.roomNameInput.value = `SERVER_${state.selectedRoomCode}`;
+  }
+
+  // CORRECCIÓN MAGISTRAL: Fijamos el número de hackers y eliminamos la sobreescritura de state.username
   el.roomMaxPlayersInput.type = 'text';
-  el.roomMaxPlayersInput.value = state.username.toUpperCase();
+  el.roomMaxPlayersInput.value = `${state.maxPlayersAllowed} HACKERS EN RED`;
+
+  // Congelar por completo ambos campos informativos en modo lectura
+  el.roomNameInput.disabled = true;
   el.roomMaxPlayersInput.disabled = true; 
 
-  // 3. CONGELAR VISUALMENTE LOS BOTONES DE DIFICULTAD MULTIJUGADOR
+  // Ajustar etiqueta lateral de forma limpia (Reutilizando la variable del ámbito superior sin duplicar const)
+  let etiquetaMax = document.querySelector('label[for="roomMaxPlayersInput"]');
+  if (etiquetaMax) {
+    etiquetaMax.textContent = "CAPACIDAD DEL NODO:";
+  }
+
+  // 3. PURIFICACIÓN VISUAL DE DIFICULTADES MULTIJUGADOR PARA EL INVITADO
   if (el.multiDiffBtns) {
     el.multiDiffBtns.forEach(b => {
       const botonLen = parseInt(b.dataset.len, 10);
-      
-      // Si el botón coincide con la dificultad heredada, lo dejamos visible y estilizado
       if (botonLen === state.multiLength) {
-        b.style.display = 'block'; // Aseguramos que sea visible
+        b.style.display = 'block'; 
         b.classList.add('active');
         b.disabled = true;
         b.style.pointerEvents = 'none';
-        b.style.opacity = '1'; // Opacidad total porque es un dato informativo real
-        b.style.border = '1px solid var(--neon)'; // Opcional: un toque estético de resalte
+        b.style.opacity = '1';
+        b.style.border = '1px solid var(--neon)'; 
       } else {
-        // ¡OCULTACIÓN TOTAL! Si no corresponde, desaparece de la pantalla
         b.style.display = 'none';
       }
     });
   }
-  // Ocultar también el botón de dificultad personalizada y su input por completo
   if (el.multiCustomDiffBtn) el.multiCustomDiffBtn.style.display = 'none';
   if (el.multiCustomLenInput) el.multiCustomLenInput.style.display = 'none';
 
@@ -293,8 +279,6 @@ el.connectSelectedBtn.addEventListener('click', () => {
   if (el.multiLimitBtns) {
     el.multiLimitBtns.forEach(b => {
       const botonLimit = parseInt(b.dataset.limit, 10) || 0;
-      
-      // Si coincide con el límite real de la sala, lo dejamos visible
       if (botonLimit === state.limit) {
         b.style.display = 'block';
         b.classList.add('active');
@@ -302,15 +286,13 @@ el.connectSelectedBtn.addEventListener('click', () => {
         b.style.pointerEvents = 'none';
         b.style.opacity = '1';
       } else {
-        // ¡OCULTACIÓN TOTAL! Los demás tiempos desaparecen
         b.style.display = 'none';
       }
     });
   }
-  // 5. GENERAR SLOTS AUTOMÁTICOS BASADOS EN LA HERENCIA
+
+  // 5. CONFIGURAR MENSAJES Y DIBUJAR ESTRUCTURA DE RANURAS REACCIONANDO A LA HERENCIA
   setMultiSetupMessage('Establece tu cifrado de acceso para ingresar a la terminal.', false);
-  
-  // Ejecutamos la función: ahora que state.multiLength es el correcto (ej. 4), dibujará 4 slots exactos
   
   el.multiLockCodeBtn.textContent = "🔒 INGRESO A RED";
   el.multiLockCodeBtn.disabled = false;
@@ -318,7 +300,8 @@ el.connectSelectedBtn.addEventListener('click', () => {
   if (el.forceStartMultiBtn) el.forceStartMultiBtn.classList.add('hidden');
   el.lobbyPanel.classList.add('hidden');
   el.createRoomPanel.classList.remove('hidden');
-  crearSlots(); 
+  
+  crearSlots(); // Dibujará la cantidad exacta heredada
   buildKeypad(); 
 });
 
