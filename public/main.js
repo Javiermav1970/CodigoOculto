@@ -299,7 +299,9 @@ el.createRoomBtn.addEventListener('click', () => {
 });
 
 /* ---------- BOTONES ADICIONALES DE RETORNO Y CONTROL ---------- */
-el.refreshRoomsBtn.addEventListener('click', () => renderRoomsList(MOCK_ROOMS));
+el.refreshRoomsBtn.addEventListener('click', () => {
+  if (socket) socket.emit('solicitar_lista_salas');
+});
 el.backToModeBtn.addEventListener('click', () => { 
   el.setupPanel.classList.add('hidden'); 
   el.modePanel.classList.remove('hidden'); 
