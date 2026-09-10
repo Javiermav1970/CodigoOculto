@@ -7,11 +7,7 @@ export const RECORDS_KEY = 'codigoOculto.records';
 // Helper: saber si un elemento es figura (para estilos)
 export const isFigure = (v) => FIGURES.includes(v);
 
-export const MOCK_ROOMS = [
-  { code: 'X9F2R', host: 'CYBER_GHOST', len: 4 },
-  { code: 'K3L7P', host: 'NEO_VANDAL', len: 5 },
-  { code: 'B8W1M', host: 'ALPHA_ZERO', len: 3 }
-];
+export const MOCK_ROOMS = [];
 
 export const NOMBRES_POOL = [
   'ANON_MOUS', 'GHOST_RIDER', 'CYBER_PUNK', 'DARK_NET', 
