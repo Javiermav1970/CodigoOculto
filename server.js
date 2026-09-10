@@ -176,8 +176,8 @@ io.on('connection', (socket) => {
     io.to(roomCode).emit('nodo_comprometido_alerta', { atacante, objetivo, decryptedPlayers: sala.decryptedPlayers });
   }
 
-  // ---- CORRECCIÓN DE TURNOS EN LA NUBE ----
-  // Avanzar el turno al siguiente jugador disponible que no esté descifrado (eliminado)
+  // ---- CORRECCIÓN DE TURNOS EN LA NUBE (ACTUALIZADO) ----
+  // Avanzar el turno al siguiente jugador disponible que no esté eliminado
   let siguienteIndex = sala.currentPlayerIndex;
   do {
     siguienteIndex = (siguienteIndex + 1) % sala.connectedPlayers.length;
@@ -188,14 +188,22 @@ io.on('connection', (socket) => {
   
   sala.currentPlayerIndex = siguienteIndex;
 
-  // Transmitir actualización de bitácora Y el nuevo turno dictado por el servidor
+  // OBTENER EL NOMBRE DEL JUGADOR QUE RECIBE EL TURNO
+  const proximoJugadorId de = sala.connectedPlayers[siguienteIndex].name;
+  
+  // RESET RESERVA: Limpiamos los bloqueos de objetivos para su nueva fase de ataques
+  sala.playerTargetBlocks[proximoJugadorId] = [];
+
+  // Transmitir la actualización con el turno y la orden de desbloqueo a la sala
   io.to(roomCode).emit('actualizar_bitacora_global', {
     multiplayerHistory: sala.multiplayerHistory,
     correct: correct,
     present: present,
     target: objetivo,
-    currentPlayerIndex: sala.currentPlayerIndex // <--- Turno sincronizado
+    currentPlayerIndex: sala.currentPlayerIndex,
+    limpiarBloqueosPara: proximoJugadorId // <--- Enviamos esta señal clave
   });
+
 
   // Evaluar Fin del Juego (Dominación)
   const totalObjetivos = sala.connectedPlayers.length - 1;
