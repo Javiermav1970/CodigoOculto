@@ -26,6 +26,17 @@ const io = new Server(server, {
 const salasActivas = {};
 
 io.on('connection', (socket) => {
+   // EVENTO NUEVO: ENVIAR LISTA DE SALAS REALES ACTIVAS
+  socket.on('solicitar_lista_salas', () => {
+    // Transformamos nuestro objeto de salas a un arreglo para el frontend
+    const listaEnviada = Object.values(salasActivas).map(s => ({
+      code: s.code,
+      host: s.connectedPlayers.find(p => p.isHost)?.name || 'Hacker',
+      len: s.multiLength
+    }));
+    socket.emit('lista_salas_actualizada', listaEnviada);
+  });
+
   console.log(`📡 Nodo conectado al servidor central: ID [${socket.id}]`);
 
   // 1. EVENTO: CREAR SALA (Ejecutado por el Host)
