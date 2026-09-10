@@ -398,26 +398,30 @@ el.sendBtn.addEventListener('click', submitGuess);
 el.StatusMultisendBtn.addEventListener('click', submitGuessMulti);
 
 el.backToLobbyFromCreateBtn.addEventListener('click', () => {
-  // 1. NOTIFICAR DESCONEXIÓN A LA RED (Si aplica)
-  // Si el usuario ya se había enlazado o bloqueado, cortamos de forma limpia el canal activo
+  // 1. NOTIFICAR DESCONEXIÓN A LA RED CENTRAL
   if (socket && typeof abandonarPartidaMultijugador === 'function') {
     abandonarPartidaMultijugador();
   }
 
-  // 2. RESTAURAR CONFIGURACIÓN DE INPUTS MAESTROS
+  // 2. RESETEAR LOS ROLES DEL CLIENTE DE FORMA ESTRICTA
+  state.isHost = false;
+  state.gameMode = null;
+  state.mySecretCode = [];
+  state.isCodeLocked = false;
+
+  // 3. RESTAURAR CONFIGURACIÓN Y VISIBILIDAD DE INPUTS MAESTROS
   el.roomNameInput.disabled = false;
   el.roomNameInput.value = '';
   el.roomMaxPlayersInput.type = 'number';
   el.roomMaxPlayersInput.disabled = false;
-  el.roomMaxPlayersInput.value = '2'; // Resetear al mínimo por defecto
+  el.roomMaxPlayersInput.value = '2'; 
   
-  // Corregir etiqueta de capacidad sin duplicar variables
   let etiquetaMax = document.querySelector('label[for="roomMaxPlayersInput"]');
   if (etiquetaMax) {
     etiquetaMax.textContent = "Límite de Hackers en partida";
   }
 
-  // 3. RESTAURAR BOTONES DE DIFICULTAD OCULTOS (Para el Modo Creación)
+  // 4. RESTAURAR BOTONES DE DIFICULTAD OCULTOS
   const diffContainer = document.querySelector('.diff-row') || el.multiDiffBtns[0]?.parentElement;
   if (diffContainer) diffContainer.style.display = 'flex';
 
@@ -425,32 +429,30 @@ el.backToLobbyFromCreateBtn.addEventListener('click', () => {
   
   if (el.multiDiffBtns) {
     el.multiDiffBtns.forEach(b => {
-      b.style.display = 'block'; // Volver a mostrarlos todos
-      b.classList.remove('active'); // Limpiar selecciones previas
+      b.style.display = 'block'; 
+      b.classList.remove('active'); 
       b.disabled = false;
       b.style.pointerEvents = 'auto';
       b.style.opacity = '1';
-      b.style.border = ''; // Quitar el borde de resalte informativo
+      b.style.border = ''; 
     });
-    // Re-activar por defecto el primer botón de dificultad (Principiante/Estándar)
     if (el.multiDiffBtns[0]) el.multiDiffBtns[0].classList.add('active');
   }
   if (el.multiCustomLenInput) el.multiCustomLenInput.disabled = false;
 
-  // 4. RESTAURAR BOTONES DE TIEMPO OCULTOS
+  // 5. RESTAURAR BOTONES DE TIEMPO OCULTOS
   if (el.multiLimitBtns) {
     el.multiLimitBtns.forEach(b => {
-      b.style.style.display = 'block'; // Volver a mostrarlos todos
+      b.style.display = 'block'; 
       b.classList.remove('active');
       b.disabled = false;
       b.style.pointerEvents = 'auto';
       b.style.opacity = '1';
     });
-    // Re-activar por defecto el primer límite de tiempo
     if (el.multiLimitBtns[0]) el.multiLimitBtns[0].classList.add('active');
   }
 
-  // 5. RESTABLECER LEYENDAS Y REDIRECCIÓN DE PANELES
+  // 6. RESTABLECER LEYENDAS VISUALES
   el.multiLockCodeBtn.textContent = "🔒 INICIAR PARTIDA";
   el.multiLockCodeBtn.disabled = false;
   el.multiLockCodeBtn.style.pointerEvents = 'auto';
@@ -458,13 +460,15 @@ el.backToLobbyFromCreateBtn.addEventListener('click', () => {
 
   if (el.forceStartMultiBtn) el.forceStartMultiBtn.classList.remove('hidden');
   
-  // Transición de regreso al menú de salas (Lobby)
+  // 7. TRANSICIÓN LIMPIA DE PANELES (Ocultar configuraciones y volver al listado)
   el.createRoomPanel.classList.add('hidden');
+  el.setupPanel.classList.add('hidden'); // <-- LIMPIEZA CRÍTICA: Apagar contenedor huérfano
   el.lobbyPanel.classList.remove('hidden');
 
-  // Solicitar inmediatamente la lista actualizada de salas al servidor
+  // Solicitar lista fresca de salas al servidor central
   if (socket) socket.emit('solicitar_lista_salas');
 });
+
 
   /* ---------- CAPTURA DE TECLADO FÍSICO ---------- */
 document.addEventListener('keydown', (event) => {
@@ -581,6 +585,23 @@ if (el.jugadorespanel) {
     renderizarBitacoraFiltrada();
   });
 }
+
+// ESCUCHAR TECLA ENTER EN EL CUADRO DE LOGEO DE NOMBRE
+if (el.usernameInput) {
+  el.usernameInput.addEventListener('keydown', (event) => {
+    if (event.key === 'ENTER') {
+      const nombreAsignado = el.usernameInput.value.trim();
+      if (!nombreAsignado) return;
+
+      // Comportamiento inteligente: si el usuario presiona enter, lo metemos directo al flujo IA por defecto
+      state.username = nombreAsignado;
+      state.gameMode = 'ia';
+      el.modePanel.classList.add('hidden');
+      el.setupPanel.classList.remove('hidden');
+    }
+  });
+}
+
 function abrirModalNotas() {
   const viejoModal = document.getElementById('modalNotasDeduccion');
   if (viejoModal) viejoModal.remove();
