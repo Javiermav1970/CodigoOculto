@@ -1,0 +1,8 @@
+/* =========================================================
+   CÓDIGO OCULTO - Consola Maestra de Hojas de Estilo (Index)
+   ========================================================= */
+@import url('style/variables.css');
+@import url('style/base-ui.css');
+@import url('style/gameplay.css');
+@import url('style/multiplayer.css');
+@import url('style/log-overlays.css');
