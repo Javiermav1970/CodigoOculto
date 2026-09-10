@@ -211,10 +211,32 @@ el.connectSelectedBtn.addEventListener('click', () => {
 
   // Buscar el elemento visual seleccionado en el menú para extraer su longitud real
   const itemSeleccionadoHTML = el.roomsList.querySelector('.room-item.selected');
+  
+  // 1. HEREDAR NOMBRE DE LA SALA DE FORMA ESTRICTA Y VISIBLE
   const salaSeleccionada = MOCK_ROOMS.find(r => r.code === state.selectedRoomCode);
+  if (salaSeleccionada) {
+    state.multiLength = parseInt(salaSeleccionada.len, 10); 
+    state.limit = parseInt(salaSeleccionada.limit, 10) || 0; 
+    
+    // CORRECCIÓN: Forzar a que el input muestre el nombre del servidor al que te estás enlazando
+    el.roomNameInput.value = `SERVER_${salaSeleccionada.host.toUpperCase()}`;
+  } else {
+    state.multiLength = 3;
+    el.roomNameInput.value = `SERVER_${state.selectedRoomCode}`;
+  }
+
+  // Bloquear e inhabilitar los campos para que no sean editables
+  el.roomNameInput.disabled = true;
+  el.roomMaxPlayersInput.type = 'text';
+  el.roomMaxPlayersInput.value = state.username.toUpperCase();
+  el.roomMaxPlayersInput.disabled = true; 
+
+  const etiquetaMax = document.querySelector('label[for="roomMaxPlayersInput"]');
+  if (etiquetaMax) etiquetaMax.textContent = "CODENAME DE RED:";
+
 
   if (itemSeleccionadoHTML) {
-    // 1. HEREDAR DIFICULTAD REAL DE FORMA ESTRICTA
+    // 2. HEREDAR DIFICULTAD REAL DE FORMA ESTRICTA
     state.multiLength = parseInt(itemSeleccionadoHTML.dataset.len, 10);
     state.limit = salaSeleccionada ? parseInt(salaSeleccionada.limit, 10) || 0 : 0;
   } else {
@@ -237,7 +259,7 @@ el.connectSelectedBtn.addEventListener('click', () => {
   el.roomMaxPlayersInput.value = state.username.toUpperCase();
   el.roomMaxPlayersInput.disabled = true; 
 
-  // 2. CONGELAR VISUALMENTE LOS BOTONES DE DIFICULTAD MULTIJUGADOR
+  // 3. CONGELAR VISUALMENTE LOS BOTONES DE DIFICULTAD MULTIJUGADOR
   if (el.multiDiffBtns) {
     el.multiDiffBtns.forEach(b => {
       const botonLen = parseInt(b.dataset.len, 10);
@@ -255,9 +277,9 @@ el.connectSelectedBtn.addEventListener('click', () => {
     el.multiCustomDiffBtn.style.pointerEvents = 'none';
     el.multiCustomDiffBtn.style.opacity = '0.5';
   }
-  
+
 // >> INYECTA ESTE NUEVO BLOQUE JUSTO AQUÍ <<
-  // 3. CONGELAR VISUALMENTE LOS BOTONES DE LÍMITE DE TIEMPO PARA EL INVITADO
+  // 4. CONGELAR VISUALMENTE LOS BOTONES DE LÍMITE DE TIEMPO PARA EL INVITADO
   if (el.multiLimitBtns) {
     el.multiLimitBtns.forEach(b => {
       const botonLimit = parseInt(b.dataset.limit, 10) || 0;
@@ -272,7 +294,7 @@ el.connectSelectedBtn.addEventListener('click', () => {
     });
   }
 
-  // 4. GENERAR SLOTS AUTOMÁTICOS BASADOS EN LA HERENCIA
+  // 5. GENERAR SLOTS AUTOMÁTICOS BASADOS EN LA HERENCIA
   setMultiSetupMessage('Establece tu cifrado de acceso para ingresar a la terminal.', false);
   
   // Ejecutamos la función: ahora que state.multiLength es el correcto (ej. 4), dibujará 4 slots exactos

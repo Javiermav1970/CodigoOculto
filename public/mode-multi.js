@@ -62,7 +62,7 @@ el.multiCustomLenInput.addEventListener('input', () => {
   }
 });
 
-// Confirmación y bloqueo del código de acceso a la red
+// Confirmación y bloqueo del código de acceso a la red (ACTUALIZADO PARA INVITADO)
 el.multiLockCodeBtn.addEventListener('click', () => {
   if (state.mySecretCode.length < state.multiLength) {
     setMultiSetupMessage(`⚠ ERROR: Cifrado incompleto. Requiere ${state.multiLength} elementos.`, true);
@@ -95,6 +95,12 @@ el.multiLockCodeBtn.addEventListener('click', () => {
   else {
     setMultiSetupMessage("✔ ENVIANDO PETICIÓN DE ACCESO AL NODO...", false);
     
+    // REQUERIMIENTO COMPLETO: Bloquear el botón e indicar estado de espera ciberpunk
+    el.multiLockCodeBtn.disabled = true;
+    el.multiLockCodeBtn.style.pointerEvents = 'none';
+    el.multiLockCodeBtn.style.opacity = '0.6';
+    el.multiLockCodeBtn.textContent = "⏳ ESPERANDO CONEXIONES...";
+
     socket.emit('unirse_sala', {
       roomCode: state.selectedRoomCode,
       username: state.username
