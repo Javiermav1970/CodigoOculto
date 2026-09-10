@@ -200,14 +200,18 @@ el.connectSelectedBtn.addEventListener('click', () => {
   state.tipoPanel = "lobbyPanel"; 
   state.currentPlayerIndex = 0;  
 
+  // Buscar los datos de la sala real que seleccionó el invitado
   const salaSeleccionada = MOCK_ROOMS.find(r => r.code === state.selectedRoomCode);
   if (salaSeleccionada) {
     state.multiLength = salaSeleccionada.len; 
+    // Si tu servidor envía también el límite de tiempo en la lista, lo asignamos aquí:
+    state.limit = salaSeleccionada.limit || 0; 
     el.roomNameInput.value = `SERVER_${salaSeleccionada.host.toUpperCase()}`;
   }
 
   state.mySecretCode = [];
 
+  // Bloquear campos de texto de la sala
   el.roomNameInput.disabled = true;
   el.roomMaxPlayersInput.type = 'text';
   el.roomMaxPlayersInput.value = state.username.toUpperCase();
@@ -216,12 +220,30 @@ el.connectSelectedBtn.addEventListener('click', () => {
   const etiquetaMax = document.querySelector('label[for="roomMaxPlayersInput"]');
   if (etiquetaMax) etiquetaMax.textContent = "CODENAME DE RED:";
 
+  // 1 y 2. OCULTAR Y COMPORTAMIENTO DE SELECCIÓN (Dificultad y Límite de Tiempo)
+  // Ocultamos las filas de botones para que el invitado no pueda hacer clic ni cambiarlos
   const diffContainer = document.querySelector('.diff-row') || el.multiDiffBtns[0]?.parentElement;
   if (diffContainer) diffContainer.style.display = 'none';
   if (el.multiCustomDiffBtn) el.multiCustomDiffBtn.style.display = 'none';
 
+  // Si tienes un contenedor para los botones de límite de tiempo en el HTML, lo ocultamos:
+  const limitContainer = el.multiLimitBtns[0]?.parentElement;
+  if (limitContainer) limitContainer.style.display = 'none';
+
+  // Opcional: Resaltar visualmente el botón que corresponde a la dificultad de la sala
+  el.multiDiffBtns.forEach(b => {
+    b.classList.toggle('active', parseInt(b.dataset.len, 10) === state.multiLength);
+  });
+  // Resaltar visualmente el botón del límite de tiempo elegido por el creador
+  if (el.multiLimitBtns) {
+    el.multiLimitBtns.forEach(b => {
+      b.classList.toggle('active', (parseInt(b.dataset.limit, 10) || 0) === state.limit);
+    });
+  }
+
+  // 3. GENERAR AUTOMÁTICAMENTE LOS SLOTS DE ACUERDO A LA SALA
   setMultiSetupMessage('Establece tu cifrado de acceso para ingresar a la terminal.', false);
-  crearSlots();
+  crearSlots(); // Esta función leerá el state.multiLength heredado de la sala y creará los candados exactos
  
   el.multiLockCodeBtn.textContent = "🔒 INGRESO A RED";
   el.multiLockCodeBtn.disabled = false;
@@ -232,6 +254,7 @@ el.connectSelectedBtn.addEventListener('click', () => {
   el.createRoomPanel.classList.remove('hidden');
   buildKeypad(); 
 });
+
 
 el.vsIaBtn.addEventListener('click', () => {
   state.username = el.usernameInput.value.trim() || 'Hacker';
