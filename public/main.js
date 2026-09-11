@@ -398,81 +398,57 @@ el.sendBtn.addEventListener('click', submitGuess);
 el.StatusMultisendBtn.addEventListener('click', submitGuessMulti);
 
 el.backToLobbyFromCreateBtn.addEventListener('click', () => {
-  // 1. NOTIFICAR DESCONEXIÓN A LA RED CENTRAL
-  // Reemplazamos abandonarPartidaMultijugador por desconexión directa para evitar que resetGame() tire la pantalla de modos
-  if (socket) {
-    socket.disconnect(); // Desconectamos limpiamente el socket físico de esta sala
-    // Volvemos a reconectar el socket para que quede listo en el lobby de salas públicas
-    socket.connect(); 
-  }
-
-  // 2. RESETEAR LOS ROLES DEL CLIENTE DE FORMA ESTRICTA
-  state.isHost = false;
-  state.mySecretCode = [];
-  state.isCodeLocked = false;
-  state.playing = false;
-
-  // 3. RESTAURAR CONFIGURACIÓN Y VISIBILIDAD DE INPUTS MAESTROS
   el.roomNameInput.disabled = false;
   el.roomNameInput.value = '';
   el.roomMaxPlayersInput.type = 'number';
   el.roomMaxPlayersInput.disabled = false;
-  el.roomMaxPlayersInput.value = '2'; 
   
-  let etiquetaMaxLocal = document.querySelector('label[for="roomMaxPlayersInput"]');
-  if (etiquetaMaxLocal) {
-    etiquetaMaxLocal.textContent = "Límite de Hackers en partida";
-  }
+  etiquetaMax = document.querySelector('label[for="roomMaxPlayersInput"]');
+  if (etiquetaMax) etiquetaMax.textContent = "Límite de Hackers en partida";
 
-  // 4. RESTAURAR BOTONES DE DIFICULTAD OCULTOS
   const diffContainer = document.querySelector('.diff-row') || el.multiDiffBtns[0]?.parentElement;
   if (diffContainer) diffContainer.style.display = 'flex';
 
   if (el.multiCustomDiffBtn) el.multiCustomDiffBtn.style.display = 'block';
   
-  if (el.multiDiffBtns) {
-    el.multiDiffBtns.forEach(b => {
-      b.style.display = 'block'; 
-      b.classList.remove('active'); 
-      b.disabled = false;
-      b.style.pointerEvents = 'auto';
-      b.style.opacity = '1';
-      b.style.border = ''; 
-    });
-    if (el.multiDiffBtns[0]) el.multiDiffBtns[0].classList.add('active');
-  }
-  if (el.multiCustomLenInput) el.multiCustomLenInput.disabled = false;
-
-  // 5. RESTAURAR BOTONES DE TIEMPO OCULTOS
-  if (el.multiLimitBtns) {
-    el.multiLimitBtns.forEach(b => {
-      b.style.display = 'block'; 
-      b.classList.remove('active');
-      b.disabled = false;
-      b.style.pointerEvents = 'auto';
-      b.style.opacity = '1';
-    });
-    if (el.multiLimitBtns[0]) el.multiLimitBtns[0].classList.add('active');
-  }
-
-  // 6. RESTABLECER LEYENDAS VISUALES
   el.multiLockCodeBtn.textContent = "🔒 INICIAR PARTIDA";
-  el.multiLockCodeBtn.disabled = false;
-  el.multiLockCodeBtn.style.pointerEvents = 'auto';
-  el.multiLockCodeBtn.style.opacity = '1';
 
   if (el.forceStartMultiBtn) el.forceStartMultiBtn.classList.remove('hidden');
   
-  // 7. ENRUTAMIENTO DE PANELES SIN AFECTAR EL MENÚ PRINCIPAL DE MODOS
-  // Garantizamos mantener el contenedor multijugador abierto y visible
-  el.setupPanel.classList.remove('hidden'); // Asegura que el entorno multijugador siga encendido
-  el.modePanel.classList.add('hidden');    // Fuerza a que el menú principal (IA / VS) se mantenga OcultO
+  el.createRoomPanel.classList.add('hidden');
+  el.lobbyPanel.classList.remove('hidden');
 
-  el.createRoomPanel.classList.add('hidden'); // Apagamos la consola de códigos
-  el.lobbyPanel.classList.remove('hidden');   // Desplegamos el lobby con la lista de salas
+    // RESTAURAR BOTONES DE DIFICULTAD PARA EL MODO CREACIÓN
+  if (el.multiDiffBtns) {
+    el.multiDiffBtns.forEach(b => {
+      b.style.display = 'block'; // Volver a mostrarlos todos
+      b.disabled = false;
+      b.style.pointerEvents = 'auto';
+      b.style.opacity = '1';
+    });
+  }
+  if (el.multiCustomDiffBtn) el.multiCustomDiffBtn.style.display = 'block';
+  if (el.multiCustomLenInput) el.multiCustomLenInput.style.display = 'block';
 
-  // Solicitar inmediatamente la lista fresca de salas al servidor central de Render
-  if (socket) socket.emit('solicitar_lista_salas');
+  // RESTAURAR BOTONES DE TIEMPO PARA EL MODO CREACIÓN
+  if (el.multiLimitBtns) {
+    el.multiLimitBtns.forEach(b => {
+      b.style.display = 'block'; // Volver a mostrarlos todos
+      b.disabled = false;
+      b.style.pointerEvents = 'auto';
+      b.style.opacity = '1';
+    });
+  }
+
+    // RESTAURAR LA CASILLA DE NÚMERO DE JUGADORES PARA EL MODO CREACIÓN
+  el.roomMaxPlayersInput.type = 'number';
+  el.roomMaxPlayersInput.value = '2'; // Valor por defecto al crear
+  el.roomMaxPlayersInput.disabled = false;
+  
+  etiquetaMax = document.querySelector('label[for="roomMaxPlayersInput"]');
+  if (etiquetaMax) {
+    etiquetaMax.textContent = "Límite de Hackers en partida";
+  }
 });
 
   /* ---------- CAPTURA DE TECLADO FÍSICO ---------- */
@@ -590,23 +566,6 @@ if (el.jugadorespanel) {
     renderizarBitacoraFiltrada();
   });
 }
-
-// ESCUCHAR TECLA ENTER EN EL CUADRO DE LOGEO DE NOMBRE
-if (el.usernameInput) {
-  el.usernameInput.addEventListener('keydown', (event) => {
-    if (event.key === 'ENTER') {
-      const nombreAsignado = el.usernameInput.value.trim();
-      if (!nombreAsignado) return;
-
-      // Comportamiento inteligente: si el usuario presiona enter, lo metemos directo al flujo IA por defecto
-      state.username = nombreAsignado;
-      state.gameMode = 'ia';
-      el.modePanel.classList.add('hidden');
-      el.setupPanel.classList.remove('hidden');
-    }
-  });
-}
-
 function abrirModalNotas() {
   const viejoModal = document.getElementById('modalNotasDeduccion');
   if (viejoModal) viejoModal.remove();
