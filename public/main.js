@@ -405,7 +405,6 @@ el.backToLobbyFromCreateBtn.addEventListener('click', () => {
 
   // 2. RESETEAR LOS ROLES DEL CLIENTE DE FORMA ESTRICTA
   state.isHost = false;
-  state.gameMode = null;
   state.mySecretCode = [];
   state.isCodeLocked = false;
 
@@ -416,12 +415,13 @@ el.backToLobbyFromCreateBtn.addEventListener('click', () => {
   el.roomMaxPlayersInput.disabled = false;
   el.roomMaxPlayersInput.value = '2'; 
   
-  let etiquetaMax = document.querySelector('label[for="roomMaxPlayersInput"]');
-  if (etiquetaMax) {
-    etiquetaMax.textContent = "Límite de Hackers en partida";
+  // Corregir etiqueta de capacidad de forma segura (sin redeclarar const)
+  let etiquetaMaxLocal = document.querySelector('label[for="roomMaxPlayersInput"]');
+  if (etiquetaMaxLocal) {
+    etiquetaMaxLocal.textContent = "Límite de Hackers en partida";
   }
 
-  // 4. RESTAURAR BOTONES DE DIFICULTAD OCULTOS
+  // 4. RESTAURAR BOTONES DE DIFICULTAD OCULTOS (Para el modo creación)
   const diffContainer = document.querySelector('.diff-row') || el.multiDiffBtns[0]?.parentElement;
   if (diffContainer) diffContainer.style.display = 'flex';
 
@@ -460,14 +460,17 @@ el.backToLobbyFromCreateBtn.addEventListener('click', () => {
 
   if (el.forceStartMultiBtn) el.forceStartMultiBtn.classList.remove('hidden');
   
-  // 7. TRANSICIÓN LIMPIA DE PANELES (Ocultar configuraciones y volver al listado)
-  el.createRoomPanel.classList.add('hidden');
-  el.setupPanel.classList.add('hidden'); // <-- LIMPIEZA CRÍTICA: Apagar contenedor huérfano
-  el.lobbyPanel.classList.remove('hidden');
+  // 7. TRANSICIÓN CORRECTA DE PANELES EN EL MULTIJUGADOR
+  el.createRoomPanel.classList.add('hidden'); // Ocultamos el panel de configuración de código
+  el.lobbyPanel.classList.remove('hidden');   // Mostramos el listado de salas públicas
+  
+  // ✖ ELIMINAMOS LA LÍNEA: el.setupPanel.classList.add('hidden'); 
+  // Esto previene que la pantalla se apague por completo y se descubra el menú inicial.
 
   // Solicitar lista fresca de salas al servidor central
   if (socket) socket.emit('solicitar_lista_salas');
 });
+
 
 
   /* ---------- CAPTURA DE TECLADO FÍSICO ---------- */
