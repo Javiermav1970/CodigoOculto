@@ -403,8 +403,8 @@ el.backToLobbyFromCreateBtn.addEventListener('click', () => {
   el.roomMaxPlayersInput.type = 'number';
   el.roomMaxPlayersInput.disabled = false;
   
-  const etiquetaMax = document.querySelector('label[for="roomMaxPlayersInput"]');
-  if (etiquetaMax) etiquetaMax.textContent = "Límite de Hackers en partida";
+  const etiquetaMax1 = document.querySelector('label[for="roomMaxPlayersInput"]');
+  if (etiquetaMax1) etiquetaMax1.textContent = "Límite de Hackers en partida";
 
   const diffContainer = document.querySelector('.diff-row') || el.multiDiffBtns[0]?.parentElement;
   if (diffContainer) diffContainer.style.display = 'flex';
@@ -445,9 +445,9 @@ el.backToLobbyFromCreateBtn.addEventListener('click', () => {
   el.roomMaxPlayersInput.value = '2'; // Valor por defecto al crear
   el.roomMaxPlayersInput.disabled = false;
   
-  etiquetaMax = document.querySelector('label[for="roomMaxPlayersInput"]');
-  if (etiquetaMax) {
-    etiquetaMax.textContent = "Límite de Hackers en partida";
+  etiquetaMax1 = document.querySelector('label[for="roomMaxPlayersInput"]');
+  if (etiquetaMax1) {
+    etiquetaMax1.textContent = "Límite de Hackers en partida";
   }
 });
 
