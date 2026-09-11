@@ -399,14 +399,18 @@ el.StatusMultisendBtn.addEventListener('click', submitGuessMulti);
 
 el.backToLobbyFromCreateBtn.addEventListener('click', () => {
   // 1. NOTIFICAR DESCONEXIÓN A LA RED CENTRAL
-  if (socket && typeof abandonarPartidaMultijugador === 'function') {
-    abandonarPartidaMultijugador();
+  // Reemplazamos abandonarPartidaMultijugador por desconexión directa para evitar que resetGame() tire la pantalla de modos
+  if (socket) {
+    socket.disconnect(); // Desconectamos limpiamente el socket físico de esta sala
+    // Volvemos a reconectar el socket para que quede listo en el lobby de salas públicas
+    socket.connect(); 
   }
 
   // 2. RESETEAR LOS ROLES DEL CLIENTE DE FORMA ESTRICTA
   state.isHost = false;
   state.mySecretCode = [];
   state.isCodeLocked = false;
+  state.playing = false;
 
   // 3. RESTAURAR CONFIGURACIÓN Y VISIBILIDAD DE INPUTS MAESTROS
   el.roomNameInput.disabled = false;
@@ -415,13 +419,12 @@ el.backToLobbyFromCreateBtn.addEventListener('click', () => {
   el.roomMaxPlayersInput.disabled = false;
   el.roomMaxPlayersInput.value = '2'; 
   
-  // Corregir etiqueta de capacidad de forma segura (sin redeclarar const)
   let etiquetaMaxLocal = document.querySelector('label[for="roomMaxPlayersInput"]');
   if (etiquetaMaxLocal) {
     etiquetaMaxLocal.textContent = "Límite de Hackers en partida";
   }
 
-  // 4. RESTAURAR BOTONES DE DIFICULTAD OCULTOS (Para el modo creación)
+  // 4. RESTAURAR BOTONES DE DIFICULTAD OCULTOS
   const diffContainer = document.querySelector('.diff-row') || el.multiDiffBtns[0]?.parentElement;
   if (diffContainer) diffContainer.style.display = 'flex';
 
@@ -460,18 +463,17 @@ el.backToLobbyFromCreateBtn.addEventListener('click', () => {
 
   if (el.forceStartMultiBtn) el.forceStartMultiBtn.classList.remove('hidden');
   
-  // 7. TRANSICIÓN CORRECTA DE PANELES EN EL MULTIJUGADOR
-  el.createRoomPanel.classList.add('hidden'); // Ocultamos el panel de configuración de código
-  el.lobbyPanel.classList.remove('hidden');   // Mostramos el listado de salas públicas
-  
-  // ✖ ELIMINAMOS LA LÍNEA: el.setupPanel.classList.add('hidden'); 
-  // Esto previene que la pantalla se apague por completo y se descubra el menú inicial.
+  // 7. ENRUTAMIENTO DE PANELES SIN AFECTAR EL MENÚ PRINCIPAL DE MODOS
+  // Garantizamos mantener el contenedor multijugador abierto y visible
+  el.setupPanel.classList.remove('hidden'); // Asegura que el entorno multijugador siga encendido
+  el.modePanel.classList.add('hidden');    // Fuerza a que el menú principal (IA / VS) se mantenga OcultO
 
-  // Solicitar lista fresca de salas al servidor central
+  el.createRoomPanel.classList.add('hidden'); // Apagamos la consola de códigos
+  el.lobbyPanel.classList.remove('hidden');   // Desplegamos el lobby con la lista de salas
+
+  // Solicitar inmediatamente la lista fresca de salas al servidor central de Render
   if (socket) socket.emit('solicitar_lista_salas');
 });
-
-
 
   /* ---------- CAPTURA DE TECLADO FÍSICO ---------- */
 document.addEventListener('keydown', (event) => {
