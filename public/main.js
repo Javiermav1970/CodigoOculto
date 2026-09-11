@@ -36,7 +36,7 @@ export function vincularEventosGraficosDeRed() {
     mostrarVentanaFlotanteAtaque(datos.emisor, datos.receptor, datos.codigo);
   });
 
-  // B. Sincronizar el historial de la bitácora unificada calculada en la nube
+  // B. Sincronizar el historial de la bitácora unificada calculada en la nube (ACTUALIZADO)
   socket.on('actualizar_bitacora_global', (datos) => {
     state.multiplayerHistory = datos.multiplayerHistory;
     state.currentPlayerIndex = datos.currentPlayerIndex;
@@ -55,10 +55,16 @@ export function vincularEventosGraficosDeRed() {
     // Refrescar paneles de espera/transmisión de inmediato con los nuevos estados de desbloqueo
     actualizarVisualSalaJugadores(); 
 
-    if (state.selectedTargetFilter === datos.target) {
-      renderizarBitacoraFiltrada();
+    // AUTOMATIZACIÓN DE BITÁCORA: Si el usuario no tiene ningún filtro seleccionado todavía, 
+    // le asignamos por defecto el objetivo del último ataque para que la pantalla cobre vida sola.
+    if (!state.selectedTargetFilter) {
+      state.selectedTargetFilter = datos.target;
     }
+
+    // Renderizado reactivo inmediato: Forzamos la actualización de la bitácora visual en pantalla
+    renderizarBitacoraFiltrada();
   });
+
 
 
   // C. Recibir notificaciones de vulnerabilidades críticas (Nodos quebrados)
