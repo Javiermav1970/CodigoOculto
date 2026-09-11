@@ -43,6 +43,11 @@ export function lanzarPartidaMultijugador(mensaje) {
   if (el.multiStatusPanel) el.multiStatusPanel.classList.remove('hidden');
   if (el.statusMultiLogPanel) el.statusMultiLogPanel.classList.remove('hidden');
   
+  // 💻 CORRECCIÓN MAESTRA: Limpiar visualmente la bitácora para la nueva partida
+  // Vaciamos tanto el contenedor multijugador como el genérico por seguridad
+  if (el.statusMultiLog) el.statusMultiLog.innerHTML = '<div class="log-empty">Sin intentos registrados...</div>';
+  if (el.log) el.log.innerHTML = '<div class="log-empty">Sin intentos registrados...</div>';
+
   // Hacer visible el contenedor del panel lateral en el DOM antes de ordenar su redibujado
   if (el.jugadorespanel) {
     el.jugadorespanel.classList.remove('hidden');
@@ -59,6 +64,7 @@ export function lanzarPartidaMultijugador(mensaje) {
   state.playing = true; 
   startTimer();
 }
+
 
 export function organizarCodigo() {
   for (let i = 0; i < state.current.length; i++) {
