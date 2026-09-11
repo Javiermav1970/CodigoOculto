@@ -1,7 +1,7 @@
 /* =========================================================
    CÓDIGO OCULTO - Juego de deducción tipo Mastermind (Cliente de Red Real-Time)
    ========================================================= */
-import { state, BANK, MOCK_ROOMS, isFigure, loadRecords } from './config.js';
+import { state, BANK, MOCK_ROOMS, isFigure, loadRecords, limpiarEstadoMemoriaCompleto } from './config.js';
 import { formatTime,  stopTimer } from './timer.js';
 import { el } from './dom.js';
 import { renderizarCuadernoNotas } from './notes.js';
@@ -126,14 +126,13 @@ function renderRecords() {
 }
 
 export function resetGame() {
+  // EJECUCIÓN CRÍTICA: Borrar toda la memoria residual de la partida anterior
+  if (typeof limpiarEstadoMemoriaCompleto === 'function') {
+    limpiarEstadoMemoriaCompleto();
+  }
   state.notasDeduccion = {};
   const panelNotas = document.getElementById('cuadernoNotasPanel');
   if (panelNotas) panelNotas.remove(); 
-
-  state.playing = false;
-  state.isCodeLocked = false;
-  state.isHost = false;
-  state.mySecretCode = [];
   
   stopTimer();
   renderRecords();
