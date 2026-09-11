@@ -142,17 +142,24 @@ export function resetGame() {
   el.modePanel.classList.remove('hidden'); // Encendemos el menú de modos principal
   el.setupPanel.classList.add('hidden');    // Apagamos configuraciones
 
-  // 2. APAGAR SUBPANELES MULTIJUGADOR ACTIVOS
+  // 2. APAGAR SUBPANELES MULTIJUGADOR ACTIVOS Y SUS CONTENEDORES DE ESTADO
   if (el.multiStatusPanel) el.multiStatusPanel.classList.add('hidden');
   if (el.statusMultiLogPanel) el.statusMultiLogPanel.classList.add('hidden');
   if (el.createRoomPanel) el.createRoomPanel.classList.add('hidden');
   if (el.lobbyPanel) el.lobbyPanel.classList.add('hidden');
+  
+  // CORRECCIÓN RADICAL: Apagar el panel de estado multijugador principal de la partida
+  if (el.multiStatusMsg) el.multiStatusMsg.parentElement?.classList.add('hidden'); 
+  const panelEstadoMulti = document.getElementById('MultistatusPanel');
+  if (panelEstadoMulti) panelEstadoMulti.classList.add('hidden');
 
-  // 3. ELIMINACIÓN DE REMANENTES (Limpieza Quirúrgica)
-  // Forzamos el apagado del panel que dibuja la cuadrícula lateral de jugadores y el botón de enviar
-  if (el.jugadorespanel) el.jugadorespanel.innerHTML = ''; // Vaciar la sala visual de hackers
-  if (el.statusPanel) el.statusPanel.classList.add('hidden'); // Apaga el panel de estado e inputs sobrantes
-  if (el.multibotones) el.multibotones.classList.add('hidden'); // Oculta botones de acción multijugador si aplica
+  // 3. LIMPIEZA DE ABSOLUTAMENTE TODOS LOS REMANENTES DE JUGADORES Y SLOTS
+  if (el.jugadorespanel) el.jugadorespanel.innerHTML = '';        // Vaciar sala de espera
+  if (el.statusMultiSlots) el.statusMultiSlots.innerHTML = '';    // Vaciar slots de juego en red
+  if (el.connectedPlayersList) el.connectedPlayersList.innerHTML = ''; // Vaciar lista de conexiones
+  
+  if (el.statusPanel) el.statusPanel.classList.add('hidden');     // Apaga panel de estado genérico
+  if (el.multibotones) el.multibotones.classList.add('hidden');   // Oculta botones de acción multijugador
 
   // 4. APAGAR CONTENEDORES DE JUEGO MODO SINGLE-PLAYER (IA)
   el.botones.classList.add('hidden');
