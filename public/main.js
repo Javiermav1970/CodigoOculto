@@ -139,24 +139,30 @@ export function resetGame() {
   renderRecords();
 
   // 1. TRANSICIÓN MAESTRA DE PANELES PRINCIPALES
-  el.modePanel.classList.remove('hidden'); // Encendemos el menú de modos (IA / MULTI)
-  el.setupPanel.classList.add('hidden');    // Apagamos la configuración previa
+  el.modePanel.classList.remove('hidden'); // Encendemos el menú de modos principal
+  el.setupPanel.classList.add('hidden');    // Apagamos configuraciones
 
-  // 2. CORRECCIÓN CRÍTICA: Apagar todos los subpaneles multijugador activos de la partida
+  // 2. APAGAR SUBPANELES MULTIJUGADOR ACTIVOS
   if (el.multiStatusPanel) el.multiStatusPanel.classList.add('hidden');
   if (el.statusMultiLogPanel) el.statusMultiLogPanel.classList.add('hidden');
   if (el.createRoomPanel) el.createRoomPanel.classList.add('hidden');
   if (el.lobbyPanel) el.lobbyPanel.classList.add('hidden');
 
-  // 3. APAGAR CONTENEDORES DE JUEGO MODO SINGLE-PLAYER (IA)
+  // 3. ELIMINACIÓN DE REMANENTES (Limpieza Quirúrgica)
+  // Forzamos el apagado del panel que dibuja la cuadrícula lateral de jugadores y el botón de enviar
+  if (el.jugadorespanel) el.jugadorespanel.innerHTML = ''; // Vaciar la sala visual de hackers
+  if (el.statusPanel) el.statusPanel.classList.add('hidden'); // Apaga el panel de estado e inputs sobrantes
+  if (el.multibotones) el.multibotones.classList.add('hidden'); // Oculta botones de acción multijugador si aplica
+
+  // 4. APAGAR CONTENEDORES DE JUEGO MODO SINGLE-PLAYER (IA)
   el.botones.classList.add('hidden');
   el.botones.disabled = false;
-  el.statusPanel.classList.add('hidden');
   el.keypadPanel.classList.add('hidden');
   el.logPanel.classList.add('hidden');
   
-  removeOverlay(); // Elimina los fondos oscurecidos de victoria o derrota
+  removeOverlay(); // Elimina los carteles flotantes de victoria o derrota
 }
+
 
 /* ---------- GESTIÓN DE SALAS MULTIJUGADOR ---------- */
 export function addLogRow(guess, correct, present, index) {
