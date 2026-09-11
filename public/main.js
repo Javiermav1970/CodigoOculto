@@ -331,10 +331,14 @@ el.connectSelectedBtn.addEventListener('click', () => {
   // 5. CONFIGURAR MENSAJES Y DIBUJAR ESTRUCTURA DE RANURAS REACCIONANDO A LA HERENCIA
   setMultiSetupMessage('Establece tu cifrado de acceso para ingresar a la terminal.', false);
   
-  el.multiLockCodeBtn.textContent = "🔒 INGRESO A RED";
-  el.multiLockCodeBtn.disabled = false;
+ // CORRECCIÓN MAESTRA: Forzamos al botón del DOM a restaurar su estado nativo de fábrica
+  el.multiLockCodeBtn.disabled = false;                  // <-- Desbloquear el botón
+  el.multiLockCodeBtn.style.pointerEvents = 'auto';      // <-- Devolver interactividad
+  el.multiLockCodeBtn.style.opacity = '1';               // <-- Opacidad brillante original
+  el.multiLockCodeBtn.textContent = "🔒 INGRESO A RED";  // <-- Restaurar la leyenda original
 
   if (el.forceStartMultiBtn) el.forceStartMultiBtn.classList.add('hidden');
+  
   el.lobbyPanel.classList.add('hidden');
   el.createRoomPanel.classList.remove('hidden');
   
