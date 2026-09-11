@@ -435,13 +435,28 @@ el.sendBtn.addEventListener('click', submitGuess);
 el.StatusMultisendBtn.addEventListener('click', submitGuessMulti);
 
 el.backToLobbyFromCreateBtn.addEventListener('click', () => {
+
+  // 1. NOTIFICAR DESCONEXIÓN A LA RED CENTRAL
+  if (socket) {
+    socket.disconnect(); 
+    socket.connect(); // Reconectar para quedar listo en el lobby
+  }
+
+  // LIMPIEZA INTERNA ANTES DE RECONFIGURAR
+  if (typeof limpiarEstadoMemoriaCompleto === 'function') {
+    limpiarEstadoMemoriaCompleto();
+  }
+
   el.roomNameInput.disabled = false;
   el.roomNameInput.value = '';
   el.roomMaxPlayersInput.type = 'number';
   el.roomMaxPlayersInput.disabled = false;
+  el.roomMaxPlayersInput.value = '2';
   
-  const etiquetaMax1 = document.querySelector('label[for="roomMaxPlayersInput"]');
-  if (etiquetaMax1) etiquetaMax1.textContent = "Límite de Hackers en partida";
+  let etiquetaMaxLocal = document.querySelector('label[for="roomMaxPlayersInput"]');
+  if (etiquetaMaxLocal) {
+    etiquetaMaxLocal.textContent = "Límite de Hackers en partida";
+  }
 
   const diffContainer = document.querySelector('.diff-row') || el.multiDiffBtns[0]?.parentElement;
   if (diffContainer) diffContainer.style.display = 'flex';
