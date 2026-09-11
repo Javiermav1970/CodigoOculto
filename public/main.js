@@ -403,7 +403,7 @@ el.backToLobbyFromCreateBtn.addEventListener('click', () => {
   el.roomMaxPlayersInput.type = 'number';
   el.roomMaxPlayersInput.disabled = false;
   
-  etiquetaMax = document.querySelector('label[for="roomMaxPlayersInput"]');
+  const etiquetaMax = document.querySelector('label[for="roomMaxPlayersInput"]');
   if (etiquetaMax) etiquetaMax.textContent = "Límite de Hackers en partida";
 
   const diffContainer = document.querySelector('.diff-row') || el.multiDiffBtns[0]?.parentElement;
