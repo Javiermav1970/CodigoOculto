@@ -139,8 +139,8 @@ export function resetGame() {
   renderRecords();
 
   // 1. TRANSICIÓN MAESTRA DE PANELES PRINCIPALES
-  el.modePanel.classList.remove('hidden'); // Encendemos el menú de modos principal
-  el.setupPanel.classList.add('hidden');    // Apagamos configuraciones
+  el.modePanel.classList.remove('hidden'); // Encendemos el menú de modos principal (IA / MULTI)
+  el.setupPanel.classList.add('hidden');    // Apagamos configuraciones previas
 
   // 2. APAGAR SUBPANELES MULTIJUGADOR ACTIVOS Y SUS CONTENEDORES DE ESTADO
   if (el.multiStatusPanel) el.multiStatusPanel.classList.add('hidden');
@@ -148,13 +148,16 @@ export function resetGame() {
   if (el.createRoomPanel) el.createRoomPanel.classList.add('hidden');
   if (el.lobbyPanel) el.lobbyPanel.classList.add('hidden');
   
-  // CORRECCIÓN RADICAL: Apagar el panel de estado multijugador principal de la partida
+  // Apagar el panel de estado multijugador principal de la partida
   if (el.multiStatusMsg) el.multiStatusMsg.parentElement?.classList.add('hidden'); 
   const panelEstadoMulti = document.getElementById('MultistatusPanel');
   if (panelEstadoMulti) panelEstadoMulti.classList.add('hidden');
 
-  // 3. LIMPIEZA DE ABSOLUTAMENTE TODOS LOS REMANENTES DE JUGADORES Y SLOTS
-  if (el.jugadorespanel) el.jugadorespanel.innerHTML = '';        // Vaciar sala de espera
+  // 3. LIMPIEZA Y OCULTACIÓN DE CONTENEDORES DE JUGADORES Y SLOTS (TU DETECCIÓN CRÍTICA)
+  if (el.jugadorespanel) {
+    el.jugadorespanel.innerHTML = '';          // Vaciamos el HTML interno
+    el.jugadorespanel.classList.add('hidden'); // <--- ¡SOLUCIÓN! Forzamos la ocultación total en pantalla
+  }
   if (el.statusMultiSlots) el.statusMultiSlots.innerHTML = '';    // Vaciar slots de juego en red
   if (el.connectedPlayersList) el.connectedPlayersList.innerHTML = ''; // Vaciar lista de conexiones
   
@@ -169,6 +172,7 @@ export function resetGame() {
   
   removeOverlay(); // Elimina los carteles flotantes de victoria o derrota
 }
+
 
 
 /* ---------- GESTIÓN DE SALAS MULTIJUGADOR ---------- */
