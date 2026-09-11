@@ -131,16 +131,31 @@ export function resetGame() {
   if (panelNotas) panelNotas.remove(); 
 
   state.playing = false;
+  state.isCodeLocked = false;
+  state.isHost = false;
+  state.mySecretCode = [];
+  
   stopTimer();
   renderRecords();
-  el.modePanel.classList.remove('hidden');
-  el.setupPanel.classList.add('hidden');
+
+  // 1. TRANSICIÓN MAESTRA DE PANELES PRINCIPALES
+  el.modePanel.classList.remove('hidden'); // Encendemos el menú de modos (IA / MULTI)
+  el.setupPanel.classList.add('hidden');    // Apagamos la configuración previa
+
+  // 2. CORRECCIÓN CRÍTICA: Apagar todos los subpaneles multijugador activos de la partida
+  if (el.multiStatusPanel) el.multiStatusPanel.classList.add('hidden');
+  if (el.statusMultiLogPanel) el.statusMultiLogPanel.classList.add('hidden');
+  if (el.createRoomPanel) el.createRoomPanel.classList.add('hidden');
+  if (el.lobbyPanel) el.lobbyPanel.classList.add('hidden');
+
+  // 3. APAGAR CONTENEDORES DE JUEGO MODO SINGLE-PLAYER (IA)
   el.botones.classList.add('hidden');
   el.botones.disabled = false;
   el.statusPanel.classList.add('hidden');
   el.keypadPanel.classList.add('hidden');
   el.logPanel.classList.add('hidden');
-  removeOverlay();
+  
+  removeOverlay(); // Elimina los fondos oscurecidos de victoria o derrota
 }
 
 /* ---------- GESTIÓN DE SALAS MULTIJUGADOR ---------- */
