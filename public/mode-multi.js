@@ -209,7 +209,8 @@ function configurarEscuchadoresRed() {
  */
 export function abandonarPartidaMultijugador() {
   if (socket) {
-    socket.disconnect(); // Cortar los WebSockets de forma inmediata
+    socket.disconnect(); // Romper la sala vieja de forma estricta
+    socket.connect();    // <--- CORRECCIÓN DE FLUJO: Reencender la antena de inmediato para futuras partidas
   }
 
   resetGame();
@@ -219,6 +220,7 @@ export function abandonarPartidaMultijugador() {
   
   actualizarVisualSalaJugadores();
 }
+
 
 // Vincular los selectores de límite de tiempo para el modo multijugador (ACTUALIZADO)
 if (el.multiLimitBtns) {

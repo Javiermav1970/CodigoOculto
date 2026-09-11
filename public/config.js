@@ -56,7 +56,7 @@ export function saveRecords(records) {
 // >> Añade esta función al final de tu config.js <<
 export function limpiarEstadoMemoriaCompleto() {
   state.playing = false;
-  state.isCodeLocked = false;
+  state.isCodeLocked = false; // <--- Garantiza apagar el cifrado visual de estrellas
   state.isHost = false;
   state.mySecretCode = [];
   state.intentoMulti = [];
@@ -67,7 +67,7 @@ export function limpiarEstadoMemoriaCompleto() {
   state.playerTargetBlocks = {};
   state.botMemory = {};
   state.currentPlayerIndex = 0;
-  state.selectedTargetFilter = 'TODOS';
+  state.selectedTargetFilter = null; // <-- Quitar el "TODOS" para forzar el mensaje de bienvenida de la bitácora
   state.selectedRoomCode = null;
   state.attempts = 0;
   state.elapsed = 0;

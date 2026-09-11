@@ -367,34 +367,37 @@ el.vsPlayerBtn.addEventListener('click', () => {
 });
 
 el.createRoomBtn.addEventListener('click', () => {
-  state.multiplayerHistory = [];
-  state.selectedTargetFilter = null;
-  state.decryptedPlayers = [];
-  state.playerTargetBlocks = {};
-  state.botMemory = {};
-  
+  // CORRECCIÓN INTERNA: Forzar limpieza absoluta antes de preparar la reconfiguración
+  if (typeof limpiarEstadoMemoriaCompleto === 'function') {
+    limpiarEstadoMemoriaCompleto();
+  }
+
   state.isHost = true;             
   state.currentPlayerIndex = 0;    
   state.tipoPanel = "lobbyPanel"; 
   state.multiLength = 3;
-  state.mySecretCode = [];
-  state.isCodeLocked = false;
   state.limit = 0;
   state.connectedPlayers = [{ name: state.username, isHost: true }];
   state.maxPlayersAllowed = parseInt(el.roomMaxPlayersInput.value, 10) || 2;
 
   el.roomNameInput.disabled = false;
   el.roomMaxPlayersInput.disabled = false;
-  el.multiCustomLenInput.disabled = false;
+  if (el.multiCustomLenInput) el.multiCustomLenInput.disabled = false;
+  
+  el.roomNameInput.value = ''; // Limpiar el cuadro de texto
   el.roomNameInput.placeholder = `SERVER_${state.username.toUpperCase()}`;
   el.roomLiveCode.textContent = "SALA: PENDIENTE";
-  el.forceStartMultiBtn.disabled = true;
+  
+  if (el.forceStartMultiBtn) {
+    el.forceStartMultiBtn.disabled = true;
+    el.forceStartMultiBtn.classList.add('hidden');
+  }
 
   setMultiSetupMessage('Establece tu cifrado usando la consola inferior.', false);
   
   el.multiDiffBtns.forEach(b => b.classList.remove('active'));
-  el.multiCustomDiffBtn.classList.remove('active');
-  el.multiDiffBtns[0].classList.add('active');
+  if (el.multiCustomDiffBtn) el.multiCustomDiffBtn.classList.remove('active');
+  if (el.multiDiffBtns[0]) el.multiDiffBtns[0].classList.add('active');
 
   if (el.multiLimitBtns) {
     el.multiLimitBtns.forEach(b => b.classList.remove('active'));
@@ -404,10 +407,11 @@ el.createRoomBtn.addEventListener('click', () => {
   el.lobbyPanel.classList.add('hidden');
   el.createRoomPanel.classList.remove('hidden');
 
-  crearSlots();
+  crearSlots(); // Ahora sí dibujará con los valores en limpio (🔒🔒🔒)
   renderConnectedPlayers();
-  buildKeypad();
+  buildKeypad(); // Re-renderizar teclado limpio sin bloqueos de la partida vieja
 });
+
 
 /* ---------- BOTONES ADICIONALES DE RETORNO Y CONTROL ---------- */
 el.refreshRoomsBtn.addEventListener('click', () => {
