@@ -445,9 +445,9 @@ el.backToLobbyFromCreateBtn.addEventListener('click', () => {
   el.roomMaxPlayersInput.value = '2'; // Valor por defecto al crear
   el.roomMaxPlayersInput.disabled = false;
   
-  etiquetaMax1 = document.querySelector('label[for="roomMaxPlayersInput"]');
-  if (etiquetaMax1) {
-    etiquetaMax1.textContent = "Límite de Hackers en partida";
+  const etiquetaMax2 = document.querySelector('label[for="roomMaxPlayersInput"]');
+  if (etiquetaMax2) {
+    etiquetaMax2.textContent = "Límite de Hackers en partida";
   }
 });
 
