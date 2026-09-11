@@ -574,7 +574,7 @@ export function actualizarVisualSalaJugadores() {
         // Plantilla HTML del componente de jugador
         return `
             <div class="player-card-item ${claseSelected} ${claseBloqueado}" data-name="${p.name}" data-order="${idx + 1}" style="${estiloTurno} ${opacidad}"> 
-                <div class="player-info-inline" style="pointer-events: auto; display: flex; flex-direction: column; align-items: flex-start; gap: 4px;"> 
+                <div class="player-info-inline" style="display: flex; flex-direction: column; align-items: flex-start; gap: 4px;"> 
                     <div style="display: flex; align-items: center; gap: 6px; width: 100%;"> 
                         <span class="player-name-text" title="${p.name.toUpperCase()}">${esTurnoActual ? '▶️ ' : ''}📡 ${p.name.toUpperCase()}</span> 
                         ${badge} 
@@ -590,6 +590,18 @@ export function actualizarVisualSalaJugadores() {
 
     htmlGrid += `</div>`;
     el.jugadorespanel.innerHTML = htmlGrid;
+}
+
+// ESCUCHAR TECLA ENTER EN EL CUADRO DE LOGEO DE NOMBRE (ACTUALIZADO INTELIGENTE)
+if (el.usernameInput) {
+  el.usernameInput.addEventListener('keydown', (event) => {
+    if (event.key === 'ENTER') {
+      // Simulamos automáticamente un clic real en el botón Multijugador que ya programaste
+      if (el.vsPlayerBtn) {
+        el.vsPlayerBtn.click();
+      }
+    }
+  });
 }
 
 if (el.jugadorespanel) {
@@ -626,6 +638,7 @@ if (el.jugadorespanel) {
     renderizarBitacoraFiltrada();
   });
 }
+
 function abrirModalNotas() {
   const viejoModal = document.getElementById('modalNotasDeduccion');
   if (viejoModal) viejoModal.remove();

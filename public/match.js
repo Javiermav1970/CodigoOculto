@@ -154,6 +154,12 @@ export function submitGuessMulti() {
     return;
   }
 
+    // ¡BARRERA DE SEGURIDAD ABSOLUTA EN RED!
+  if (state.selectedTargetFilter === state.username) {
+    alert("❌ ACCESO RECHAZADO: Protocolo de seguridad activado. No puedes inyectar un ataque a tu propia terminal.");
+    return;
+  }
+
   const codigoAtaque = [...digitosIngresados];
 
   // REGISTRO CRÍTICO: Bloquear local e inmediatamente al objetivo en esta ronda
