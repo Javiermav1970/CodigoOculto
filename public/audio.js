@@ -2,14 +2,14 @@
    CÓDIGO OCULTO - Motor de Audio y Síntesis Psicoacústica
    ========================================================= */
 
-// Contexto de audio nativo del navegador (se activa al primer clic del usuario)
+// Contexto de audio nativo del navegador (CORREGIDO PARA AUTOPLAY)
 let audioCtx = null;
-let musicaActual = null;
 
 function obtenerAudioContext() {
   if (!audioCtx) {
     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   }
+  // Si el navegador congeló el audio de fondo, le ordenamos despertar de inmediato
   if (audioCtx.state === 'suspended') {
     audioCtx.resume();
   }

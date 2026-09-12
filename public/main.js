@@ -17,6 +17,35 @@ import { sfx, emitirVozTerminal } from './audio.js';
 import './mode-ia.js';
 import './mode-multi.js';
 
+// >> INYECTAR ESTE BLOQUE DESPERTADOR AL INICIO DE MAIN.JS <<
+/* ---------- PROTOCOLO DE DESPERTAR MOTOR DE AUDIO CYBERPUNK ---------- */
+function desbloquearEcosistemaAudio() {
+  // Disparamos la inicialización del contexto matemático de ondas
+  import('./audio.js').then(modulo => {
+    // Forzamos un micro-sonido silencioso imperceptible para que el navegador libere el canal de audio
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      if (ctx.state === 'suspended') ctx.resume();
+    } catch (e) {
+      console.log("Esperando interacción de red para inicializar nodos acústicos...");
+    }
+    
+    // Despierta de una vez el motor de síntesis de voz nativa (Speech)
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.getVoices();
+    }
+  });
+
+  // Una vez desbloqueado, removemos los escuchadores para no saturar la memoria
+  document.removeEventListener('click', desbloquearEcosistemaAudio);
+  document.removeEventListener('keydown', desbloquearEcosistemaAudio);
+}
+
+// Escuchar el primer clic o pulsación de teclado del usuario en la web para encender los parlantes
+document.addEventListener('click', desbloquearEcosistemaAudio);
+document.addEventListener('keydown', desbloquearEcosistemaAudio);
+
+
 /* ---------- CONFIGURACIÓN DE ESCUCHADORES DE INTERFAZ EN TIEMPO REAL ---------- */
 export function vincularEventosGraficosDeRed() {
   if (!socket) return;
