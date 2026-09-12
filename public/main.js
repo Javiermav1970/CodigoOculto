@@ -11,6 +11,7 @@ import { launchConfetti, removeOverlay } from './fx.js';
 import { startGame, submitGuess, submitGuessMulti } from './match.js';
 import { abandonarPartidaMultijugador, socket } from './mode-multi.js'; // Importación del canal de red activo
 import { celebrarDescifradoIntermedio, mostrarVentanaFlotanteAtaque, ejecutarVictoriaGlobal } from './referee.js';
+import { sfx, emitirVozTerminal } from './audio.js';
 
 // Importamos la inicialización de los manejadores de eventos de cada modo para que se ejecuten
 import './mode-ia.js';
@@ -37,35 +38,43 @@ export function vincularEventosGraficosDeRed() {
   });
 
   // B. Sincronizar el historial de la bitácora unificada calculada en la nube (ACTUALIZADO)
+    // B. Sincronizar el historial de la bitácora unificada calculada en la nube
   socket.on('actualizar_bitacora_global', (datos) => {
     state.multiplayerHistory = datos.multiplayerHistory;
     state.currentPlayerIndex = datos.currentPlayerIndex;
-  
-    // CORRECCIÓN CLIENTE: Si el servidor indica que se deben limpiar los bloqueos de un jugador
+
     if (datos.limpiarBloqueosPara) {
       state.playerTargetBlocks[datos.limpiarBloqueosPara] = [];
     }
 
-    // Si resulta que ahora es NUESTRO turno de transmisión, nos aseguramos de limpiar nuestros propios bloqueos locales
     const jugadorActual = state.connectedPlayers[state.currentPlayerIndex];
+
+    // >> INYECTAMOS LA VOZ DE TERMINAL AQUÍ <<
     if (jugadorActual && jugadorActual.name === state.username) {
       state.playerTargetBlocks[state.username] = [];
+      emitirVozTerminal("Your turn, Hacker. Inject code."); // El navegador te hablará robóticamente
     }
 
-    // Refrescar paneles de espera/transmisión de inmediato con los nuevos estados de desbloqueo
-    actualizarVisualSalaJugadores(); 
+    // >> 🔊 PSICOACÚSTICA ADAPTATIVA: SONIDOS BASADOS EN EL RESULTADO DEL ÚLTIMO ATAQUE <<
+    if (datos.multiplayerHistory && datos.multiplayerHistory.length > 0) {
+      const ultimoAtaque = datos.multiplayerHistory[datos.multiplayerHistory.length - 1];
+      
+      // Solo reproducimos el feedback si el ataque lo realizaste TÚ (para dar recompensa dopaminérgica directa)
+      if (ultimoAtaque.player === state.username) {
+        if (ultimoAtaque.correct >= state.multiLength - 1) {
+          sfx.aciertoBueno(); // Feedback brillante si estás a 1 o 0 de ganar el nodo
+        } else if (ultimoAtaque.correct === 0 && ultimoAtaque.present === 0) {
+          sfx.falloTotal(); // Zumbido sordo industrial si fallaste por completo
+        }
+      }
+    }    
 
-    // AUTOMATIZACIÓN DE BITÁCORA: Si el usuario no tiene ningún filtro seleccionado todavía, 
-    // le asignamos por defecto el objetivo del último ataque para que la pantalla cobre vida sola.
+    actualizarVisualSalaJugadores(); 
     if (!state.selectedTargetFilter) {
       state.selectedTargetFilter = datos.target;
     }
-
-    // Renderizado reactivo inmediato: Forzamos la actualización de la bitácora visual en pantalla
     renderizarBitacoraFiltrada();
   });
-
-
 
   // C. Recibir notificaciones de vulnerabilidades críticas (Nodos quebrados)
   socket.on('nodo_comprometido_alerta', (datos) => {
@@ -76,6 +85,11 @@ export function vincularEventosGraficosDeRed() {
 
   // D. Fin del juego dictado por el servidor central de Render
   socket.on('victoria_global_servidor', (datos) => {
+    if (datos.ganador === state.username) {
+      sfx.victoria(); // Sonido de triunfo masivo
+    } else {
+      sfx.derrota(); // Sonido distorsionado de fracaso
+    }
     ejecutarVictoriaGlobal(datos.ganador);
   });
 

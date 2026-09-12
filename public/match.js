@@ -11,6 +11,7 @@ import { finalizarTurnoJugador } from './referee.js';
 import { generateSecret } from './rooms.js';
 import { removeOverlay } from './fx.js';
 import { socket } from './mode-multi.js'; // Importamos la instancia del WebSocket activo
+import { sfx } from './audio.js';
 
 export function startGame() {
   state.secret = generateSecret(state.length);
@@ -173,6 +174,7 @@ export function submitGuessMulti() {
 
   // TRANSMISIÓN EN TIEMPO REAL: Emitir el intento al servidor central
   // El cálculo de pistas, guardado de historial y estados de victoria se procesan ahora en la nube
+  sfx.ataque(); // <-- ¡DISPARAR AQUÍ! Suena un latigazo digital al presionar Enviar.
   socket.emit('inyectar_ataque', {
     roomCode: state.isHost ? (el.roomNameInput.value.trim().toUpperCase() || `SERVER_${state.username.toUpperCase()}`) : state.selectedRoomCode,
     atacante: atacante,
