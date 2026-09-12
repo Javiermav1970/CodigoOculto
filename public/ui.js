@@ -5,6 +5,7 @@
 import { BANK, isFigure, state } from './config.js';
 import { renderizarCuadernoNotas } from './notes.js';
 import { el } from './dom.js';
+import { sfx } from './audio.js';
 
 // Helper para actualizar mensajes de estado
 export function setStatus(msg, isError) {
@@ -178,7 +179,6 @@ export function addElement(value) {
   if (state.gameMode === 'ia') {
     if (!state.playing || state.current.includes(value)) return;
     
-    // Si no hay un slot seleccionado explícitamente mediante clic, busca el primer espacio vacío disponible
     if (!state.presionado) {
       const primerVacio = state.current.findIndex(v => v === undefined || v === null);
       if (primerVacio !== -1 && primerVacio < state.length) {
@@ -186,7 +186,7 @@ export function addElement(value) {
       } else if (state.current.length < state.length) {
         state.presionado = `numero-${state.current.length}`;
       } else {
-        return; // Ya está lleno
+        return;
       }
     }
 
@@ -198,7 +198,10 @@ export function addElement(value) {
     idSlot.classList.replace('locked', 'filled');
     idSlot.textContent = value;
     
-    state.presionado = ""; // Limpiar foco de selección para la siguiente tecla
+    state.presionado = ""; 
+    
+    sfx.slotIngreso(); // <--- 🔊 AUDIO: Clic táctil al llenar slot en Modo IA
+    
     refreshKeypad();
     setStatus('', false);
   } 
@@ -207,7 +210,6 @@ export function addElement(value) {
     if (el.multiStatusPanel && !el.multiStatusPanel.classList.contains('hidden')) {
       if (!state.playing || state.intentoMulti.includes(value)) return;
       
-      // Auto-asignación de ranura vacía si el usuario oprime el teclado directo sin dar clic al slot
       if (!state.presionado) {
         let primerVacio = -1;
         for (let i = 0; i < state.multiLength; i++) {
@@ -219,7 +221,7 @@ export function addElement(value) {
         if (primerVacio !== -1) {
           state.presionado = `numero-${primerVacio}`;
         } else {
-          return; // Ranuras llenas
+          return;
         }
       }
 
@@ -231,18 +233,25 @@ export function addElement(value) {
       idSlot.classList.replace('locked', 'filled');
       idSlot.textContent = value;
       
-      state.presionado = ""; // Limpiar foco
+      state.presionado = ""; 
+      
+      sfx.slotIngreso(); // <--- 🔊 AUDIO: Clic táctil al llenar slot en plena Partida Online
+      
       refreshKeypad();
       setStatus('', false);
     }
     else if (el.createRoomPanel && !el.createRoomPanel.classList.contains('hidden')) {
       if (state.isCodeLocked || state.mySecretCode.length >= state.multiLength || state.mySecretCode.includes(value)) return;
       state.mySecretCode.push(value);
+      
+      sfx.slotIngreso(); // <--- 🔊 AUDIO: Clic táctil al configurar tu contraseña inicial
+      
       crearSlots();
       refreshKeypad();
     }
   }
 }
+
 
 export function deleteElement() {
   

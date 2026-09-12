@@ -20,6 +20,24 @@ function obtenerAudioContext() {
  * 🔊 EFECTOS DE SONIDO SINTETIZADOS MATEMÁTICAMENTE
  */
 export const sfx = {
+  // Sonido de pulso digital corto para el ingreso de cada dígito/figura
+  slotIngreso: () => {
+    const ctx = obtenerAudioContext();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    
+    osc.type = 'sine'; // Onda pura, limpia y sutil
+    osc.frequency.setValueAtTime(1200, ctx.currentTime); // Frecuencia alta (tono agudo tipo clic)
+    osc.frequency.exponentialRampToValueAtTime(300, ctx.currentTime + 0.03); // Caída ultra veloz
+    
+    gain.gain.setValueAtTime(0.08, ctx.currentTime); // Volumen bajo para que no sea molesto al escribir rápido
+    gain.gain.linearRampToValueAtTime(0.001, ctx.currentTime + 0.03); // Desvanecimiento en milisegundos
+    
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start();
+    osc.stop(ctx.currentTime + 0.03);
+  },
   // Sonido tipo "Láser Glitch" al lanzar un virus
   ataque: () => {
     const ctx = obtenerAudioContext();
