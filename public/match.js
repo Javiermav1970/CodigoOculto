@@ -32,6 +32,11 @@ export function startGame() {
   setStatus('Arma tu intento con el teclado.', false);
   removeOverlay();
   startTimer();
+
+  // >> 🎙 SÍNTESIS DE VOZ: La IA del mainframe desafía al jugador al arrancar
+  import('./audio.js').then(audio => {
+    audio.emitirVozTerminal("Mainframe asegurado. Intenta burlar mi cifrado, hacker.");
+  });
 }
 
 export function lanzarPartidaMultijugador(mensaje) {
@@ -87,6 +92,9 @@ export function submitGuess() {
     return;
   }
 
+  // >> 🔊 AUDIO: Suena el latigazo digital al lanzar el ataque a la IA
+  sfx.ataque();
+
   const guess = [...state.current];
   const { correct, present } = calculateHints(guess, state.secret);
   state.attempts++;
@@ -106,15 +114,26 @@ export function submitGuess() {
     }
 
     setStatus(`✔ CÓDIGO DESCIFRADO en ${state.attempts} intento(s).`, false);
+    
+    // >> 🔊 AUDIO: Sonido de victoria contra la IA
+    sfx.victoria(); 
     showVictory(isRecord);
   } else {
     setStatus(`Aciertos exactos: ${correct} · Presentes: ${present}`, false);
+
+    // >> 🔊 AUDIO: Feedback adaptativo contra la IA
+    if (correct >= state.length - 1) {
+      sfx.aciertoBueno(); // Arpegio brillante si estás a punto de descifrarlo
+    } else if (correct === 0 && present === 0) {
+      sfx.falloTotal(); // Zumbido sordo si fallaste todas las casillas
+    }
   }
 
   state.current = [];
   crearSlots();
   refreshKeypad();
 }
+
 
 export function submitGuessMulti() {
   if (!state.playing) return;
