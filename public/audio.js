@@ -111,21 +111,35 @@ export const sfx = {
 };
 
 /**
- * 🎙 SÍNTESIS DE VOZ DE INTELIGENCIA ARTIFICIAL (NATIVA)
+ * 🎙 SÍNTESIS DE VOZ DE INTELIGENCIA ARTIFICIAL EN ESPAÑOL NATIVO
  */
 export function emitirVozTerminal(texto) {
   if (!('speechSynthesis' in window)) return;
-  window.speechSynthesis.cancel(); // Cancelar voces anteriores en cola
+  window.speechSynthesis.cancel(); // Cancelar cualquier audio previo en cola para evitar retrasos
   
   const mensaje = new SpeechSynthesisUtterance(texto);
-  mensaje.lang = 'en-US'; // Idioma inglés para darle la estética de comando internacional de red
-  mensaje.rate = 1.0;     // Velocidad normal
-  mensaje.pitch = 0.6;    // Voz grave, estilo IA fría y robótica
   
-  // Buscar una voz masculina/femenina estable del sistema si existe
-  const voces = window.speechSynthesis.getVoices();
-  const vozRobot = voces.find(v => v.lang.includes('en') && v.name.includes('Google')) || voces[0];
-  if (vozRobot) mensaje.voice = vozRobot;
+  // 1. CONFIGURACIÓN IDIOMA MAESTRO: Forzamos la fonética al español neutro/castellano
+  mensaje.lang = 'es-ES'; 
+  
+  // 2. PARÁMETROS PSICOACÚSTICOS CIBERPUNK
+  mensaje.rate = 1.05; // Un toque más rápido para dar sensación de procesamiento informático veloz
+  mensaje.pitch = 0.75; // Voz más grave de lo normal, emulando una supercomputadora fría o un Mainframe militar
+  mensaje.volume = 0.9;
+
+  // 3. SELECCIÓN DE MOTOR NATIVO EN ESPAÑOL
+  // Escaneamos la base de datos de voces del sistema operativo del jugador (Windows, Linux, Android o iOS)
+  const vocesDisponibles = window.speechSynthesis.getVoices();
+  
+  // Buscamos prioritariamente voces de Microsoft, Google o Apple que hablen español ("es")
+  const vozEspañola = vocesDisponibles.find(v => v.lang.startsWith('es') && (v.name.includes('Sabina') || v.name.includes('Google') || v.name.includes('Helena') || v.name.includes('Microsoft'))) 
+                      || vocesDisponibles.find(v => v.lang.startsWith('es')); // Alternativa si no encuentra las principales
+
+  if (vozEspañola) {
+    mensaje.voice = vozEspañola; // Anclamos de forma mandatoria la voz en castellano hallada
+    console.log(`🎙️ Voz de Terminal establecida: ${vozEspañola.name} (${vozEspañola.lang})`);
+  }
 
   window.speechSynthesis.speak(mensaje);
 }
+
