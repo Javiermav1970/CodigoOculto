@@ -81,7 +81,7 @@ export function vincularEventosGraficosDeRed() {
     // >> INYECTAMOS LA VOZ DE TERMINAL AQUÍ <<
     if (jugadorActual && jugadorActual.name === state.username) {
       state.playerTargetBlocks[state.username] = [];
-      emitirVozTerminal("Your turn, Hacker. Inject code."); // El navegador te hablará robóticamente
+      emitirVozTerminal("Es tu turno, hacker. Inyecta el código."); // El navegador te hablará robóticamente
     }
 
     // >> 🔊 PSICOACÚSTICA ADAPTATIVA: SONIDOS BASADOS EN EL RESULTADO DEL ÚLTIMO ATAQUE <<
