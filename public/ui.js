@@ -5,7 +5,6 @@
 import { BANK, isFigure, state } from './config.js';
 import { renderizarCuadernoNotas } from './notes.js';
 import { el } from './dom.js';
-import { sfx } from './audio.js';
 
 // Helper para actualizar mensajes de estado
 export function setStatus(msg, isError) {
@@ -179,6 +178,7 @@ export function addElement(value) {
   if (state.gameMode === 'ia') {
     if (!state.playing || state.current.includes(value)) return;
     
+    // Si no hay un slot seleccionado explícitamente mediante clic, busca el primer espacio vacío disponible
     if (!state.presionado) {
       const primerVacio = state.current.findIndex(v => v === undefined || v === null);
       if (primerVacio !== -1 && primerVacio < state.length) {
@@ -186,7 +186,7 @@ export function addElement(value) {
       } else if (state.current.length < state.length) {
         state.presionado = `numero-${state.current.length}`;
       } else {
-        return;
+        return; // Ya está lleno
       }
     }
 
@@ -198,10 +198,7 @@ export function addElement(value) {
     idSlot.classList.replace('locked', 'filled');
     idSlot.textContent = value;
     
-    state.presionado = ""; 
-    
-    sfx.slotIngreso(); // <--- 🔊 AUDIO: Clic táctil al llenar slot en Modo IA
-    
+    state.presionado = ""; // Limpiar foco de selección para la siguiente tecla
     refreshKeypad();
     setStatus('', false);
   } 
@@ -210,6 +207,7 @@ export function addElement(value) {
     if (el.multiStatusPanel && !el.multiStatusPanel.classList.contains('hidden')) {
       if (!state.playing || state.intentoMulti.includes(value)) return;
       
+      // Auto-asignación de ranura vacía si el usuario oprime el teclado directo sin dar clic al slot
       if (!state.presionado) {
         let primerVacio = -1;
         for (let i = 0; i < state.multiLength; i++) {
@@ -221,7 +219,7 @@ export function addElement(value) {
         if (primerVacio !== -1) {
           state.presionado = `numero-${primerVacio}`;
         } else {
-          return;
+          return; // Ranuras llenas
         }
       }
 
@@ -233,25 +231,18 @@ export function addElement(value) {
       idSlot.classList.replace('locked', 'filled');
       idSlot.textContent = value;
       
-      state.presionado = ""; 
-      
-      sfx.slotIngreso(); // <--- 🔊 AUDIO: Clic táctil al llenar slot en plena Partida Online
-      
+      state.presionado = ""; // Limpiar foco
       refreshKeypad();
       setStatus('', false);
     }
     else if (el.createRoomPanel && !el.createRoomPanel.classList.contains('hidden')) {
       if (state.isCodeLocked || state.mySecretCode.length >= state.multiLength || state.mySecretCode.includes(value)) return;
       state.mySecretCode.push(value);
-      
-      sfx.slotIngreso(); // <--- 🔊 AUDIO: Clic táctil al configurar tu contraseña inicial
-      
       crearSlots();
       refreshKeypad();
     }
   }
 }
-
 
 export function deleteElement() {
   
@@ -314,46 +305,4 @@ export function deleteElement() {
       refreshKeypad();
     }
   }
-}
-/**
- * Inyecta una alerta flotante ciberpunk temporal en el DOM
- * Reemplazo directo y seguro para el alert() nativo
- */
-export function mostrarAlertaCyber(mensaje, esError = true) {
-  // Eliminar si ya existe una alerta activa para no encimarlas
-  const alertaPrevia = document.getElementById('pop-alerta-cyber');
-  if (alertaPrevia) alertaPrevia.remove();
-
-  const popup = document.createElement('div');
-  popup.id = 'pop-alerta-cyber';
-  popup.className = 'broadcast-popup';
-  
-  // Aplicar estilos dinámicos basados en la gravedad del mensaje
-  popup.style.borderColor = esError ? 'var(--danger)' : 'var(--neon)';
-  popup.style.boxShadow = esError ? '0 0 25px rgba(255, 77, 109, 0.4)' : '0 0 25px rgba(0, 245, 212, 0.4)';
-  popup.style.pointerEvents = 'auto'; // Permitir interactividad si se desea cerrar al hacer clic
-
-  const titulo = esError ? '⚠️ ERROR DE PROTOCOLO' : '📡 NOTIFICACIÓN DE RED';
-  const colorTitulo = esError ? 'var(--danger)' : 'var(--neon)';
-
-  popup.innerHTML = `
-    <div class="broadcast-content">
-      <div class="broadcast-header" style="color: ${colorTitulo}; letter-spacing: 2px;">${titulo}</div>
-      <p style="margin-top: 10px; font-size: 13px; line-height: 1.4; color: var(--text);">${mensaje}</p>
-    </div>
-  `;
-
-  document.body.appendChild(popup);
-
-  // Permitir cierre inmediato al hacer clic sobre la alerta
-  popup.addEventListener('click', () => popup.remove());
-
-  // Auto-eliminación suave tras 3.5 segundos
-  setTimeout(() => {
-    if (document.body.contains(popup)) {
-      popup.style.opacity = '0';
-      popup.style.transform = 'translate(-50%, -60%) scale(0.9)';
-      setTimeout(() => popup.remove(), 400);
-    }
-  }, 3500);
 }

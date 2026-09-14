@@ -52,24 +52,3 @@ export function loadRecords() {
 export function saveRecords(records) {
   try { localStorage.setItem(RECORDS_KEY, JSON.stringify(records)); } catch {}
 }
-
-// >> Añade esta función al final de tu config.js <<
-export function limpiarEstadoMemoriaCompleto() {
-  state.playing = false;
-  state.isCodeLocked = false; // <--- Garantiza apagar el cifrado visual de estrellas
-  state.isHost = false;
-  state.mySecretCode = [];
-  state.intentoMulti = [];
-  state.current = [];
-  state.multiplayerHistory = [];
-  state.connectedPlayers = [];
-  state.decryptedPlayers = [];
-  state.playerTargetBlocks = {};
-  state.botMemory = {};
-  state.currentPlayerIndex = 0;
-  state.selectedTargetFilter = null; // <-- Quitar el "TODOS" para forzar el mensaje de bienvenida de la bitácora
-  state.selectedRoomCode = null;
-  state.attempts = 0;
-  state.elapsed = 0;
-  // Conservamos state.username para que el jugador no tenga que volver a logearse
-}

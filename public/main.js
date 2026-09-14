@@ -1,50 +1,20 @@
 /* =========================================================
    CÓDIGO OCULTO - Juego de deducción tipo Mastermind (Cliente de Red Real-Time)
    ========================================================= */
-import { state, BANK, MOCK_ROOMS, isFigure, loadRecords, limpiarEstadoMemoriaCompleto } from './config.js';
+import { state, BANK, MOCK_ROOMS, isFigure, loadRecords } from './config.js';
 import { formatTime,  stopTimer } from './timer.js';
 import { el } from './dom.js';
 import { renderizarCuadernoNotas } from './notes.js';
-import { setStatus, setMultiSetupMessage, buildKeypad, crearSlots, renderizarBitacoraFiltrada, addElement, deleteElement, mostrarAlertaCyber  } from './ui.js';
+import { setStatus, setMultiSetupMessage, buildKeypad, crearSlots, renderizarBitacoraFiltrada, addElement, deleteElement } from './ui.js';
 import { renderRoomsList, renderConnectedPlayers } from './rooms.js';
 import { launchConfetti, removeOverlay } from './fx.js';
 import { startGame, submitGuess, submitGuessMulti } from './match.js';
 import { abandonarPartidaMultijugador, socket } from './mode-multi.js'; // Importación del canal de red activo
 import { celebrarDescifradoIntermedio, mostrarVentanaFlotanteAtaque, ejecutarVictoriaGlobal } from './referee.js';
-import { sfx, emitirVozTerminal } from './audio.js';
 
 // Importamos la inicialización de los manejadores de eventos de cada modo para que se ejecuten
 import './mode-ia.js';
 import './mode-multi.js';
-
-// >> INYECTAR ESTE BLOQUE DESPERTADOR AL INICIO DE MAIN.JS <<
-/* ---------- PROTOCOLO DE DESPERTAR MOTOR DE AUDIO CYBERPUNK ---------- */
-function desbloquearEcosistemaAudio() {
-  // Disparamos la inicialización del contexto matemático de ondas
-  import('./audio.js').then(modulo => {
-    // Forzamos un micro-sonido silencioso imperceptible para que el navegador libere el canal de audio
-    try {
-      const ctx = new (window.AudioContext || window.webkitAudioContext)();
-      if (ctx.state === 'suspended') ctx.resume();
-    } catch (e) {
-      console.log("Esperando interacción de red para inicializar nodos acústicos...");
-    }
-    
-    // Despierta de una vez el motor de síntesis de voz nativa (Speech)
-    if ('speechSynthesis' in window) {
-      window.speechSynthesis.getVoices();
-    }
-  });
-
-  // Una vez desbloqueado, removemos los escuchadores para no saturar la memoria
-  document.removeEventListener('click', desbloquearEcosistemaAudio);
-  document.removeEventListener('keydown', desbloquearEcosistemaAudio);
-}
-
-// Escuchar el primer clic o pulsación de teclado del usuario en la web para encender los parlantes
-document.addEventListener('click', desbloquearEcosistemaAudio);
-document.addEventListener('keydown', desbloquearEcosistemaAudio);
-
 
 /* ---------- CONFIGURACIÓN DE ESCUCHADORES DE INTERFAZ EN TIEMPO REAL ---------- */
 export function vincularEventosGraficosDeRed() {
@@ -66,44 +36,30 @@ export function vincularEventosGraficosDeRed() {
     mostrarVentanaFlotanteAtaque(datos.emisor, datos.receptor, datos.codigo);
   });
 
-  // B. Sincronizar el historial de la bitácora unificada calculada en la nube (ACTUALIZADO)
-    // B. Sincronizar el historial de la bitácora unificada calculada en la nube
+  // B. Sincronizar el historial de la bitácora unificada calculada en la nube
   socket.on('actualizar_bitacora_global', (datos) => {
     state.multiplayerHistory = datos.multiplayerHistory;
     state.currentPlayerIndex = datos.currentPlayerIndex;
-
+  
+    // CORRECCIÓN CLIENTE: Si el servidor indica que se deben limpiar los bloqueos de un jugador
     if (datos.limpiarBloqueosPara) {
       state.playerTargetBlocks[datos.limpiarBloqueosPara] = [];
     }
 
+    // Si resulta que ahora es NUESTRO turno de transmisión, nos aseguramos de limpiar nuestros propios bloqueos locales
     const jugadorActual = state.connectedPlayers[state.currentPlayerIndex];
-
-    // >> INYECTAMOS LA VOZ DE TERMINAL AQUÍ <<
     if (jugadorActual && jugadorActual.name === state.username) {
       state.playerTargetBlocks[state.username] = [];
-      emitirVozTerminal("Es tu turno, hacker. Inyecta el código."); // El navegador te hablará robóticamente
     }
 
-    // >> 🔊 PSICOACÚSTICA ADAPTATIVA: SONIDOS BASADOS EN EL RESULTADO DEL ÚLTIMO ATAQUE <<
-    if (datos.multiplayerHistory && datos.multiplayerHistory.length > 0) {
-      const ultimoAtaque = datos.multiplayerHistory[datos.multiplayerHistory.length - 1];
-      
-      // Solo reproducimos el feedback si el ataque lo realizaste TÚ (para dar recompensa dopaminérgica directa)
-      if (ultimoAtaque.player === state.username) {
-        if (ultimoAtaque.correct >= state.multiLength - 1) {
-          sfx.aciertoBueno(); // Feedback brillante si estás a 1 o 0 de ganar el nodo
-        } else if (ultimoAtaque.correct === 0 && ultimoAtaque.present === 0) {
-          sfx.falloTotal(); // Zumbido sordo industrial si fallaste por completo
-        }
-      }
-    }    
-
+    // Refrescar paneles de espera/transmisión de inmediato con los nuevos estados de desbloqueo
     actualizarVisualSalaJugadores(); 
-    if (!state.selectedTargetFilter) {
-      state.selectedTargetFilter = datos.target;
+
+    if (state.selectedTargetFilter === datos.target) {
+      renderizarBitacoraFiltrada();
     }
-    renderizarBitacoraFiltrada();
   });
+
 
   // C. Recibir notificaciones de vulnerabilidades críticas (Nodos quebrados)
   socket.on('nodo_comprometido_alerta', (datos) => {
@@ -114,11 +70,6 @@ export function vincularEventosGraficosDeRed() {
 
   // D. Fin del juego dictado por el servidor central de Render
   socket.on('victoria_global_servidor', (datos) => {
-    if (datos.ganador === state.username) {
-      sfx.victoria(); // Sonido de triunfo masivo
-    } else {
-      sfx.derrota(); // Sonido distorsionado de fracaso
-    }
     ejecutarVictoriaGlobal(datos.ganador);
   });
 
@@ -169,53 +120,22 @@ function renderRecords() {
 }
 
 export function resetGame() {
-  // EJECUCIÓN CRÍTICA: Borrar toda la memoria residual de la partida anterior
-  if (typeof limpiarEstadoMemoriaCompleto === 'function') {
-    limpiarEstadoMemoriaCompleto();
-  }
   state.notasDeduccion = {};
   const panelNotas = document.getElementById('cuadernoNotasPanel');
   if (panelNotas) panelNotas.remove(); 
-  
+
+  state.playing = false;
   stopTimer();
   renderRecords();
-
-  // 1. TRANSICIÓN MAESTRA DE PANELES PRINCIPALES
-  el.modePanel.classList.remove('hidden'); // Encendemos el menú de modos principal (IA / MULTI)
-  el.setupPanel.classList.add('hidden');    // Apagamos configuraciones previas
-
-  // 2. APAGAR SUBPANELES MULTIJUGADOR ACTIVOS Y SUS CONTENEDORES DE ESTADO
-  if (el.multiStatusPanel) el.multiStatusPanel.classList.add('hidden');
-  if (el.statusMultiLogPanel) el.statusMultiLogPanel.classList.add('hidden');
-  if (el.createRoomPanel) el.createRoomPanel.classList.add('hidden');
-  if (el.lobbyPanel) el.lobbyPanel.classList.add('hidden');
-  
-  // Apagar el panel de estado multijugador principal de la partida
-  if (el.multiStatusMsg) el.multiStatusMsg.parentElement?.classList.add('hidden'); 
-  const panelEstadoMulti = document.getElementById('MultistatusPanel');
-  if (panelEstadoMulti) panelEstadoMulti.classList.add('hidden');
-
-  // 3. LIMPIEZA Y OCULTACIÓN DE CONTENEDORES DE JUGADORES Y SLOTS (TU DETECCIÓN CRÍTICA)
-  if (el.jugadorespanel) {
-    el.jugadorespanel.innerHTML = '';          // Vaciamos el HTML interno
-    el.jugadorespanel.classList.add('hidden'); // <--- ¡SOLUCIÓN! Forzamos la ocultación total en pantalla
-  }
-  if (el.statusMultiSlots) el.statusMultiSlots.innerHTML = '';    // Vaciar slots de juego en red
-  if (el.connectedPlayersList) el.connectedPlayersList.innerHTML = ''; // Vaciar lista de conexiones
-  
-  if (el.statusPanel) el.statusPanel.classList.add('hidden');     // Apaga panel de estado genérico
-  if (el.multibotones) el.multibotones.classList.add('hidden');   // Oculta botones de acción multijugador
-
-  // 4. APAGAR CONTENEDORES DE JUEGO MODO SINGLE-PLAYER (IA)
+  el.modePanel.classList.remove('hidden');
+  el.setupPanel.classList.add('hidden');
   el.botones.classList.add('hidden');
   el.botones.disabled = false;
+  el.statusPanel.classList.add('hidden');
   el.keypadPanel.classList.add('hidden');
   el.logPanel.classList.add('hidden');
-  
-  removeOverlay(); // Elimina los carteles flotantes de victoria o derrota
+  removeOverlay();
 }
-
-
 
 /* ---------- GESTIÓN DE SALAS MULTIJUGADOR ---------- */
 export function addLogRow(guess, correct, present, index) {
@@ -374,14 +294,10 @@ el.connectSelectedBtn.addEventListener('click', () => {
   // 5. CONFIGURAR MENSAJES Y DIBUJAR ESTRUCTURA DE RANURAS REACCIONANDO A LA HERENCIA
   setMultiSetupMessage('Establece tu cifrado de acceso para ingresar a la terminal.', false);
   
- // CORRECCIÓN MAESTRA: Forzamos al botón del DOM a restaurar su estado nativo de fábrica
-  el.multiLockCodeBtn.disabled = false;                  // <-- Desbloquear el botón
-  el.multiLockCodeBtn.style.pointerEvents = 'auto';      // <-- Devolver interactividad
-  el.multiLockCodeBtn.style.opacity = '1';               // <-- Opacidad brillante original
-  el.multiLockCodeBtn.textContent = "🔒 INGRESO A RED";  // <-- Restaurar la leyenda original
+  el.multiLockCodeBtn.textContent = "🔒 INGRESO A RED";
+  el.multiLockCodeBtn.disabled = false;
 
   if (el.forceStartMultiBtn) el.forceStartMultiBtn.classList.add('hidden');
-  
   el.lobbyPanel.classList.add('hidden');
   el.createRoomPanel.classList.remove('hidden');
   
@@ -399,7 +315,7 @@ el.vsIaBtn.addEventListener('click', () => {
 el.vsPlayerBtn.addEventListener('click', () => {
   const inputName = el.usernameInput.value.trim();
   if (!inputName) {
-    mostrarAlertaCyber("ACCESO DENEGADO: El seudónimo es obligatorio para el protocolo Multijugador.", true);
+    alert("❌ ACCESO DENEGADO: El seudónimo es obligatorio para el protocolo Multijugador.");
     el.usernameInput.focus();
     return;
   }
@@ -410,42 +326,38 @@ el.vsPlayerBtn.addEventListener('click', () => {
   el.lobbyPanel.classList.remove('hidden');
   renderRoomsList(MOCK_ROOMS);
   renderRoomsList([]); // Limpia la lista vieja primero
-  if (socket) socket.emit('solicitar_lista_salas');
+  if (socket) socket.emit('solicitar_lista_salas'); // <--- Pide las salas reales al servidor de inmediato
 });
 
-
 el.createRoomBtn.addEventListener('click', () => {
-  // CORRECCIÓN INTERNA: Forzar limpieza absoluta antes de preparar la reconfiguración
-  if (typeof limpiarEstadoMemoriaCompleto === 'function') {
-    limpiarEstadoMemoriaCompleto();
-  }
-
+  state.multiplayerHistory = [];
+  state.selectedTargetFilter = null;
+  state.decryptedPlayers = [];
+  state.playerTargetBlocks = {};
+  state.botMemory = {};
+  
   state.isHost = true;             
   state.currentPlayerIndex = 0;    
   state.tipoPanel = "lobbyPanel"; 
   state.multiLength = 3;
+  state.mySecretCode = [];
+  state.isCodeLocked = false;
   state.limit = 0;
   state.connectedPlayers = [{ name: state.username, isHost: true }];
   state.maxPlayersAllowed = parseInt(el.roomMaxPlayersInput.value, 10) || 2;
 
   el.roomNameInput.disabled = false;
   el.roomMaxPlayersInput.disabled = false;
-  if (el.multiCustomLenInput) el.multiCustomLenInput.disabled = false;
-  
-  el.roomNameInput.value = ''; // Limpiar el cuadro de texto
+  el.multiCustomLenInput.disabled = false;
   el.roomNameInput.placeholder = `SERVER_${state.username.toUpperCase()}`;
   el.roomLiveCode.textContent = "SALA: PENDIENTE";
-  
-  if (el.forceStartMultiBtn) {
-    el.forceStartMultiBtn.disabled = true;
-    el.forceStartMultiBtn.classList.add('hidden');
-  }
+  el.forceStartMultiBtn.disabled = true;
 
   setMultiSetupMessage('Establece tu cifrado usando la consola inferior.', false);
   
   el.multiDiffBtns.forEach(b => b.classList.remove('active'));
-  if (el.multiCustomDiffBtn) el.multiCustomDiffBtn.classList.remove('active');
-  if (el.multiDiffBtns[0]) el.multiDiffBtns[0].classList.add('active');
+  el.multiCustomDiffBtn.classList.remove('active');
+  el.multiDiffBtns[0].classList.add('active');
 
   if (el.multiLimitBtns) {
     el.multiLimitBtns.forEach(b => b.classList.remove('active'));
@@ -455,11 +367,10 @@ el.createRoomBtn.addEventListener('click', () => {
   el.lobbyPanel.classList.add('hidden');
   el.createRoomPanel.classList.remove('hidden');
 
-  crearSlots(); // Ahora sí dibujará con los valores en limpio (🔒🔒🔒)
+  crearSlots();
   renderConnectedPlayers();
-  buildKeypad(); // Re-renderizar teclado limpio sin bloqueos de la partida vieja
+  buildKeypad();
 });
-
 
 /* ---------- BOTONES ADICIONALES DE RETORNO Y CONTROL ---------- */
 el.refreshRoomsBtn.addEventListener('click', () => {
@@ -487,28 +398,13 @@ el.sendBtn.addEventListener('click', submitGuess);
 el.StatusMultisendBtn.addEventListener('click', submitGuessMulti);
 
 el.backToLobbyFromCreateBtn.addEventListener('click', () => {
-
-  // 1. NOTIFICAR DESCONEXIÓN A LA RED CENTRAL
-  if (socket) {
-    socket.disconnect(); 
-    socket.connect(); // Reconectar para quedar listo en el lobby
-  }
-
-  // LIMPIEZA INTERNA ANTES DE RECONFIGURAR
-  if (typeof limpiarEstadoMemoriaCompleto === 'function') {
-    limpiarEstadoMemoriaCompleto();
-  }
-
   el.roomNameInput.disabled = false;
   el.roomNameInput.value = '';
   el.roomMaxPlayersInput.type = 'number';
   el.roomMaxPlayersInput.disabled = false;
-  el.roomMaxPlayersInput.value = '2';
   
-  let etiquetaMaxLocal = document.querySelector('label[for="roomMaxPlayersInput"]');
-  if (etiquetaMaxLocal) {
-    etiquetaMaxLocal.textContent = "Límite de Hackers en partida";
-  }
+  etiquetaMax = document.querySelector('label[for="roomMaxPlayersInput"]');
+  if (etiquetaMax) etiquetaMax.textContent = "Límite de Hackers en partida";
 
   const diffContainer = document.querySelector('.diff-row') || el.multiDiffBtns[0]?.parentElement;
   if (diffContainer) diffContainer.style.display = 'flex';
@@ -549,9 +445,9 @@ el.backToLobbyFromCreateBtn.addEventListener('click', () => {
   el.roomMaxPlayersInput.value = '2'; // Valor por defecto al crear
   el.roomMaxPlayersInput.disabled = false;
   
-  const etiquetaMax2 = document.querySelector('label[for="roomMaxPlayersInput"]');
-  if (etiquetaMax2) {
-    etiquetaMax2.textContent = "Límite de Hackers en partida";
+  etiquetaMax = document.querySelector('label[for="roomMaxPlayersInput"]');
+  if (etiquetaMax) {
+    etiquetaMax.textContent = "Límite de Hackers en partida";
   }
 });
 
@@ -618,7 +514,7 @@ export function actualizarVisualSalaJugadores() {
         // Plantilla HTML del componente de jugador
         return `
             <div class="player-card-item ${claseSelected} ${claseBloqueado}" data-name="${p.name}" data-order="${idx + 1}" style="${estiloTurno} ${opacidad}"> 
-                <div class="player-info-inline" style="display: flex; flex-direction: column; align-items: flex-start; gap: 4px;"> 
+                <div class="player-info-inline" style="pointer-events: auto; display: flex; flex-direction: column; align-items: flex-start; gap: 4px;"> 
                     <div style="display: flex; align-items: center; gap: 6px; width: 100%;"> 
                         <span class="player-name-text" title="${p.name.toUpperCase()}">${esTurnoActual ? '▶️ ' : ''}📡 ${p.name.toUpperCase()}</span> 
                         ${badge} 
@@ -634,18 +530,6 @@ export function actualizarVisualSalaJugadores() {
 
     htmlGrid += `</div>`;
     el.jugadorespanel.innerHTML = htmlGrid;
-}
-
-// ESCUCHAR TECLA ENTER EN EL CUADRO DE LOGEO DE NOMBRE (ACTUALIZADO INTELIGENTE)
-if (el.usernameInput) {
-  el.usernameInput.addEventListener('keydown', (event) => {
-    if (event.key === 'ENTER') {
-      // Simulamos automáticamente un clic real en el botón Multijugador que ya programaste
-      if (el.vsPlayerBtn) {
-        el.vsPlayerBtn.click();
-      }
-    }
-  });
 }
 
 if (el.jugadorespanel) {
@@ -682,7 +566,6 @@ if (el.jugadorespanel) {
     renderizarBitacoraFiltrada();
   });
 }
-
 function abrirModalNotas() {
   const viejoModal = document.getElementById('modalNotasDeduccion');
   if (viejoModal) viejoModal.remove();
