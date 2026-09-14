@@ -102,7 +102,7 @@ export function crearSlots() {
       for (let i = 0; i < state.multiLength; i++) {
         const candado = document.createElement('div');
         const val = state.intentoMulti[i];
-        console.log(state.intentoMulti[i]);
+        console.log(val);
         candado.className = `slot ${val ? 'filled' : 'locked'}`;
         candado.textContent = val ? val : '🔒';
         candado.id = `numero-${i}`;
