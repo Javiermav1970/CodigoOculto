@@ -36,9 +36,7 @@ export function buildKeypad() {
 
   if (!contenedor) return;
 
-  // Limpiar el contenedor antes de rellenar
   contenedor.innerHTML = '';
-
   BANK.forEach(value => {
     const tecla = document.createElement('button');
     tecla.className = `key ${isFigure(value) ? 'figure' : ''}`;
