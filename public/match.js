@@ -135,12 +135,16 @@ export function submitGuess() {
 }
 
 
+// =============================================================================
+// MODIFICACIÓN CRÍTICA EN match.js: LECTURA DIRECTA DESDE ESTADO EN RED
+// =============================================================================
+
 export function submitGuessMulti() {
   if (!state.playing) return;
 
   // VERIFICACIÓN DE SEGURIDAD INTERNA: Validar si es realmente el turno del jugador humano
   const jugadorActual = state.connectedPlayers[state.currentPlayerIndex];
-  if (jugadorActual.name !== state.username) {
+  if (!jugadorActual || jugadorActual.name !== state.username) {
     mostrarAlertaCyber("No es tu turno de transmisión. Espera a que los demás terminales concluyan.", true);
     return;
   }
@@ -157,31 +161,29 @@ export function submitGuessMulti() {
   // VERIFICACIÓN DE REPETICIÓN: Validar si el humano ya atacó a este objetivo en el turno actual
   if (!state.playerTargetBlocks[atacante]) state.playerTargetBlocks[atacante] = [];
   if (state.playerTargetBlocks[atacante].includes(objetivo)) {
-    mostrarAlertaCyber(`OBJEITVO BLOQUEADO: Ya has inyectado un código en el nodo de ${objetivo.toUpperCase()} durante esta fase.`, true);
+    mostrarAlertaCyber(`OBJETIVO BLOQUEADO: Ya has inyectado un código en el nodo de ${objetivo.toUpperCase()} durante esta fase.`, true);
     return;
   }
 
-  // Organizar los elementos que el usuario introdujo en los slots multijugador
-  for (let i = 0; i < state.multiLength; i++) {
-    const node = document.getElementById(`numero-${i}`);
-    if (node) state.intentoMulti[i] = node.textContent;
-  }
+  // ¡CORRECCIÓN MAESTRA!: En lugar de buscar los elementos en el HTML mediante document.getElementById,
+  // leemos directamente el array de memoria 'state.intentoMulti' que ya está purificado por el teclado.
+  // Filtramos cualquier valor nulo, indefinido o vacío para asegurar un envío limpio.
+  const digitosIngresados = state.intentoMulti.filter(v => v !== undefined && v !== null && v !== '');
 
-  // 2. Validar que el código esté completo
-  const digitosIngresados = state.intentoMulti.filter(v => BANK.includes(v));
-
+  // 2. Validar que el código esté completo comparando contra la longitud requerida de la sala
   if (digitosIngresados.length < state.multiLength) {
     mostrarAlertaCyber(`SECUENCIA INCOMPLETA: Se requieren exactamente ${state.multiLength} elementos para ejecutar el descifrado.`, true);
     return;
   }
 
+  // 3. Validar elementos repetidos (Regla Mastermind)
   if (new Set(digitosIngresados).size !== digitosIngresados.length) {
     mostrarAlertaCyber('ERROR DE CONFIGURACIÓN: No se permiten elementos repetidos en la secuencia de ataque.', true);
     return;
   }
 
   // ¡BARRERA DE SEGURIDAD ABSOLUTA EN RED!
-  if (state.selectedTargetFilter === state.username) {
+  if (objetivo === state.username) {
     mostrarAlertaCyber("Acceso rechazado. Protocolo de seguridad activado. No puedes inyectar un ataque a tu propia terminal.", true);
     return;
   }
@@ -191,19 +193,31 @@ export function submitGuessMulti() {
   // REGISTRO CRÍTICO: Bloquear local e inmediatamente al objetivo en esta ronda
   state.playerTargetBlocks[atacante].push(objetivo);
 
-  // TRANSMISIÓN EN TIEMPO REAL: Emitir el intento al servidor central
+  // TRANSMISIÓN EN TIEMPO REAL: Emitir el intento al servidor central de Render
   sfx.ataque();
+  
+  let nombreSalaActive = state.isHost 
+    ? (el.roomNameInput.value.trim().toUpperCase() || `SERVER_${state.username.toUpperCase()}`) 
+    : state.selectedRoomCode;
+
+  // Si por alguna razón el texto de la interfaz tiene el código en vivo real (ej. SALA: X9F2R), lo extraemos de forma segura
+  if (el.roomLiveCode && el.roomLiveCode.textContent.includes('SALA:') && !el.roomLiveCode.textContent.includes('PENDIENTE')) {
+    nombreSalaActive = el.roomLiveCode.textContent.replace('SALA:', '').trim();
+  }
+
   socket.emit('inyectar_ataque', {
-    roomCode: state.isHost ? (el.roomNameInput.value.trim().toUpperCase() || `SERVER_${state.username.toUpperCase()}`) : state.selectedRoomCode,
+    roomCode: nombreSalaActive,
     atacante: atacante,
     objetivo: objetivo,
     guess: codigoAtaque
   });
 
-  // Limpiar y resetear las casillas de entrada locales inmediatamente para el siguiente ataque
+  // Limpiar y resetear las casillas de entrada locales inmediatamente para el siguiente ataque de la partida
   state.intentoMulti = [];
+  state.presionado = ""; // Liberar el foco del slot para que el auto-foco del teclado vuelva a empezar desde cero
+  
   crearSlots();
   refreshKeypad();
-  state.selectedTargetFilter = null; 
 }
+
 
