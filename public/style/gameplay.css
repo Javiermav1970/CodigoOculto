@@ -286,3 +286,10 @@
   animation: panelFadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
+/* Realce estético ciberpunk para el slot que tiene el foco de escritura */
+.slot.selected {
+  border-style: solid !important;
+  border-color: var(--neon-2) !important; /* Resalta en magenta neón el slot seleccionado */
+  box-shadow: 0 0 14px rgba(246, 55, 236, 0.45);
+  transform: scale(1.05);
+}
