@@ -12,11 +12,6 @@ app.use(cors()); // Permitir conexiones desde cualquier URL (importante para hos
 
 app.use(express.static(path.join(__dirname, 'public')));  
 
-// Parche definitivo de transmisión para el Favicon Cyberpunk en internet
-app.get('/favicon.ico', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'favicon.png'));
-});
-
 const server = http.createServer(app);
 // Configurar los WebSockets para aceptar tráficos remotos
 const io = new Server(server, {
