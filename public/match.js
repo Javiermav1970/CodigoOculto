@@ -3,7 +3,7 @@
    ========================================================= */
 import { BANK, state, loadRecords, saveRecords } from './config.js';
 import { el } from './dom.js';
-import { buildKeypad, crearSlots, refreshKeypad, renderizarBitacoraFiltrada, setStatus } from './ui.js';
+import { buildKeypad, crearSlots, refreshKeypad, renderizarBitacoraFiltrada, setStatus, mostrarAlertaCyber } from './ui.js';
 import { actualizarVisualSalaJugadores, showVictory, addLogRow } from './main.js';
 import { startTimer, stopTimer } from './timer.js';
 import { calculateHints } from './bots.js';
@@ -11,6 +11,7 @@ import { finalizarTurnoJugador } from './referee.js';
 import { generateSecret } from './rooms.js';
 import { removeOverlay } from './fx.js';
 import { socket } from './mode-multi.js'; // Importamos la instancia del WebSocket activo
+import { sfx } from './audio.js';
 
 export function startGame() {
   state.secret = generateSecret(state.length);
@@ -31,6 +32,11 @@ export function startGame() {
   setStatus('Arma tu intento con el teclado.', false);
   removeOverlay();
   startTimer();
+
+  // >> 🎙 SÍNTESIS DE VOZ: La IA del mainframe desafía al jugador al arrancar
+  import('./audio.js').then(audio => {
+    audio.emitirVozTerminal("Mainframe  asegurado. Intenta  burlar  mi  cifrado, hacker.");
+  });
 }
 
 export function lanzarPartidaMultijugador(mensaje) {
@@ -43,6 +49,11 @@ export function lanzarPartidaMultijugador(mensaje) {
   if (el.multiStatusPanel) el.multiStatusPanel.classList.remove('hidden');
   if (el.statusMultiLogPanel) el.statusMultiLogPanel.classList.remove('hidden');
   
+  // 💻 CORRECCIÓN MAESTRA: Limpiar visualmente la bitácora para la nueva partida
+  // Vaciamos tanto el contenedor multijugador como el genérico por seguridad
+  if (el.statusMultiLog) el.statusMultiLog.innerHTML = '<div class="log-empty">Sin intentos registrados...</div>';
+  if (el.log) el.log.innerHTML = '<div class="log-empty">Sin intentos registrados...</div>';
+
   // Hacer visible el contenedor del panel lateral en el DOM antes de ordenar su redibujado
   if (el.jugadorespanel) {
     el.jugadorespanel.classList.remove('hidden');
@@ -59,6 +70,7 @@ export function lanzarPartidaMultijugador(mensaje) {
   state.playing = true; 
   startTimer();
 }
+
 
 export function organizarCodigo() {
   for (let i = 0; i < state.current.length; i++) {
@@ -80,6 +92,9 @@ export function submitGuess() {
     return;
   }
 
+  // >> 🔊 AUDIO: Suena el latigazo digital al lanzar el ataque a la IA
+  sfx.ataque();
+
   const guess = [...state.current];
   const { correct, present } = calculateHints(guess, state.secret);
   state.attempts++;
@@ -99,9 +114,19 @@ export function submitGuess() {
     }
 
     setStatus(`✔ CÓDIGO DESCIFRADO en ${state.attempts} intento(s).`, false);
+    
+    // >> 🔊 AUDIO: Sonido de victoria contra la IA
+    sfx.victoria(); 
     showVictory(isRecord);
   } else {
     setStatus(`Aciertos exactos: ${correct} · Presentes: ${present}`, false);
+
+    // >> 🔊 AUDIO: Feedback adaptativo contra la IA
+    if (correct >= state.length - 1) {
+      sfx.aciertoBueno(); // Arpegio brillante si estás a punto de descifrarlo
+    } else if (correct === 0 && present === 0) {
+      sfx.falloTotal(); // Zumbido sordo si fallaste todas las casillas
+    }
   }
 
   state.current = [];
@@ -109,19 +134,20 @@ export function submitGuess() {
   refreshKeypad();
 }
 
+
 export function submitGuessMulti() {
   if (!state.playing) return;
 
   // VERIFICACIÓN DE SEGURIDAD INTERNA: Validar si es realmente el turno del jugador humano
   const jugadorActual = state.connectedPlayers[state.currentPlayerIndex];
   if (jugadorActual.name !== state.username) {
-    alert("✖ ACCESO DENEGADO: No es tu turno de transmisión. Espera a que los demás terminales concluyan.");
+    mostrarAlertaCyber("No es tu turno de transmisión. Espera a que los demás terminales concluyan.", true);
     return;
   }
 
   // 1. Validar que haya un jugador objetivo seleccionado
   if (!state.selectedTargetFilter) {
-    alert("❌ PROTOCOLO COMPROMETIDO: Debes seleccionar un Hacker objetivo de la lista lateral antes de lanzar el ataque.");
+    mostrarAlertaCyber("PROTOCOLO COMPROMETIDO: Debes seleccionar un Hacker objetivo de la lista lateral antes de lanzar el ataque.", true);
     return;
   }
 
@@ -131,7 +157,7 @@ export function submitGuessMulti() {
   // VERIFICACIÓN DE REPETICIÓN: Validar si el humano ya atacó a este objetivo en el turno actual
   if (!state.playerTargetBlocks[atacante]) state.playerTargetBlocks[atacante] = [];
   if (state.playerTargetBlocks[atacante].includes(objetivo)) {
-    alert(`⚠ OBJETIVO BLOQUEADO: Ya has inyectado un código en el nodo de ${objetivo.toUpperCase()} durante esta fase.`);
+    mostrarAlertaCyber(`OBJEITVO BLOQUEADO: Ya has inyectado un código en el nodo de ${objetivo.toUpperCase()} durante esta fase.`, true);
     return;
   }
 
@@ -145,12 +171,18 @@ export function submitGuessMulti() {
   const digitosIngresados = state.intentoMulti.filter(v => BANK.includes(v));
 
   if (digitosIngresados.length < state.multiLength) {
-    alert(`⚠ SECUENCIA INCOMPLETA: Se requieren exactamente ${state.multiLength} elementos para ejecutar el descifrado.`);
+    mostrarAlertaCyber(`SECUENCIA INCOMPLETA: Se requieren exactamente ${state.multiLength} elementos para ejecutar el descifrado.`, true);
     return;
   }
 
   if (new Set(digitosIngresados).size !== digitosIngresados.length) {
-    alert('⚠ ERROR DE CONFIGURACIÓN: No se permiten elementos repetidos en la secuencia de ataque.');
+    mostrarAlertaCyber('ERROR DE CONFIGURACIÓN: No se permiten elementos repetidos en la secuencia de ataque.', true);
+    return;
+  }
+
+  // ¡BARRERA DE SEGURIDAD ABSOLUTA EN RED!
+  if (state.selectedTargetFilter === state.username) {
+    mostrarAlertaCyber("Acceso rechazado. Protocolo de seguridad activado. No puedes inyectar un ataque a tu propia terminal.", true);
     return;
   }
 
@@ -160,7 +192,7 @@ export function submitGuessMulti() {
   state.playerTargetBlocks[atacante].push(objetivo);
 
   // TRANSMISIÓN EN TIEMPO REAL: Emitir el intento al servidor central
-  // El cálculo de pistas, guardado de historial y estados de victoria se procesan ahora en la nube
+  sfx.ataque();
   socket.emit('inyectar_ataque', {
     roomCode: state.isHost ? (el.roomNameInput.value.trim().toUpperCase() || `SERVER_${state.username.toUpperCase()}`) : state.selectedRoomCode,
     atacante: atacante,
@@ -174,3 +206,4 @@ export function submitGuessMulti() {
   refreshKeypad();
   state.selectedTargetFilter = null; 
 }
+
