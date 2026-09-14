@@ -25,15 +25,12 @@ export function setMultiSetupMessage(msg, isError) {
 // Construye dinámicamente los botones del teclado virtual
 export function buildKeypad() {
   let contenedor = el.keypad; // Por defecto modo VS IA
-  let panelContenedor = el.keypadPanel; // Panel fixed padre para IA
   
   if (state.gameMode === 'multi') {
     if (el.createRoomPanel && !el.createRoomPanel.classList.contains('hidden')) {
       contenedor = el.multiKeypad;
-      panelContenedor = null; // En la creación de sala está integrado, no es flotante 
     } else if (el.multiStatusPanel && !el.multiStatusPanel.classList.contains('hidden')) {
       contenedor = el.statusMultiKeypad;
-      panelContenedor = el.statusMultiKeypadPanel; // Panel fixed padre para partida online
     }
   }
 
@@ -41,41 +38,6 @@ export function buildKeypad() {
 
   // Limpiar el contenedor antes de rellenar
   contenedor.innerHTML = '';
-
-  // INYECCIÓN CYBERPUNK: Si el panel es flotante fixed, añadimos un botón de colapso
-  if (panelContenedor) {
-    // Eliminamos cualquier barra de cierre previa para no duplicar
-    const barraPrevia = panelContenedor.querySelector('.keypad-close-bar');
-    if (barraPrevia) barraPrevia.remove();
-
-    const barraCierre = document.createElement('div');
-    barraCierre.className = 'keypad-close-bar';
-    barraCierre.style.cssText = `
-      display: flex;
-      justify-content: flex-end;
-      margin-bottom: 8px;
-      width: 100%;
-    `;
-
-    const btnCierre = document.createElement('button');
-    btnCierre.className = 'ghost-btn';
-    btnCierre.textContent = '▼ CLOSE CONSOLE';
-    btnCierre.style.cssText = `
-      font-size: 10px;
-      padding: 4px 10px;
-      border-color: rgba(255,255,255,0.15);
-      letter-spacing: 1px;
-    `;
-    
-    // Al hacer clic, ocultamos el panel fixed de forma segura
-    btnCierre.addEventListener('click', () => {
-      panelContenedor.classList.add('hidden');
-    });
-
-    barraCierre.appendChild(btnCierre);
-    // Insertamos la barra antes de la cuadrícula de teclas
-    panelContenedor.insertBefore(barraCierre, contenedor);
-  }
 
   BANK.forEach(value => {
     const tecla = document.createElement('button');
