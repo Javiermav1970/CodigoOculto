@@ -22,49 +22,35 @@ export function setMultiSetupMessage(msg, isError) {
   }
 }
 
-// Construye dinámicamente los botones del teclado virtual con barra de cierre y soporte multimodo
 export function buildKeypad() {
-  let contenedor = el.keypad; // Por defecto modo VS IA
-  let panelContenedor = el.keypadPanel; // Panel fixed padre para IA
+  let contenedor = el.keypad; 
+  let panelContenedor = el.keypadPanel; 
   
   if (state.gameMode === 'multi') {
     if (el.createRoomPanel && !el.createRoomPanel.classList.contains('hidden')) {
       contenedor = el.multiKeypad;
-      panelContenedor = null; // En la creación de sala está integrado, no es flotante
+      panelContenedor = null; 
     } else if (el.multiStatusPanel && !el.multiStatusPanel.classList.contains('hidden')) {
       contenedor = el.statusMultiKeypad;
-      panelContenedor = el.statusMultiKeypadPanel; // Panel fixed padre para partida online
+      panelContenedor = el.statusMultiKeypadPanel; 
     }
   }
 
   if (!contenedor) return;
-
-  // Limpiar el contenedor antes de rellenar
   contenedor.innerHTML = '';
 
-  // Si el panel es flotante fixed, añadimos el botón de colapso rápido
   if (panelContenedor) {
     const barraPrevia = panelContenedor.querySelector('.keypad-close-bar');
     if (barraPrevia) barraPrevia.remove();
 
     const barraCierre = document.createElement('div');
     barraCierre.className = 'keypad-close-bar';
-    barraCierre.style.cssText = `
-      display: flex;
-      justify-content: flex-end;
-      margin-bottom: 8px;
-      width: 100%;
-    `;
+    barraCierre.style.cssText = `display: flex; justify-content: flex-end; margin-bottom: 8px; width: 100%;`;
 
     const btnCierre = document.createElement('button');
     btnCierre.className = 'ghost-btn';
     btnCierre.textContent = '▼ CLOSE CONSOLE';
-    btnCierre.style.cssText = `
-      font-size: 10px;
-      padding: 4px 10px;
-      border-color: rgba(255,255,255,0.15);
-      letter-spacing: 1px;
-    `;
+    btnCierre.style.cssText = `font-size: 10px; padding: 4px 10px; border-color: rgba(255,255,255,0.15); letter-spacing: 1px;`;
     
     btnCierre.addEventListener('click', () => {
       panelContenedor.classList.add('hidden');
@@ -74,7 +60,6 @@ export function buildKeypad() {
     panelContenedor.insertBefore(barraCierre, contenedor);
   }
 
-  // Renderizar las teclas del banco matemático
   BANK.forEach(value => {
     const tecla = document.createElement('button');
     tecla.className = `key ${isFigure(value) ? 'figure' : ''}`;
@@ -82,32 +67,56 @@ export function buildKeypad() {
     tecla.dataset.value = value;
     
     tecla.addEventListener('click', () => {
-      // CORRECCIÓN MAGISTRAL: Identificar en qué modo y qué candado exacto se está editando
       if (state.gameMode === 'ia') {
         if (el.keypadPanel) el.keypadPanel.classList.add('hidden');
-        addElement(value); // El modo práctica usa su inyección nativa
+        addElement(value); 
       } 
       else if (state.gameMode === 'multi') {
-        // Averiguar qué número de candado (slot) clickeó el usuario antes de abrir el teclado
+        // AUTOFOCU LOGIC: Si el usuario pulsa el teclado directamente sin elegir slot, buscamos el primer espacio vacío
+        if (!state.presionado) {
+          const limitePool = state.multiLength;
+          const poolObjetivo = (el.createRoomPanel && !el.createRoomPanel.classList.contains('hidden')) ? state.mySecretCode : state.intentoMulti;
+          
+          let primerVacio = -1;
+          for (let i = 0; i < limitePool; i++) {
+            if (poolObjetivo[i] === undefined || poolObjetivo[i] === null || poolObjetivo[i] === '') {
+              primerVacio = i;
+              break;
+            }
+          }
+          if (primerVacio !== -1) {
+            state.presionado = `numero-${primerVacio}`;
+          }
+        }
+
         if (state.presionado) {
           const indiceSlot = parseInt(state.presionado.replace('numero-', ''), 10);
           
           if (!isNaN(indiceSlot)) {
             if (el.multiStatusPanel && !el.multiStatusPanel.classList.contains('hidden')) {
-              // Escenario A: Partida en vivo -> Guardamos en el intento de ataque
-              state.intentoMulti[indiceSlot] = value;
+              if (!state.intentoMulti.includes(value)) {
+                state.intentoMulti[indiceSlot] = value;
+              }
               if (el.statusMultiKeypadPanel) el.statusMultiKeypadPanel.classList.add('hidden');
+              state.presionado = ""; 
             } else if (el.createRoomPanel && !el.createRoomPanel.classList.contains('hidden')) {
-              // Escenario B: Configuración de sala -> Guardamos en tu propio código secreto
-              if (!state.isCodeLocked) {
+              // ¡SOPORTE REPARADO PARA CONFIGURACIÓN!: Evitar caracteres duplicados si tu juego es tipo Mastermind estricto
+              if (!state.isCodeLocked && !state.mySecretCode.includes(value)) {
                 state.mySecretCode[indiceSlot] = value;
+                
+                // Salto automático inteligente al siguiente slot vacío para mejorar la UX
+                let sig = indiceSlot + 1;
+                if (sig < state.multiLength) {
+                  state.presionado = `numero-${sig}`;
+                } else {
+                  state.presionado = "";
+                }
               }
             }
             
-            // Forzar el redibujado inmediato de los candados y actualizar el teclado físico/virtual
+            sfx.slotIngreso(); // Feedback acústico ciberpunk
             crearSlots();
             refreshKeypad();
-            state.presionado = ""; // Liberar el foco del candado actual
           }
         }
       }
@@ -144,7 +153,6 @@ export function refreshKeypad() {
   });
 }
 
-// Genera las casillas de entrada (Candados) - CORREGIDO PARA BOTÓN ATRÁS MÓVIL
 export function crearSlots() {
   // 1. MODO VS IA
   if (state.gameMode === 'ia' && el.slots) {
@@ -153,47 +161,64 @@ export function crearSlots() {
       const candado = document.createElement('div');
       const val = state.current[i];
       candado.className = `slot ${val ? 'filled' : 'locked'}`;
+      if (state.presionado === `numero-${i}`) candado.classList.add('selected'); // Resaltar celda activa
       candado.textContent = val ? val : '🔒';
       candado.id = `numero-${i}`;
       candado.addEventListener('click', function() {
         state.presionado = this.id;
         if (el.keypadPanel) {
           el.keypadPanel.classList.remove('hidden');
-          // PROTOCOLO ANDROID/MÓVIL: Inyectamos un estado en el historial del celular
           history.pushState({ tecladoAbierto: true }, "");
         }
+        crearSlots(); // Redibujar para actualizar indicador visual de selección
       });
       el.slots.appendChild(candado);
     }
   } 
   // 2. MODO MULTIJUGADOR
   else if (state.gameMode === 'multi') {
+    // Escenario A: Partida en vivo (Atacando)
     if (el.multiStatusPanel && !el.multiStatusPanel.classList.contains('hidden') && el.statusMultiSlots) {   
       el.statusMultiSlots.innerHTML = '';
       for (let i = 0; i < state.multiLength; i++) {
         const candado = document.createElement('div');
         const val = state.intentoMulti[i];
         candado.className = `slot ${val ? 'filled' : 'locked'}`;
+        if (state.presionado === `numero-${i}`) candado.classList.add('selected');
         candado.textContent = val ? val : '🔒';
         candado.id = `numero-${i}`;
         candado.addEventListener('click', function() {
           state.presionado = this.id;
           if (el.statusMultiKeypadPanel) {
             el.statusMultiKeypadPanel.classList.remove('hidden');
-            // PROTOCOLO ANDROID/MÓVIL: Inyectamos un estado en el historial del celular
             history.pushState({ tecladoAbierto: true }, "");
           }
+          crearSlots();
         });
         el.statusMultiSlots.appendChild(candado);
       }
     }
+    // Escenario B: Configuración de sala nueva (Escribiendo código secreto inicial)
     else if (el.createRoomPanel && !el.createRoomPanel.classList.contains('hidden') && el.multiSlots) {
       el.multiSlots.innerHTML = '';
       for (let i = 0; i < state.multiLength; i++) {
         const candado = document.createElement('div');
         const val = state.mySecretCode[i];
+        
         candado.className = `slot ${val ? 'filled' : 'locked'}`;
+        // ¡CORRECCIÓN MAESTRA!: Si esta casilla es la seleccionada actualmente, añadir clase CSS
+        if (state.presionado === `numero-${i}`) candado.classList.add('selected');
+        
         candado.textContent = val ? (state.isCodeLocked ? '★' : val) : '🔒';
+        candado.id = `numero-${i}`; // Asignamos ID único
+        
+        // ¡CONEXIÓN DE EVENTO CLIC!: Permitir seleccionar la casilla para escribir
+        candado.addEventListener('click', function() {
+          if (state.isCodeLocked) return;
+          state.presionado = this.id;
+          crearSlots(); // Refrescar visualmente qué celda tiene el foco
+        });
+        
         el.multiSlots.appendChild(candado);
       }
     }
