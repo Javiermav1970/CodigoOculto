@@ -59,12 +59,5 @@ export const el = {
   usernameInput: document.getElementById('usernameInput'),
   vsIaBtn: document.getElementById('vsIaBtn'),
   vsPlayerBtn: document.getElementById('vsPlayerBtn'),
-  multiplayerHistory: [], // Almacenará todos los intentos: { player: string, guess: array, correct: number, present: number, index: number }
-  selectedPlayerFilter: 'TODOS', // Filtro activo: 'TODOS' o el nombre del jugador específico
-// para simular jugada de bots
-  botMemory: {},         // Almacenará los intentos previos de cada bot para no repetir elementos repetidos
-  playerTargetBlocks: {},// Relación de ataques: { 'ATACANTE': ['OBJETIVO1', 'OBJETIVO2'] }
-  decryptedPlayers: [],  // Lista de jugadores cuyo código ya fue descubierto (bloqueados para todos)
-  currentPlayerIndex: 0, // Índice del jugador que tiene el turno actual en connectedPlayers
   multiLimitBtns: document.querySelectorAll('.create-room-row .limit-btn, #createRoomPanel .limit-btn') 
 };

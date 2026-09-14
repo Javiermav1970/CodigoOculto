@@ -6,7 +6,6 @@ import { el } from './dom.js';
 import { buildKeypad, crearSlots, refreshKeypad, renderizarBitacoraFiltrada, setStatus, mostrarAlertaCyber } from './ui.js';
 import { actualizarVisualSalaJugadores, showVictory, addLogRow } from './main.js';
 import { startTimer, stopTimer } from './timer.js';
-import { calculateHints } from './bots.js';
 import { finalizarTurnoJugador } from './referee.js';
 import { generateSecret } from './rooms.js';
 import { removeOverlay } from './fx.js';
@@ -96,7 +95,7 @@ export function submitGuess() {
   sfx.ataque();
 
   const guess = [...state.current];
-  const { correct, present } = calculateHints(guess, state.secret);
+  const { correct, present } = calcularPistasLocalIA(guess, state.secret);
   state.attempts++;
 
   addLogRow(guess, correct, present, state.attempts);
@@ -205,4 +204,32 @@ export function submitGuessMulti() {
   crearSlots();
   refreshKeypad();
   state.selectedTargetFilter = null; 
+}
+
+/* ---------- EVALUACIÓN LÓGICA DE INTENTOS MODO PRÁCTICA ---------- */
+function calcularPistasLocalIA(guess, secret) {
+  let correct = 0;
+  let present = 0;
+  const secretUsed = new Array(secret.length).fill(false);
+  const guessResolved = new Array(guess.length).fill(false);
+
+  for (let i = 0; i < guess.length; i++) {
+    if (guess[i] === secret[i]) {
+      correct++;
+      secretUsed[i] = true;
+      guessResolved[i] = true;
+    }
+  }
+
+  for (let i = 0; i < guess.length; i++) {
+    if (guessResolved[i]) continue;
+    for (let j = 0; j < secret.length; j++) {
+      if (!secretUsed[j] && guess[i] === secret[j]) {
+        present++;
+        secretUsed[j] = true;
+        break;
+      }
+    }
+  }
+  return { correct, present };
 }

@@ -309,7 +309,6 @@ el.connectSelectedBtn.addEventListener('click', () => {
   state.selectedTargetFilter = null;
   state.decryptedPlayers = [];
   state.playerTargetBlocks = {};
-  state.botMemory = {};
   state.isHost = false; 
   state.tipoPanel = "lobbyPanel"; 
   state.currentPlayerIndex = 0;  
@@ -762,3 +761,19 @@ const instanciaSocket = io(urlServidorPruebas);
 // Compartir el canal activo e inicializar los escuchadores gráficos que acabamos de configurar
 inicializarConexionSocket(instanciaSocket);
 vincularEventosGraficosDeRed();
+
+/* ---------- CONTROL PROTOCOLO BOTÓN ATRÁS EN CELULARES ---------- */
+window.addEventListener('popstate', (event) => {
+  // Verificamos si los teclados flotantes están visibles en pantalla
+  const tecladoIaVisible = el.keypadPanel && !el.keypadPanel.classList.contains('hidden');
+  const tecladoMultiVisible = el.statusMultiKeypadPanel && !el.statusMultiKeypadPanel.classList.contains('hidden');
+
+  if (tecladoIaVisible || tecladoMultiVisible) {
+    // Si alguno estaba abierto, mitigamos la salida ocultando las consolas
+    if (el.keypadPanel) el.keypadPanel.classList.add('hidden');
+    if (el.statusMultiKeypadPanel) el.statusMultiKeypadPanel.classList.add('hidden');
+    state.presionado = "";
+    
+    console.log("📡 GESTO MÓVIL DETECTADO: Consola replegada con éxito.");
+  }
+});

@@ -119,7 +119,7 @@ export function refreshKeypad() {
   });
 }
 
-// Genera las casillas de entrada (Candados)
+// Genera las casillas de entrada (Candados) - CORREGIDO PARA BOTÓN ATRÁS MÓVIL
 export function crearSlots() {
   // 1. MODO VS IA
   if (state.gameMode === 'ia' && el.slots) {
@@ -132,7 +132,11 @@ export function crearSlots() {
       candado.id = `numero-${i}`;
       candado.addEventListener('click', function() {
         state.presionado = this.id;
-        if (el.keypadPanel) el.keypadPanel.classList.remove('hidden');
+        if (el.keypadPanel) {
+          el.keypadPanel.classList.remove('hidden');
+          // PROTOCOLO ANDROID/MÓVIL: Inyectamos un estado en el historial del celular
+          history.pushState({ tecladoAbierto: true }, "");
+        }
       });
       el.slots.appendChild(candado);
     }
@@ -149,7 +153,11 @@ export function crearSlots() {
         candado.id = `numero-${i}`;
         candado.addEventListener('click', function() {
           state.presionado = this.id;
-          if (el.statusMultiKeypadPanel) el.statusMultiKeypadPanel.classList.remove('hidden');
+          if (el.statusMultiKeypadPanel) {
+            el.statusMultiKeypadPanel.classList.remove('hidden');
+            // PROTOCOLO ANDROID/MÓVIL: Inyectamos un estado en el historial del celular
+            history.pushState({ tecladoAbierto: true }, "");
+          }
         });
         el.statusMultiSlots.appendChild(candado);
       }
@@ -166,6 +174,7 @@ export function crearSlots() {
     }
   }
 }
+
 
 // Renderiza el historial detallado de ataques recibidos de un rival específico
 export function renderizarBitacoraFiltrada() {
