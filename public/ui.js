@@ -22,7 +22,7 @@ export function setMultiSetupMessage(msg, isError) {
   }
 }
 
-// Construye dinámicamente los botones del teclado virtual
+// Construye dinámicamente los botones del teclado virtual (EDICIÓN SÉNIOR UNIFICADA)
 export function buildKeypad() {
   let contenedor = el.keypad; // Por defecto modo VS IA
   
@@ -36,22 +36,41 @@ export function buildKeypad() {
 
   if (!contenedor) return;
 
-  contenedor.innerHTML = '';
+  // LIMPIEZA ABSOLUTA DE NODOS: Clonamos el contenedor para destruir cualquier escuchador fantasma previo
+  const contenedorLimpio = contenedor.cloneNode(false);
+  contenedor.parentNode.replaceChild(contenedorLimpio, contenedor);
+  
+  // Reasignar la referencia al nuevo contenedor limpio de eventos residuales
+  if (state.gameMode === 'ia') el.keypad = contenedorLimpio;
+  else {
+    if (el.createRoomPanel && !el.createRoomPanel.classList.contains('hidden')) el.multiKeypad = contenedorLimpio;
+    else if (el.multiStatusPanel && !el.multiStatusPanel.classList.contains('hidden')) el.statusMultiKeypad = contenedorLimpio;
+  }
+
+  contenedorLimpio.innerHTML = '';
+  
   BANK.forEach(value => {
     const tecla = document.createElement('button');
     tecla.className = `key ${isFigure(value) ? 'figure' : ''}`;
     tecla.textContent = value;
     tecla.dataset.value = value;
-    tecla.addEventListener('click', () => {
-      // Ocultar paneles de selección flotantes si existieran de manera segura
+    
+    tecla.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation(); // Frenamos cualquier propagación doble en el DOM
+      
+      // Ocultar paneles flotantes si existieran de forma segura
       if (el.keypadPanel) el.keypadPanel.classList.add('hidden');
       if (el.statusMultiKeypadPanel) el.statusMultiKeypadPanel.classList.add('hidden');
+      
       addElement(value);
     });
-    contenedor.appendChild(tecla);      
+    contenedorLimpio.appendChild(tecla);      
   });
+  
   refreshKeypad();
 }
+
 
 // Deshabilita o resalta las teclas que ya están en uso
 export function refreshKeypad() {
@@ -194,7 +213,7 @@ export function addElement(value) {
     const idSlot = document.getElementById(state.presionado);
     if (!idSlot) return;
     
-    let indice = parseInt(state.presionado.split('-')[1], 10);
+    let indice = parseInt(state.presionado.split('-'), 10);
     state.current[indice] = value;
     idSlot.classList.replace('locked', 'filled');
     idSlot.textContent = value;
@@ -206,19 +225,8 @@ export function addElement(value) {
   } 
   // 2. CASO MODO MULTIJUGADOR
   else if (state.gameMode === 'multi') {
-    // CORRECCIÓN PRIORITARIA: Evaluamos primero si estamos configurando la contraseña de la sala (HOST o INVITADO)
-    if (el.createRoomPanel && !el.createRoomPanel.classList.contains('hidden')) {
-      if (state.isCodeLocked || state.mySecretCode.length >= state.multiLength || state.mySecretCode.includes(value)) return;
-      
-      state.mySecretCode.push(value);
-      state.presionado = ""; // Limpieza estricta de foco
-      
-      sfx.slotIngreso(); 
-      crearSlots();
-      refreshKeypad();
-    }
-    // Escenario B: Partida en vivo activa (Lanzando ataques de descifrado)
-    else if (el.multiStatusPanel && !el.multiStatusPanel.classList.contains('hidden')) {
+    // Escenario A: Partida en vivo (Lanzar ataques a oponentes)
+    if (el.multiStatusPanel && !el.multiStatusPanel.classList.contains('hidden')) {
       if (!state.playing || state.intentoMulti.includes(value)) return;
       
       if (!state.presionado) {
@@ -239,7 +247,7 @@ export function addElement(value) {
       const idSlot = document.getElementById(state.presionado);
       if (!idSlot) return; 
 
-      let indice = parseInt(state.presionado.split('-')[1], 10);
+      let indice = parseInt(state.presionado.split('-'), 10);
       state.intentoMulti[indice] = value;
       idSlot.classList.replace('locked', 'filled');
       idSlot.textContent = value;
@@ -249,9 +257,23 @@ export function addElement(value) {
       refreshKeypad();
       setStatus('', false);
     }
+    // Escenario B: Creación de sala (Configurar clave secreta propia como HOST)
+    else if (el.createRoomPanel && !el.createRoomPanel.classList.contains('hidden')) {
+      // VALIDACIÓN ESTRICTA ANTI-DUPLICACIÓN ASÍNCRONA
+      if (state.isCodeLocked || state.mySecretCode.length >= state.multiLength || state.mySecretCode.includes(value)) {
+        return;
+      }
+      
+      // Inyección lineal limpia en la memoria de la sala
+      state.mySecretCode.push(value);
+      state.presionado = ""; 
+      
+      sfx.slotIngreso(); 
+      crearSlots(); // Redibuja los candados reflejando el push de inmediato
+      refreshKeypad(); // Actualiza el estado gris de las teclas usadas
+    }
   }
 }
-
 
 
 export function deleteElement() {
