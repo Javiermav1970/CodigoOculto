@@ -22,7 +22,7 @@ export function setMultiSetupMessage(msg, isError) {
   }
 }
 
-// Construye dinámicamente los botones del teclado virtual con barra de cierre
+// Construye dinámicamente los botones del teclado virtual con barra de cierre y soporte multimodo
 export function buildKeypad() {
   let contenedor = el.keypad; // Por defecto modo VS IA
   let panelContenedor = el.keypadPanel; // Panel fixed padre para IA
@@ -42,9 +42,8 @@ export function buildKeypad() {
   // Limpiar el contenedor antes de rellenar
   contenedor.innerHTML = '';
 
-  // INYECCIÓN CYBERPUNK: Si el panel es flotante fixed, añadimos un botón de colapso
+  // Si el panel es flotante fixed, añadimos el botón de colapso rápido
   if (panelContenedor) {
-    // Eliminamos cualquier barra de cierre previa para no duplicar
     const barraPrevia = panelContenedor.querySelector('.keypad-close-bar');
     if (barraPrevia) barraPrevia.remove();
 
@@ -67,13 +66,11 @@ export function buildKeypad() {
       letter-spacing: 1px;
     `;
     
-    // Al hacer clic, ocultamos el panel fixed de forma segura
     btnCierre.addEventListener('click', () => {
       panelContenedor.classList.add('hidden');
     });
 
     barraCierre.appendChild(btnCierre);
-    // Insertamos la barra antes de la cuadrícula de teclas
     panelContenedor.insertBefore(barraCierre, contenedor);
   }
 
@@ -83,12 +80,39 @@ export function buildKeypad() {
     tecla.className = `key ${isFigure(value) ? 'figure' : ''}`;
     tecla.textContent = value;
     tecla.dataset.value = value;
+    
     tecla.addEventListener('click', () => {
-      // Ocultar paneles de selección flotantes tras presionar un dígito
-      if (el.keypadPanel) el.keypadPanel.classList.add('hidden');
-      if (el.statusMultiKeypadPanel) el.statusMultiKeypadPanel.classList.add('hidden');
-      addElement(value);
+      // CORRECCIÓN MAGISTRAL: Identificar en qué modo y qué candado exacto se está editando
+      if (state.gameMode === 'ia') {
+        if (el.keypadPanel) el.keypadPanel.classList.add('hidden');
+        addElement(value); // El modo práctica usa su inyección nativa
+      } 
+      else if (state.gameMode === 'multi') {
+        // Averiguar qué número de candado (slot) clickeó el usuario antes de abrir el teclado
+        if (state.presionado) {
+          const indiceSlot = parseInt(state.presionado.replace('numero-', ''), 10);
+          
+          if (!isNaN(indiceSlot)) {
+            if (el.multiStatusPanel && !el.multiStatusPanel.classList.contains('hidden')) {
+              // Escenario A: Partida en vivo -> Guardamos en el intento de ataque
+              state.intentoMulti[indiceSlot] = value;
+              if (el.statusMultiKeypadPanel) el.statusMultiKeypadPanel.classList.add('hidden');
+            } else if (el.createRoomPanel && !el.createRoomPanel.classList.contains('hidden')) {
+              // Escenario B: Configuración de sala -> Guardamos en tu propio código secreto
+              if (!state.isCodeLocked) {
+                state.mySecretCode[indiceSlot] = value;
+              }
+            }
+            
+            // Forzar el redibujado inmediato de los candados y actualizar el teclado físico/virtual
+            crearSlots();
+            refreshKeypad();
+            state.presionado = ""; // Liberar el foco del candado actual
+          }
+        }
+      }
     });
+    
     contenedor.appendChild(tecla);      
   });
 
