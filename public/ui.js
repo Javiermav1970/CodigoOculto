@@ -102,6 +102,7 @@ export function crearSlots() {
       for (let i = 0; i < state.multiLength; i++) {
         const candado = document.createElement('div');
         const val = state.intentoMulti[i];
+        console.log(state.intentoMulti[i]);
         candado.className = `slot ${val ? 'filled' : 'locked'}`;
         candado.textContent = val ? val : '🔒';
         candado.id = `numero-${i}`;
@@ -209,7 +210,6 @@ export function addElement(value) {
   else if (state.gameMode === 'multi') {
     if (el.multiStatusPanel && !el.multiStatusPanel.classList.contains('hidden')) {
       if (!state.playing || state.intentoMulti.includes(value)) return;
-      console.log(state.presionado);
       if (!state.presionado) {
         let primerVacio = -1;
         for (let i = 0; i < state.multiLength; i++) {
