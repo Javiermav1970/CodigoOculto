@@ -22,34 +22,76 @@ export function setMultiSetupMessage(msg, isError) {
   }
 }
 
-// Construye dinámicamente los botones del teclado virtual
+// Construye dinámicamente los botones del teclado virtual con barra de cierre
 export function buildKeypad() {
   let contenedor = el.keypad; // Por defecto modo VS IA
+  let panelContenedor = el.keypadPanel; // Panel fixed padre para IA
   
   if (state.gameMode === 'multi') {
     if (el.createRoomPanel && !el.createRoomPanel.classList.contains('hidden')) {
       contenedor = el.multiKeypad;
+      panelContenedor = null; // En la creación de sala está integrado, no es flotante
     } else if (el.multiStatusPanel && !el.multiStatusPanel.classList.contains('hidden')) {
       contenedor = el.statusMultiKeypad;
+      panelContenedor = el.statusMultiKeypadPanel; // Panel fixed padre para partida online
     }
   }
 
   if (!contenedor) return;
 
+  // Limpiar el contenedor antes de rellenar
   contenedor.innerHTML = '';
+
+  // INYECCIÓN CYBERPUNK: Si el panel es flotante fixed, añadimos un botón de colapso
+  if (panelContenedor) {
+    // Eliminamos cualquier barra de cierre previa para no duplicar
+    const barraPrevia = panelContenedor.querySelector('.keypad-close-bar');
+    if (barraPrevia) barraPrevia.remove();
+
+    const barraCierre = document.createElement('div');
+    barraCierre.className = 'keypad-close-bar';
+    barraCierre.style.cssText = `
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 8px;
+      width: 100%;
+    `;
+
+    const btnCierre = document.createElement('button');
+    btnCierre.className = 'ghost-btn';
+    btnCierre.textContent = '▼ CLOSE CONSOLE';
+    btnCierre.style.cssText = `
+      font-size: 10px;
+      padding: 4px 10px;
+      border-color: rgba(255,255,255,0.15);
+      letter-spacing: 1px;
+    `;
+    
+    // Al hacer clic, ocultamos el panel fixed de forma segura
+    btnCierre.addEventListener('click', () => {
+      panelContenedor.classList.add('hidden');
+    });
+
+    barraCierre.appendChild(btnCierre);
+    // Insertamos la barra antes de la cuadrícula de teclas
+    panelContenedor.insertBefore(barraCierre, contenedor);
+  }
+
+  // Renderizar las teclas del banco matemático
   BANK.forEach(value => {
     const tecla = document.createElement('button');
     tecla.className = `key ${isFigure(value) ? 'figure' : ''}`;
     tecla.textContent = value;
     tecla.dataset.value = value;
     tecla.addEventListener('click', () => {
-      // Ocultar paneles de selección flotantes si existieran de manera segura
+      // Ocultar paneles de selección flotantes tras presionar un dígito
       if (el.keypadPanel) el.keypadPanel.classList.add('hidden');
       if (el.statusMultiKeypadPanel) el.statusMultiKeypadPanel.classList.add('hidden');
       addElement(value);
     });
     contenedor.appendChild(tecla);      
   });
+
   refreshKeypad();
 }
 
@@ -314,4 +356,47 @@ export function deleteElement() {
       refreshKeypad();
     }
   }
+}
+
+/**
+ * Inyecta una alerta flotante ciberpunk temporal en el DOM
+ * Reemplazo directo y seguro para el alert() nativo
+ */
+export function mostrarAlertaCyber(mensaje, esError = true) {
+  // Eliminar si ya existe una alerta activa para no encimarlas
+  const alertaPrevia = document.getElementById('pop-alerta-cyber');
+  if (alertaPrevia) alertaPrevia.remove();
+
+  const popup = document.createElement('div');
+  popup.id = 'pop-alerta-cyber';
+  popup.className = 'broadcast-popup';
+  
+  // Aplicar estilos dinámicos basados en la gravedad del mensaje
+  popup.style.borderColor = esError ? 'var(--danger)' : 'var(--neon)';
+  popup.style.boxShadow = esError ? '0 0 25px rgba(255, 77, 109, 0.4)' : '0 0 25px rgba(0, 245, 212, 0.4)';
+  popup.style.pointerEvents = 'auto'; // Permitir interactividad si se desea cerrar al hacer clic
+
+  const titulo = esError ? '⚠️ ERROR DE PROTOCOLO' : '📡 NOTIFICACIÓN DE RED';
+  const colorTitulo = esError ? 'var(--danger)' : 'var(--neon)';
+
+  popup.innerHTML = `
+    <div class="broadcast-content">
+      <div class="broadcast-header" style="color: ${colorTitulo}; letter-spacing: 2px;">${titulo}</div>
+      <p style="margin-top: 10px; font-size: 13px; line-height: 1.4; color: var(--text);">${mensaje}</p>
+    </div>
+  `;
+
+  document.body.appendChild(popup);
+
+  // Permitir cierre inmediato al hacer clic sobre la alerta
+  popup.addEventListener('click', () => popup.remove());
+
+  // Auto-eliminación suave tras 3.5 segundos
+  setTimeout(() => {
+    if (document.body.contains(popup)) {
+      popup.style.opacity = '0';
+      popup.style.transform = 'translate(-50%, -60%) scale(0.9)';
+      setTimeout(() => popup.remove(), 400);
+    }
+  }, 3500);
 }

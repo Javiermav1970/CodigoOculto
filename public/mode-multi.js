@@ -3,7 +3,7 @@
    ========================================================= */
 import { state, BANK } from './config.js';
 import { el } from './dom.js';
-import { buildKeypad, crearSlots, refreshKeypad, setMultiSetupMessage } from './ui.js';
+import { buildKeypad, crearSlots, refreshKeypad, setMultiSetupMessage, mostrarAlertaCyber } from './ui.js';
 import { renderConnectedPlayers } from './rooms.js';
 import { lanzarPartidaMultijugador } from './match.js';
 import { resetGame, actualizarVisualSalaJugadores } from './main.js';
@@ -163,7 +163,7 @@ function configurarEscuchadoresRed() {
   });
 
   socket.on('error_red', (mensaje) => {
-    alert(mensaje);
+    mostrarAlertaCyber(mensaje, true); // Reemplaza el alert(mensaje) nativo
     state.isCodeLocked = false;
     setMultiSetupMessage(mensaje, true);
   });

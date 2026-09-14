@@ -5,7 +5,7 @@ import { state, BANK, MOCK_ROOMS, isFigure, loadRecords, limpiarEstadoMemoriaCom
 import { formatTime,  stopTimer } from './timer.js';
 import { el } from './dom.js';
 import { renderizarCuadernoNotas } from './notes.js';
-import { setStatus, setMultiSetupMessage, buildKeypad, crearSlots, renderizarBitacoraFiltrada, addElement, deleteElement } from './ui.js';
+import { setStatus, setMultiSetupMessage, buildKeypad, crearSlots, renderizarBitacoraFiltrada, addElement, deleteElement, mostrarAlertaCyber  } from './ui.js';
 import { renderRoomsList, renderConnectedPlayers } from './rooms.js';
 import { launchConfetti, removeOverlay } from './fx.js';
 import { startGame, submitGuess, submitGuessMulti } from './match.js';
@@ -399,7 +399,7 @@ el.vsIaBtn.addEventListener('click', () => {
 el.vsPlayerBtn.addEventListener('click', () => {
   const inputName = el.usernameInput.value.trim();
   if (!inputName) {
-    alert("❌ ACCESO DENEGADO: El seudónimo es obligatorio para el protocolo Multijugador.");
+    mostrarAlertaCyber("ACCESO DENEGADO: El seudónimo es obligatorio para el protocolo Multijugador.", true);
     el.usernameInput.focus();
     return;
   }
@@ -410,8 +410,9 @@ el.vsPlayerBtn.addEventListener('click', () => {
   el.lobbyPanel.classList.remove('hidden');
   renderRoomsList(MOCK_ROOMS);
   renderRoomsList([]); // Limpia la lista vieja primero
-  if (socket) socket.emit('solicitar_lista_salas'); // <--- Pide las salas reales al servidor de inmediato
+  if (socket) socket.emit('solicitar_lista_salas');
 });
+
 
 el.createRoomBtn.addEventListener('click', () => {
   // CORRECCIÓN INTERNA: Forzar limpieza absoluta antes de preparar la reconfiguración
@@ -556,8 +557,18 @@ el.backToLobbyFromCreateBtn.addEventListener('click', () => {
 
   /* ---------- CAPTURA DE TECLADO FÍSICO ---------- */
 document.addEventListener('keydown', (event) => {
-  if (!state.playing) return;
   const key = event.key.toUpperCase();
+  
+  //Cierra los teclados flotantes de inmediato
+  if (event.key === 'Escape') {
+    if (el.keypadPanel) el.keypadPanel.classList.add('hidden');
+    if (el.statusMultiKeypadPanel) el.statusMultiKeypadPanel.classList.add('hidden');
+    state.presionado = "";
+    return;
+  }
+
+  if (!state.playing) return;
+
   const figureMap = { 'Q': '▲', 'W': '●', 'E': '■', 'R': '♦', 'T': '♥', 'Y': '✖' };
   if (key === 'ENTER') {
     if (state.gameMode === 'multi') {
