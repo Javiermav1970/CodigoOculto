@@ -213,11 +213,6 @@ export function resetGame() {
   el.logPanel.classList.add('hidden');
   
   removeOverlay(); // Elimina los carteles flotantes de victoria o derrota
-
-  // Agrega esto al final de resetGame() en main.js para forzar el vaciado de clases residuales
-if (el.multiStatusPanel) el.multiStatusPanel.classList.add('hidden');
-if (el.statusMultiKeypadPanel) el.statusMultiKeypadPanel.classList.add('hidden');
-state.presionado = ""; // Saneamos cualquier foco fantasma de la IA
 }
 
 
@@ -562,8 +557,18 @@ el.backToLobbyFromCreateBtn.addEventListener('click', () => {
 
   /* ---------- CAPTURA DE TECLADO FÍSICO ---------- */
 document.addEventListener('keydown', (event) => {
-  if (!state.playing) return;
   const key = event.key.toUpperCase();
+
+  // Cierra los teclados flotantes de inmediato
+  if (event.key === 'Escape') {
+    if (el.keypadPanel) el.keypadPanel.classList.add('hidden');
+    if (el.statusMultiKeypadPanel) el.statusMultiKeypadPanel.classList.add('hidden');
+    state.presionado = "";
+    return;
+  }
+
+  if (!state.playing) return;
+
   const figureMap = { 'Q': '▲', 'W': '●', 'E': '■', 'R': '♦', 'T': '♥', 'Y': '✖' };
   if (key === 'ENTER') {
     if (state.gameMode === 'multi') {
@@ -757,3 +762,19 @@ const instanciaSocket = io(urlServidorPruebas);
 // Compartir el canal activo e inicializar los escuchadores gráficos que acabamos de configurar
 inicializarConexionSocket(instanciaSocket);
 vincularEventosGraficosDeRed();
+
+/* ---------- CONTROL PROTOCOLO BOTÓN ATRÁS EN CELULARES ---------- */
+window.addEventListener('popstate', (event) => {
+  // Verificamos si los teclados flotantes están visibles en pantalla
+  const tecladoIaVisible = el.keypadPanel && !el.keypadPanel.classList.contains('hidden');
+  const tecladoMultiVisible = el.statusMultiKeypadPanel && !el.statusMultiKeypadPanel.classList.contains('hidden');
+
+  if (tecladoIaVisible || tecladoMultiVisible) {
+    // Si alguno estaba abierto, mitigamos la salida ocultando las consolas
+    if (el.keypadPanel) el.keypadPanel.classList.add('hidden');
+    if (el.statusMultiKeypadPanel) el.statusMultiKeypadPanel.classList.add('hidden');
+    state.presionado = "";
+    
+    console.log("📡 GESTO MÓVIL DETECTADO: Consola replegada con éxito.");
+  }
+});

@@ -22,52 +22,100 @@ export function setMultiSetupMessage(msg, isError) {
   }
 }
 
-// Construye dinámicamente los botones del teclado virtual (EDICIÓN SÉNIOR UNIFICADA)
+// Construye dinámicamente los botones del teclado virtual con barra de cierre y soporte multimodo
 export function buildKeypad() {
   let contenedor = el.keypad; // Por defecto modo VS IA
+  let panelContenedor = el.keypadPanel; // Panel fixed padre para IA
   
   if (state.gameMode === 'multi') {
     if (el.createRoomPanel && !el.createRoomPanel.classList.contains('hidden')) {
       contenedor = el.multiKeypad;
+      panelContenedor = null; // En la creación de sala está integrado, no es flotante
     } else if (el.multiStatusPanel && !el.multiStatusPanel.classList.contains('hidden')) {
       contenedor = el.statusMultiKeypad;
+      panelContenedor = el.statusMultiKeypadPanel; // Panel fixed padre para partida online
     }
   }
 
   if (!contenedor) return;
 
-  // LIMPIEZA ABSOLUTA DE NODOS: Clonamos el contenedor para destruir cualquier escuchador fantasma previo
-  const contenedorLimpio = contenedor.cloneNode(false);
-  contenedor.parentNode.replaceChild(contenedorLimpio, contenedor);
-  
-  // Reasignar la referencia al nuevo contenedor limpio de eventos residuales
-  if (state.gameMode === 'ia') el.keypad = contenedorLimpio;
-  else {
-    if (el.createRoomPanel && !el.createRoomPanel.classList.contains('hidden')) el.multiKeypad = contenedorLimpio;
-    else if (el.multiStatusPanel && !el.multiStatusPanel.classList.contains('hidden')) el.statusMultiKeypad = contenedorLimpio;
+  // Limpiar el contenedor antes de rellenar
+  contenedor.innerHTML = '';
+
+  // Si el panel es flotante fixed, añadimos el botón de colapso rápido
+  if (panelContenedor) {
+    const barraPrevia = panelContenedor.querySelector('.keypad-close-bar');
+    if (barraPrevia) barraPrevia.remove();
+
+    const barraCierre = document.createElement('div');
+    barraCierre.className = 'keypad-close-bar';
+    barraCierre.style.cssText = `
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 8px;
+      width: 100%;
+    `;
+
+    const btnCierre = document.createElement('button');
+    btnCierre.className = 'ghost-btn';
+    btnCierre.textContent = '▼ CLOSE CONSOLE';
+    btnCierre.style.cssText = `
+      font-size: 10px;
+      padding: 4px 10px;
+      border-color: rgba(255,255,255,0.15);
+      letter-spacing: 1px;
+    `;
+    
+    btnCierre.addEventListener('click', () => {
+      panelContenedor.classList.add('hidden');
+    });
+
+    barraCierre.appendChild(btnCierre);
+    panelContenedor.insertBefore(barraCierre, contenedor);
   }
 
-  contenedorLimpio.innerHTML = '';
-  
+  // Renderizar las teclas del banco matemático
   BANK.forEach(value => {
     const tecla = document.createElement('button');
     tecla.className = `key ${isFigure(value) ? 'figure' : ''}`;
     tecla.textContent = value;
     tecla.dataset.value = value;
     
-    tecla.addEventListener('click', (e) => {
-      e.preventDefault();
-      e.stopPropagation(); // Frenamos cualquier propagación doble en el DOM
-      
-      // Ocultar paneles flotantes si existieran de forma segura
-      if (el.keypadPanel) el.keypadPanel.classList.add('hidden');
-      if (el.statusMultiKeypadPanel) el.statusMultiKeypadPanel.classList.add('hidden');
-      
-      addElement(value);
+    tecla.addEventListener('click', () => {
+      // CORRECCIÓN MAGISTRAL: Identificar en qué modo y qué candado exacto se está editando
+      if (state.gameMode === 'ia') {
+        if (el.keypadPanel) el.keypadPanel.classList.add('hidden');
+        addElement(value); // El modo práctica usa su inyección nativa
+      } 
+      else if (state.gameMode === 'multi') {
+        // Averiguar qué número de candado (slot) clickeó el usuario antes de abrir el teclado
+        if (state.presionado) {
+          const indiceSlot = parseInt(state.presionado.replace('numero-', ''), 10);
+          
+          if (!isNaN(indiceSlot)) {
+            if (el.multiStatusPanel && !el.multiStatusPanel.classList.contains('hidden')) {
+              // Escenario A: Partida en vivo -> Guardamos en el intento de ataque
+              state.intentoMulti[indiceSlot] = value;
+              if (el.statusMultiKeypadPanel) el.statusMultiKeypadPanel.classList.add('hidden');
+            } else if (el.createRoomPanel && !el.createRoomPanel.classList.contains('hidden')) {
+              // Escenario B: Configuración de sala -> Guardamos en tu propio código secreto
+              if (!state.isCodeLocked) {
+                state.mySecretCode[indiceSlot] = value;
+              }
+            }
+            
+            // Forzar el redibujado inmediato de los candados y actualizar el teclado físico/virtual
+            crearSlots();
+            refreshKeypad();
+            state.presionado = ""; // Liberar el foco del candado actual
+          }
+        }
+      }
     });
-    contenedorLimpio.appendChild(tecla);      
+    
+    contenedor.appendChild(tecla);      
   });
-  
+
   refreshKeypad();
 }
 
@@ -96,7 +144,7 @@ export function refreshKeypad() {
   });
 }
 
-// Genera las casillas de entrada (Candados)
+// Genera las casillas de entrada (Candados) - CORREGIDO PARA BOTÓN ATRÁS MÓVIL
 export function crearSlots() {
   // 1. MODO VS IA
   if (state.gameMode === 'ia' && el.slots) {
@@ -109,7 +157,11 @@ export function crearSlots() {
       candado.id = `numero-${i}`;
       candado.addEventListener('click', function() {
         state.presionado = this.id;
-        if (el.keypadPanel) el.keypadPanel.classList.remove('hidden');
+        if (el.keypadPanel) {
+          el.keypadPanel.classList.remove('hidden');
+          // PROTOCOLO ANDROID/MÓVIL: Inyectamos un estado en el historial del celular
+          history.pushState({ tecladoAbierto: true }, "");
+        }
       });
       el.slots.appendChild(candado);
     }
@@ -121,13 +173,16 @@ export function crearSlots() {
       for (let i = 0; i < state.multiLength; i++) {
         const candado = document.createElement('div');
         const val = state.intentoMulti[i];
-        console.log(val);
         candado.className = `slot ${val ? 'filled' : 'locked'}`;
         candado.textContent = val ? val : '🔒';
         candado.id = `numero-${i}`;
         candado.addEventListener('click', function() {
           state.presionado = this.id;
-          if (el.statusMultiKeypadPanel) el.statusMultiKeypadPanel.classList.remove('hidden');
+          if (el.statusMultiKeypadPanel) {
+            el.statusMultiKeypadPanel.classList.remove('hidden');
+            // PROTOCOLO ANDROID/MÓVIL: Inyectamos un estado en el historial del celular
+            history.pushState({ tecladoAbierto: true }, "");
+          }
         });
         el.statusMultiSlots.appendChild(candado);
       }
@@ -144,6 +199,7 @@ export function crearSlots() {
     }
   }
 }
+
 
 // Renderiza el historial detallado de ataques recibidos de un rival específico
 export function renderizarBitacoraFiltrada() {
@@ -213,19 +269,20 @@ export function addElement(value) {
     const idSlot = document.getElementById(state.presionado);
     if (!idSlot) return;
     
-    let indice = parseInt(state.presionado.split('-'), 10);
+    let indice = parseInt(state.presionado.split('-')[1], 10);
     state.current[indice] = value;
     idSlot.classList.replace('locked', 'filled');
     idSlot.textContent = value;
     
     state.presionado = ""; 
-    sfx.slotIngreso(); 
+    
+    sfx.slotIngreso(); // <--- 🔊 AUDIO: Clic táctil al llenar slot en Modo IA
+    
     refreshKeypad();
     setStatus('', false);
   } 
   // 2. CASO MODO MULTIJUGADOR
   else if (state.gameMode === 'multi') {
-    // Escenario A: Partida en vivo (Lanzar ataques a oponentes)
     if (el.multiStatusPanel && !el.multiStatusPanel.classList.contains('hidden')) {
       if (!state.playing || state.intentoMulti.includes(value)) return;
       
@@ -247,30 +304,26 @@ export function addElement(value) {
       const idSlot = document.getElementById(state.presionado);
       if (!idSlot) return; 
 
-      let indice = parseInt(state.presionado.split('-'), 10);
+      let indice = parseInt(state.presionado.split('-')[1], 10);
       state.intentoMulti[indice] = value;
       idSlot.classList.replace('locked', 'filled');
       idSlot.textContent = value;
       
       state.presionado = ""; 
-      sfx.slotIngreso(); 
+      
+      sfx.slotIngreso(); // <--- 🔊 AUDIO: Clic táctil al llenar slot en plena Partida Online
+      
       refreshKeypad();
       setStatus('', false);
     }
-    // Escenario B: Creación de sala (Configurar clave secreta propia como HOST)
     else if (el.createRoomPanel && !el.createRoomPanel.classList.contains('hidden')) {
-      // VALIDACIÓN ESTRICTA ANTI-DUPLICACIÓN ASÍNCRONA
-      if (state.isCodeLocked || state.mySecretCode.length >= state.multiLength || state.mySecretCode.includes(value)) {
-        return;
-      }
-      
-      // Inyección lineal limpia en la memoria de la sala
+      if (state.isCodeLocked || state.mySecretCode.length >= state.multiLength || state.mySecretCode.includes(value)) return;
       state.mySecretCode.push(value);
-      state.presionado = ""; 
       
-      sfx.slotIngreso(); 
-      crearSlots(); // Redibuja los candados reflejando el push de inmediato
-      refreshKeypad(); // Actualiza el estado gris de las teclas usadas
+      sfx.slotIngreso(); // <--- 🔊 AUDIO: Clic táctil al configurar tu contraseña inicial
+      
+      crearSlots();
+      refreshKeypad();
     }
   }
 }
