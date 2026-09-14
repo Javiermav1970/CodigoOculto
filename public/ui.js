@@ -179,7 +179,7 @@ export function addElement(value) {
   if (state.gameMode === 'ia') {
     if (!state.playing || state.current.includes(value)) return;
     
-    if (!state.presionado) {
+    if (!state.presionado || typeof state.presionado !== 'string' || !state.presionado.includes('-')) {
       const primerVacio = state.current.findIndex(v => v === undefined || v === null);
       if (primerVacio !== -1 && primerVacio < state.length) {
         state.presionado = `numero-${primerVacio}`;
@@ -198,19 +198,19 @@ export function addElement(value) {
     idSlot.classList.replace('locked', 'filled');
     idSlot.textContent = value;
     
-    state.presionado = ""; 
+    state.presionado = null; // Cambiado a null para evitar strings vacíos residuales
     
-    sfx.slotIngreso(); // <--- 🔊 AUDIO: Clic táctil al llenar slot en Modo IA
-    
+    sfx.slotIngreso(); 
     refreshKeypad();
     setStatus('', false);
   } 
   // 2. CASO MODO MULTIJUGADOR
   else if (state.gameMode === 'multi') {
+    // Escenario A: Partida en vivo (Lanzar ataques)
     if (el.multiStatusPanel && !el.multiStatusPanel.classList.contains('hidden')) {
       if (!state.playing || state.intentoMulti.includes(value)) return;
       
-      if (!state.presionado) {
+      if (!state.presionado || typeof state.presionado !== 'string' || !state.presionado.includes('-')) {
         let primerVacio = -1;
         for (let i = 0; i < state.multiLength; i++) {
           if (!state.intentoMulti[i]) {
@@ -233,24 +233,39 @@ export function addElement(value) {
       idSlot.classList.replace('locked', 'filled');
       idSlot.textContent = value;
       
-      state.presionado = ""; 
-      
-      sfx.slotIngreso(); // <--- 🔊 AUDIO: Clic táctil al llenar slot en plena Partida Online
-      
+      state.presionado = null; 
+      sfx.slotIngreso(); 
       refreshKeypad();
       setStatus('', false);
     }
+    // Escenario B: Creación de sala (Configurar clave secreta propia como HOST)
     else if (el.createRoomPanel && !el.createRoomPanel.classList.contains('hidden')) {
+      // Bloqueo de seguridad: Evitar duplicados u desbordamientos de longitud
       if (state.isCodeLocked || state.mySecretCode.length >= state.multiLength || state.mySecretCode.includes(value)) return;
-      state.mySecretCode.push(value);
+
+      // VALIDACIÓN DE SEGURIDAD EXTREMA: Ignorar cualquier residuo soso ("") proveniente del modo IA
+      if (!state.presionado || typeof state.presionado !== 'string' || !state.presionado.includes('-')) {
+        // Al estar en el panel de creación de sala estática, forzamos un push nativo limpio
+        state.mySecretCode.push(value);
+      } else {
+        // En caso de que se haya clickeado un slot, inyectamos por posición
+        let indice = parseInt(state.presionado.split('-')[1], 10);
+        if (!isNaN(indice) && indice < state.multiLength) {
+          state.mySecretCode[indice] = value;
+        } else {
+          state.mySecretCode.push(value);
+        }
+      }
       
-      sfx.slotIngreso(); // <--- 🔊 AUDIO: Clic táctil al configurar tu contraseña inicial
+      state.presionado = null; 
+      sfx.slotIngreso(); 
       
       crearSlots();
       refreshKeypad();
     }
   }
 }
+
 
 
 export function deleteElement() {
@@ -275,7 +290,7 @@ export function deleteElement() {
         idSlot.classList.replace('filled', 'locked');
         idSlot.textContent = '🔒';
       }
-      state.presionado = "";
+      state.presionado = null;
       refreshKeypad();
     }
     if (el.keypadPanel) el.keypadPanel.classList.add('hidden');
@@ -301,7 +316,7 @@ export function deleteElement() {
           idSlot.classList.replace('filled', 'locked');
           idSlot.textContent = '🔒';
         }
-        state.presionado = "";
+        state.presionado = null;
         refreshKeypad();
       }
       
