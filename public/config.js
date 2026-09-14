@@ -13,6 +13,11 @@ export const MOCK_ROOMS = [
   { code: 'B8W1M', host: 'ALPHA_ZERO', len: 3 }
 ];
 
+export const NOMBRES_POOL = [
+  'ANON_MOUS', 'GHOST_RIDER', 'CYBER_PUNK', 'DARK_NET', 
+  'HEX_HACKER', 'ROBOT_X', 'NULL_POINTER', 'PHANTOM_OS'
+];
+
 // Estado global del juego
 export let state = {
   attempts: 0,
@@ -60,6 +65,7 @@ export function limpiarEstadoMemoriaCompleto() {
   state.connectedPlayers = [];
   state.decryptedPlayers = [];
   state.playerTargetBlocks = {};
+  state.botMemory = {};
   state.currentPlayerIndex = 0;
   state.selectedTargetFilter = null; // <-- Quitar el "TODOS" para forzar el mensaje de bienvenida de la bitácora
   state.selectedRoomCode = null;
