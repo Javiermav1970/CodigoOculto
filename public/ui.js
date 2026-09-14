@@ -207,7 +207,6 @@ export function addElement(value) {
   } 
   // 2. CASO MODO MULTIJUGADOR
   else if (state.gameMode === 'multi') {
-    console.log(12345);
     if (el.multiStatusPanel && !el.multiStatusPanel.classList.contains('hidden')) {
       if (!state.playing || state.intentoMulti.includes(value)) return;
       
