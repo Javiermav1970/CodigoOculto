@@ -213,6 +213,11 @@ export function resetGame() {
   el.logPanel.classList.add('hidden');
   
   removeOverlay(); // Elimina los carteles flotantes de victoria o derrota
+
+  // Agrega esto al final de resetGame() en main.js para forzar el vaciado de clases residuales
+if (el.multiStatusPanel) el.multiStatusPanel.classList.add('hidden');
+if (el.statusMultiKeypadPanel) el.statusMultiKeypadPanel.classList.add('hidden');
+state.presionado = ""; // Saneamos cualquier foco fantasma de la IA
 }
 
 

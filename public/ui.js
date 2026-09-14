@@ -200,16 +200,27 @@ export function addElement(value) {
     idSlot.textContent = value;
     
     state.presionado = ""; 
-    
-    sfx.slotIngreso(); // <--- 🔊 AUDIO: Clic táctil al llenar slot en Modo IA
-    
+    sfx.slotIngreso(); 
     refreshKeypad();
     setStatus('', false);
   } 
   // 2. CASO MODO MULTIJUGADOR
   else if (state.gameMode === 'multi') {
-    if (el.multiStatusPanel && !el.multiStatusPanel.classList.contains('hidden')) {
+    // CORRECCIÓN PRIORITARIA: Evaluamos primero si estamos configurando la contraseña de la sala (HOST o INVITADO)
+    if (el.createRoomPanel && !el.createRoomPanel.classList.contains('hidden')) {
+      if (state.isCodeLocked || state.mySecretCode.length >= state.multiLength || state.mySecretCode.includes(value)) return;
+      
+      state.mySecretCode.push(value);
+      state.presionado = ""; // Limpieza estricta de foco
+      
+      sfx.slotIngreso(); 
+      crearSlots();
+      refreshKeypad();
+    }
+    // Escenario B: Partida en vivo activa (Lanzando ataques de descifrado)
+    else if (el.multiStatusPanel && !el.multiStatusPanel.classList.contains('hidden')) {
       if (!state.playing || state.intentoMulti.includes(value)) return;
+      
       if (!state.presionado) {
         let primerVacio = -1;
         for (let i = 0; i < state.multiLength; i++) {
@@ -234,23 +245,13 @@ export function addElement(value) {
       idSlot.textContent = value;
       
       state.presionado = ""; 
-      
-      sfx.slotIngreso(); // <--- 🔊 AUDIO: Clic táctil al llenar slot en plena Partida Online
-      
+      sfx.slotIngreso(); 
       refreshKeypad();
       setStatus('', false);
     }
-    else if (el.createRoomPanel && !el.createRoomPanel.classList.contains('hidden')) {
-      if (state.isCodeLocked || state.mySecretCode.length >= state.multiLength || state.mySecretCode.includes(value)) return;
-      state.mySecretCode.push(value);
-      
-      sfx.slotIngreso(); // <--- 🔊 AUDIO: Clic táctil al configurar tu contraseña inicial
-      
-      crearSlots();
-      refreshKeypad();
-    }
   }
 }
+
 
 
 export function deleteElement() {
