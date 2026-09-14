@@ -22,76 +22,34 @@ export function setMultiSetupMessage(msg, isError) {
   }
 }
 
-// Construye dinámicamente los botones del teclado virtual con barra de cierre
+// Construye dinámicamente los botones del teclado virtual
 export function buildKeypad() {
   let contenedor = el.keypad; // Por defecto modo VS IA
-  let panelContenedor = el.keypadPanel; // Panel fixed padre para IA
   
   if (state.gameMode === 'multi') {
     if (el.createRoomPanel && !el.createRoomPanel.classList.contains('hidden')) {
       contenedor = el.multiKeypad;
-      panelContenedor = null; // En la creación de sala está integrado, no es flotante
     } else if (el.multiStatusPanel && !el.multiStatusPanel.classList.contains('hidden')) {
       contenedor = el.statusMultiKeypad;
-      panelContenedor = el.statusMultiKeypadPanel; // Panel fixed padre para partida online
     }
   }
 
   if (!contenedor) return;
 
-  // Limpiar el contenedor antes de rellenar
   contenedor.innerHTML = '';
-
-  // INYECCIÓN CYBERPUNK: Si el panel es flotante fixed, añadimos un botón de colapso
-  if (panelContenedor) {
-    // Eliminamos cualquier barra de cierre previa para no duplicar
-    const barraPrevia = panelContenedor.querySelector('.keypad-close-bar');
-    if (barraPrevia) barraPrevia.remove();
-
-    const barraCierre = document.createElement('div');
-    barraCierre.className = 'keypad-close-bar';
-    barraCierre.style.cssText = `
-      display: flex;
-      justify-content: flex-end;
-      margin-bottom: 8px;
-      width: 100%;
-    `;
-
-    const btnCierre = document.createElement('button');
-    btnCierre.className = 'ghost-btn';
-    btnCierre.textContent = '▼ CLOSE CONSOLE';
-    btnCierre.style.cssText = `
-      font-size: 10px;
-      padding: 4px 10px;
-      border-color: rgba(255,255,255,0.15);
-      letter-spacing: 1px;
-    `;
-    
-    // Al hacer clic, ocultamos el panel fixed de forma segura
-    btnCierre.addEventListener('click', () => {
-      panelContenedor.classList.add('hidden');
-    });
-
-    barraCierre.appendChild(btnCierre);
-    // Insertamos la barra antes de la cuadrícula de teclas
-    panelContenedor.insertBefore(barraCierre, contenedor);
-  }
-
-  // Renderizar las teclas del banco matemático
   BANK.forEach(value => {
     const tecla = document.createElement('button');
     tecla.className = `key ${isFigure(value) ? 'figure' : ''}`;
     tecla.textContent = value;
     tecla.dataset.value = value;
     tecla.addEventListener('click', () => {
-      // Ocultar paneles de selección flotantes tras presionar un dígito
+      // Ocultar paneles de selección flotantes si existieran de manera segura
       if (el.keypadPanel) el.keypadPanel.classList.add('hidden');
       if (el.statusMultiKeypadPanel) el.statusMultiKeypadPanel.classList.add('hidden');
       addElement(value);
     });
     contenedor.appendChild(tecla);      
   });
-
   refreshKeypad();
 }
 
@@ -119,7 +77,7 @@ export function refreshKeypad() {
   });
 }
 
-// Genera las casillas de entrada (Candados) - CORREGIDO PARA BOTÓN ATRÁS MÓVIL
+// Genera las casillas de entrada (Candados)
 export function crearSlots() {
   // 1. MODO VS IA
   if (state.gameMode === 'ia' && el.slots) {
@@ -132,11 +90,7 @@ export function crearSlots() {
       candado.id = `numero-${i}`;
       candado.addEventListener('click', function() {
         state.presionado = this.id;
-        if (el.keypadPanel) {
-          el.keypadPanel.classList.remove('hidden');
-          // PROTOCOLO ANDROID/MÓVIL: Inyectamos un estado en el historial del celular
-          history.pushState({ tecladoAbierto: true }, "");
-        }
+        if (el.keypadPanel) el.keypadPanel.classList.remove('hidden');
       });
       el.slots.appendChild(candado);
     }
@@ -153,11 +107,7 @@ export function crearSlots() {
         candado.id = `numero-${i}`;
         candado.addEventListener('click', function() {
           state.presionado = this.id;
-          if (el.statusMultiKeypadPanel) {
-            el.statusMultiKeypadPanel.classList.remove('hidden');
-            // PROTOCOLO ANDROID/MÓVIL: Inyectamos un estado en el historial del celular
-            history.pushState({ tecladoAbierto: true }, "");
-          }
+          if (el.statusMultiKeypadPanel) el.statusMultiKeypadPanel.classList.remove('hidden');
         });
         el.statusMultiSlots.appendChild(candado);
       }
@@ -174,7 +124,6 @@ export function crearSlots() {
     }
   }
 }
-
 
 // Renderiza el historial detallado de ataques recibidos de un rival específico
 export function renderizarBitacoraFiltrada() {
@@ -366,7 +315,6 @@ export function deleteElement() {
     }
   }
 }
-
 /**
  * Inyecta una alerta flotante ciberpunk temporal en el DOM
  * Reemplazo directo y seguro para el alert() nativo
