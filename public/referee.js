@@ -1,15 +1,16 @@
 /* =========================================================
-   CÓDIGO OCULTO - Motor del Árbitro, Turnos y Fin de Juego
+   CÓDIGO OCULTO - Motor del Árbitro, Turnos y Fin de Juego - LIMPIO
    ========================================================= */
 
 import { state, isFigure } from './config.js';
 import { stopTimer, startTimer } from './timer.js';
 import { actualizarVisualSalaJugadores, resetGame, lanzarFuegosArtificialesCiberpunk } from './main.js';
-import { simularTurnoBot } from './bots.js';
+import { el } from './dom.js'; // CORRECCIÓN EXTRA: Añadida importación de elementos de la interfaz
 
 /**
  * ESCENARIO 1: El tiempo terminó para el jugador de turno. 
  * Pasa de forma estricta la transmisión al siguiente nodo de la sala.
+ * (Nota: Mantenida para compatibilidad local si tu temporizador la invoca)
  */
 export function manejarTiempoAgotadoTurno() {
   if (!state.playing) return;
@@ -23,20 +24,14 @@ export function manejarTiempoAgotadoTurno() {
   // Avanzar al siguiente hacker de la lista
   state.currentPlayerIndex = (state.currentPlayerIndex + 1) % state.connectedPlayers.length;
   
-  const nuevoJugadorActivo = state.connectedPlayers[state.currentPlayerIndex];
   actualizarVisualSalaJugadores();
 
-  // El turno cambió por expiración -> Reseteamos el conteo para el siguiente jugador que recibe el turno
+  // El turno cambió por expiración -> Reseteamos el conteo de forma limpia
   startTimer();
-
-  if (nuevoJugadorActivo.name !== state.username) {
-    setTimeout(simularTurnoBot, 1500);
-  }
 }
 
 
 /**
- * ACTUALIZACIÓN DEL ÁRBITRO ORIGINAL
  * Controla el reseteo del conteo en los escenarios de ataque parcial y fin de ciclo.
  */
 export function finalizarTurnoJugador(atacante) {
@@ -53,7 +48,6 @@ export function finalizarTurnoJugador(atacante) {
   // COMPROBACIÓN: ¿Terminó por completo de atacar a todos sus objetivos válidos de la fase?
   if (ataquesEfectuadosAActivos >= oponentesActivos || state.playerTargetBlocks[atacante].length >= state.connectedPlayers.length - 1) {
     
-    // ESCENARIO 3: Si el turno total del jugador termina, el tiempo se resetea y comienza para el que recibe el turno
     state.playerTargetBlocks[atacante] = [];
     state.currentPlayerIndex = (state.currentPlayerIndex + 1) % state.connectedPlayers.length;
     
@@ -61,40 +55,24 @@ export function finalizarTurnoJugador(atacante) {
     console.log(`🔄 FIN DE CICLO: Turno transferido a ${nuevoJugadorActivo.name}`);
     
     actualizarVisualSalaJugadores();
-
-    // Reinicia el conteo de forma limpia para el hacker entrante
     startTimer();
-
-    if (nuevoJugadorActivo.name !== state.username) {
-      setTimeout(simularTurnoBot, 1500); 
-    }
   } else {
-    // ESCENARIO 2: Cuando realice el ataque a un jugador, el tiempo se resetea y comienza el conteo nuevamente
     console.log(`📡 Nodo atacado con éxito. Reconfigurando reloj para el próximo ataque de ${atacante}.`);
-    
-    // El conteo arranca de nuevo para el mismo jugador hasta que decida atacar al siguiente bot de su lista
     startTimer();
-
-    if (atacante !== state.username) {
-      setTimeout(simularTurnoBot, 1000);
-    }
   }
 }
 
 export function verificarCondicionVictoriaSala() {
-  // El número total de oponentes que cada jugador debe descifrar
   const totalObjetivosPorHackear = state.connectedPlayers.length - 1;
 
   for (let jugador of state.connectedPlayers) {
-    // Contamos cuántos ataques exitosos ha realizado este jugador en específico
     const codigosDescifradosPorEl = state.multiplayerHistory.filter(item => 
       item.player === jugador.name && item.correct === state.multiLength
     ).length;
 
-    // Si alcanzó el total, ¡tenemos un Ganador Absoluto!
     if (codigosDescifradosPorEl === totalObjetivosPorHackear) {
       ejecutarVictoriaGlobal(jugador.name);
-      return true; // Detiene comprobaciones posteriores
+      return true;
     }
   }
   return false;
@@ -135,28 +113,23 @@ export function ejecutarVictoriaGlobal(ganador) {
 
   document.body.appendChild(overlay);
   
-  // Configurar el botón de reinicio
   document.getElementById('btnCerrarMulti').addEventListener('click', () => {
     resetGame();
-    if (el.multiStatusPanel) el.multiStatusPanel.classList.add('hidden');
-    if (el.statusMultiLogPanel) el.statusMultiLogPanel.classList.add('hidden');
+    if (el && el.multiStatusPanel) el.multiStatusPanel.classList.add('hidden');
+    if (el && el.statusMultiLogPanel) el.statusMultiLogPanel.classList.add('hidden');
   });
 
-  // Lanzar la pirotecnia de fuegos artificiales digitales
   lanzarFuegosArtificialesCiberpunk();
 }
 
 export function mostrarVentanaFlotanteAtaque(emisor, receptor, codigo) {
-  // Eliminar cualquier ventana flotante de ataque anterior que haya quedado activa
   const viejaVentana = document.getElementById('pop-ataque-global');
   if (viejaVentana) viejaVentana.remove();
 
-  // Crear el contenedor de la ventana flotante
   const pop = document.createElement('div');
   pop.id = 'pop-ataque-global';
   pop.className = 'broadcast-popup';
 
-  // Mapear los elementos del código para aplicarles tus clases de estilo (.fig o .num)
   const codigoHtml = codigo.map(v => `<div class="log-el ${isFigure(v) ? 'fig' : 'num'}">${v}</div>`).join('');
 
   pop.innerHTML = `
@@ -169,13 +142,13 @@ export function mostrarVentanaFlotanteAtaque(emisor, receptor, codigo) {
 
   document.body.appendChild(pop);
 
-  // Desvanecer y remover la ventana automáticamente tras 3000 milisegundos (3 segundos)
   setTimeout(() => {
     pop.style.opacity = '0';
     pop.style.transform = 'translate(-50%, -60%) scale(0.9)';
-    setTimeout(() => pop.remove(), 400); // Espera que termine la animación CSS para remover del DOM
+    setTimeout(() => pop.remove(), 400);
   }, 3000);
 }
+
 export function celebrarDescifradoIntermedio(atacante, objetivo) {
   const alerta = document.createElement('div');
   alerta.className = 'broadcast-popup';
@@ -196,7 +169,6 @@ export function celebrarDescifradoIntermedio(atacante, objetivo) {
 
   document.body.appendChild(alerta);
 
-  // Desvanecer automáticamente tras 3.5 segundos
   setTimeout(() => {
     alerta.style.opacity = '0';
     alerta.style.transform = 'translate(-50%, -60%) scale(0.9)';
