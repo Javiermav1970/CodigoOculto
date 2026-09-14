@@ -22,7 +22,7 @@ export function setMultiSetupMessage(msg, isError) {
   }
 }
 
-// Construye dinámicamente los botones del teclado virtual con barra de cierre
+// Construye dinámicamente los botones del teclado virtual
 export function buildKeypad() {
   let contenedor = el.keypad; // Por defecto modo VS IA
   let panelContenedor = el.keypadPanel; // Panel fixed padre para IA
@@ -30,7 +30,7 @@ export function buildKeypad() {
   if (state.gameMode === 'multi') {
     if (el.createRoomPanel && !el.createRoomPanel.classList.contains('hidden')) {
       contenedor = el.multiKeypad;
-      panelContenedor = null; // En la creación de sala está integrado, no es flotante
+      panelContenedor = null; // En la creación de sala está integrado, no es flotante 
     } else if (el.multiStatusPanel && !el.multiStatusPanel.classList.contains('hidden')) {
       contenedor = el.statusMultiKeypad;
       panelContenedor = el.statusMultiKeypadPanel; // Panel fixed padre para partida online
@@ -77,24 +77,21 @@ export function buildKeypad() {
     panelContenedor.insertBefore(barraCierre, contenedor);
   }
 
-  // Renderizar las teclas del banco matemático
   BANK.forEach(value => {
     const tecla = document.createElement('button');
     tecla.className = `key ${isFigure(value) ? 'figure' : ''}`;
     tecla.textContent = value;
     tecla.dataset.value = value;
     tecla.addEventListener('click', () => {
-      // Ocultar paneles de selección flotantes tras presionar un dígito
+      // Ocultar paneles de selección flotantes si existieran de manera segura
       if (el.keypadPanel) el.keypadPanel.classList.add('hidden');
       if (el.statusMultiKeypadPanel) el.statusMultiKeypadPanel.classList.add('hidden');
       addElement(value);
     });
     contenedor.appendChild(tecla);      
   });
-
   refreshKeypad();
 }
-
 
 // Deshabilita o resalta las teclas que ya están en uso
 export function refreshKeypad() {
