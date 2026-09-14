@@ -1,4 +1,4 @@
-import { state, BANK } from './config.js';
+import { state, NOMBRES_POOL, BANK } from './config.js';
 import { el } from './dom.js';
 import { lanzarPartidaMultijugador } from './match.js';
 
@@ -20,6 +20,7 @@ export function renderRoomsList(rooms) {
     return;
   }
 
+  // AGREGAMOS data-len="${room.len}" AL DIV CONTENEDOR
   el.roomsList.innerHTML = rooms.map(room => `
     <div class="room-item" data-code="${room.code}" data-len="${room.len}"> 
       <span class="room-host">${room.host} <span class="room-details">(${room.code})</span></span> 
@@ -44,15 +45,47 @@ export function renderConnectedPlayers() {
   }
 
   el.connectedPlayersList.innerHTML = state.connectedPlayers.map((p, index) => {
-    const badge = p.isHost 
-      ? '<span class="player-status host">HOST</span>' 
-      : '<span class="player-status ready">READY</span>';
-      
-    return `
-      <div class="player-item" data-name="${p.name}" data-order="${index + 1}">
-        <span class="player-name">📡 ${p.name.toUpperCase()}</span>
-        ${badge}
-      </div>
-    `;
+  const badge = p.isHost 
+    ? '<span class="player-status host">HOST</span>' 
+    : '<span class="player-status ready">READY</span>';
+    
+  // Añadimos data-name, data-order e index al HTML
+  return `
+    <div class="player-item" data-name="${p.name}" data-order="${index + 1}">
+      <span class="player-name">📡 ${p.name.toUpperCase()}</span>
+      ${badge}
+    </div>
+  `;
   }).join('');
+}
+
+export function simularEntradaDeJugadores() {
+  const poolMezclado = [...NOMBRES_POOL].sort(() => Math.random() - 0.5);
+
+  const entradaInterval = setInterval(() => {
+    if (!state.isCodeLocked) {
+      clearInterval(entradaInterval);
+      return;
+    }
+
+    let nuevoNombre = poolMezclado.pop() || `BOT_${Math.floor(100 + Math.random() * 900)}`;
+    
+    // GENERACIÓN CRÍTICA: Cada bot genera su combinación secreta única sin repetidos
+    const codigoSecretoBot = generateSecret(state.multiLength);
+
+    state.connectedPlayers.push({ 
+      name: nuevoNombre, 
+      isHost: false,
+      secretCode: codigoSecretoBot // <-- Almacenamos su clave en su estructura de jugador
+    });
+    
+    console.log(`🤖 BOT CONECTADO: ${nuevoNombre} | Cifrado generado: [${codigoSecretoBot.join(' ')}]`); // Log en consola para auditoría de desarrollo
+    
+    renderConnectedPlayers();
+
+    if (state.connectedPlayers.length >= state.maxPlayersAllowed) {
+      clearInterval(entradaInterval);
+      lanzarPartidaMultijugador("Sincronización completa. Iniciando...");
+    }
+  }, 1500);
 }
