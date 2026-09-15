@@ -10,8 +10,8 @@ const path = require('path');
 const app = express();
 
 // Colocar al inicio absoluto, justo debajo de const app = express();
-app.get('/favicon.ico', (req, res) => {
-  res.set('Content-Type', 'image/x-icon');
+app.get('/favicon.png', (req, res) => {
+  res.set('Content-Type', 'image/png');
   res.status(204).end();
 });
 
