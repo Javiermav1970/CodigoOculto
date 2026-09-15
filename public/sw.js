@@ -1,7 +1,14 @@
 const CACHE_NAME = 'codigo-oculto-v1';
 const ASSETS = [
   './index.html',
+  // 💡 ¡CONEXIÓN MAESTRA DE ESTILOS FRAGMENTADOS!:
   './index.css',
+  './style/variables.css',
+  './style/base-ui.css',
+  './style/gameplay.css',
+  './style/multiplayer.css',
+  './style/log-overlays.css',
+  // Scripts principales del juego
   './main.js',
   './config.js',
   './dom.js',
