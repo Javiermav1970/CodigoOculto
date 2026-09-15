@@ -9,8 +9,11 @@ const cors = require('cors');
 const path = require('path');
 const app = express();
 
-// Middleware crítico para silenciar y resolver las peticiones automáticas de favicon
-app.get('/favicon.ico', (req, res) => res.status(204).end());
+// Colocar al inicio absoluto, justo debajo de const app = express();
+app.get('/favicon.ico', (req, res) => {
+  res.set('Content-Type', 'image/x-icon');
+  res.status(204).end();
+});
 
 app.use(cors()); // Permitir conexiones desde cualquier URL (importante para hosting gratuitos)
 
