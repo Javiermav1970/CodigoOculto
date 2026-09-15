@@ -21,7 +21,7 @@ const ASSETS = [
   './timer.js',
   './ui.js',
   './audio.js',
-  './image_uU8_cv.png'
+  './favicon.png'
 ];
 
 self.addEventListener('install', (e) => {
