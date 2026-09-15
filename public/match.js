@@ -1,13 +1,11 @@
 /* =========================================================
    CÓDIGO OCULTO - Controlador de Partidas (Modo IA y Red en Línea)
    ========================================================= */
-import { BANK, state, loadRecords, saveRecords } from './config.js';
+import { state, loadRecords, saveRecords } from './config.js';
 import { el } from './dom.js';
 import { buildKeypad, crearSlots, refreshKeypad, renderizarBitacoraFiltrada, setStatus, mostrarAlertaCyber } from './ui.js';
 import { actualizarVisualSalaJugadores, showVictory, addLogRow } from './main.js';
 import { startTimer, stopTimer } from './timer.js';
-import { calculateHints } from './bots.js';
-import { finalizarTurnoJugador } from './referee.js';
 import { generateSecret } from './rooms.js';
 import { removeOverlay } from './fx.js';
 import { socket } from './mode-multi.js'; // Importamos la instancia del WebSocket activo
@@ -220,4 +218,31 @@ export function submitGuessMulti() {
   refreshKeypad();
 }
 
+// Pega esto al final de match.js para respaldar el Modo Solo de Práctica
+export function calculateHints(guess, secret) {
+  let correct = 0;
+  let present = 0;
+  const secretUsed = new Array(secret.length).fill(false);
+  const guessResolved = new Array(guess.length).fill(false);
+
+  for (let i = 0; i < guess.length; i++) {
+    if (guess[i] === secret[i]) {
+      correct++;
+      secretUsed[i] = true;
+      guessResolved[i] = true;
+    }
+  }
+
+  for (let i = 0; i < guess.length; i++) {
+    if (guessResolved[i]) continue;
+    for (let j = 0; j < secret.length; j++) {
+      if (!secretUsed[j] && guess[i] === secret[j]) {
+        present++;
+        secretUsed[j] = true;
+        break;
+      }
+    }
+  }
+  return { correct, present };
+}
 

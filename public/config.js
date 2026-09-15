@@ -6,17 +6,7 @@ export const RECORDS_KEY = 'codigoOculto.records';
 
 // Helper: saber si un elemento es figura (para estilos)
 export const isFigure = (v) => FIGURES.includes(v);
-
-export const MOCK_ROOMS = [
-  { code: 'X9F2R', host: 'CYBER_GHOST', len: 4 },
-  { code: 'K3L7P', host: 'NEO_VANDAL', len: 5 },
-  { code: 'B8W1M', host: 'ALPHA_ZERO', len: 3 }
-];
-
-export const NOMBRES_POOL = [
-  'ANON_MOUS', 'GHOST_RIDER', 'CYBER_PUNK', 'DARK_NET', 
-  'HEX_HACKER', 'ROBOT_X', 'NULL_POINTER', 'PHANTOM_OS'
-];
+export const MOCK_ROOMS = []; // Ahora solo se llenará con las salas que devuelva el servidor real
 
 // Estado global del juego
 export let state = {
@@ -33,6 +23,7 @@ export let state = {
   maxPlayersAllowed: 2,
   multiLength: 3,
   mySecretCode: [],
+  multiplayerHistory: [],
   playing: false,
   presionado: "",
   selectedRoomCode: null,

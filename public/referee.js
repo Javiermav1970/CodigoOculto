@@ -5,7 +5,6 @@
 import { state, isFigure } from './config.js';
 import { stopTimer, startTimer } from './timer.js';
 import { actualizarVisualSalaJugadores, resetGame, lanzarFuegosArtificialesCiberpunk } from './main.js';
-import { simularTurnoBot } from './bots.js';
 
 /**
  * ESCENARIO 1: El tiempo terminó para el jugador de turno. 
@@ -29,9 +28,6 @@ export function manejarTiempoAgotadoTurno() {
   // El turno cambió por expiración -> Reseteamos el conteo para el siguiente jugador que recibe el turno
   startTimer();
 
-  if (nuevoJugadorActivo.name !== state.username) {
-    setTimeout(simularTurnoBot, 1500);
-  }
 }
 
 
@@ -65,9 +61,6 @@ export function finalizarTurnoJugador(atacante) {
     // Reinicia el conteo de forma limpia para el hacker entrante
     startTimer();
 
-    if (nuevoJugadorActivo.name !== state.username) {
-      setTimeout(simularTurnoBot, 1500); 
-    }
   } else {
     // ESCENARIO 2: Cuando realice el ataque a un jugador, el tiempo se resetea y comienza el conteo nuevamente
     console.log(`📡 Nodo atacado con éxito. Reconfigurando reloj para el próximo ataque de ${atacante}.`);
@@ -75,9 +68,6 @@ export function finalizarTurnoJugador(atacante) {
     // El conteo arranca de nuevo para el mismo jugador hasta que decida atacar al siguiente bot de su lista
     startTimer();
 
-    if (atacante !== state.username) {
-      setTimeout(simularTurnoBot, 1000);
-    }
   }
 }
 

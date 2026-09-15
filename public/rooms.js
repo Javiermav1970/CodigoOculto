@@ -1,6 +1,5 @@
-import { state, NOMBRES_POOL, BANK } from './config.js';
+import { state, BANK } from './config.js';
 import { el } from './dom.js';
-import { lanzarPartidaMultijugador } from './match.js';
 
 export function generateSecret(len) {
   const pool = [...BANK];
@@ -59,33 +58,3 @@ export function renderConnectedPlayers() {
   }).join('');
 }
 
-export function simularEntradaDeJugadores() {
-  const poolMezclado = [...NOMBRES_POOL].sort(() => Math.random() - 0.5);
-
-  const entradaInterval = setInterval(() => {
-    if (!state.isCodeLocked) {
-      clearInterval(entradaInterval);
-      return;
-    }
-
-    let nuevoNombre = poolMezclado.pop() || `BOT_${Math.floor(100 + Math.random() * 900)}`;
-    
-    // GENERACIÓN CRÍTICA: Cada bot genera su combinación secreta única sin repetidos
-    const codigoSecretoBot = generateSecret(state.multiLength);
-
-    state.connectedPlayers.push({ 
-      name: nuevoNombre, 
-      isHost: false,
-      secretCode: codigoSecretoBot // <-- Almacenamos su clave en su estructura de jugador
-    });
-    
-    console.log(`🤖 BOT CONECTADO: ${nuevoNombre} | Cifrado generado: [${codigoSecretoBot.join(' ')}]`); // Log en consola para auditoría de desarrollo
-    
-    renderConnectedPlayers();
-
-    if (state.connectedPlayers.length >= state.maxPlayersAllowed) {
-      clearInterval(entradaInterval);
-      lanzarPartidaMultijugador("Sincronización completa. Iniciando...");
-    }
-  }, 1500);
-}
