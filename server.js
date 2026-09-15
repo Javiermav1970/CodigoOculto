@@ -9,11 +9,11 @@ const cors = require('cors');
 const path = require('path');
 const app = express();
 
-// Colocar al inicio absoluto, justo debajo de const app = express();
+/*// Colocar al inicio absoluto, justo debajo de const app = express();
 app.get('/favicon.png', (req, res) => {
   res.set('Content-Type', 'image/png');
   res.status(204).end();
-});
+});*/
 
 app.use(cors()); // Permitir conexiones desde cualquier URL (importante para hosting gratuitos)
 
