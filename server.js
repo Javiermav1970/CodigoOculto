@@ -8,10 +8,11 @@ const { Server } = require('socket.io');
 const cors = require('cors');
 const path = require('path');
 const app = express();
-app.use(cors()); // Permitir conexiones desde cualquier URL (importante para hosting gratuitos)
 
 // Middleware crítico para silenciar y resolver las peticiones automáticas de favicon
 app.get('/favicon.ico', (req, res) => res.status(204).end());
+
+app.use(cors()); // Permitir conexiones desde cualquier URL (importante para hosting gratuitos)
 
 app.use(express.static(path.join(__dirname, 'public')));  
 
