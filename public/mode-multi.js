@@ -209,17 +209,21 @@ function configurarEscuchadoresRed() {
  */
 export function abandonarPartidaMultijugador() {
   if (socket) {
-    socket.disconnect(); // Romper la sala vieja de forma estricta
-    socket.connect();    // <--- CORRECCIÓN DE FLUJO: Reencender la antena de inmediato para futuras partidas
+    socket.disconnect(); // Romper la sala vieja de forma estricta en el backend
+    socket.connect();    // Reencender la antena de inmediato para futuras partidas online
   }
 
+  // 💡 ¡ORDEN DE LIMPIEZA REPARADO!: 'resetGame' ya se encarga de vaciar y ocultar 
+  // de forma centralizada todos los subpaneles multijugador activos.
   resetGame();
   
   if (el.multiStatusPanel) el.multiStatusPanel.classList.add('hidden');
   if (el.statusMultiLogPanel) el.statusMultiLogPanel.classList.add('hidden');
   
-  actualizarVisualSalaJugadores();
+  // Elminamos la llamada a actualizarVisualSalaJugadores() aquí, ya que el panel 
+  // fue purgado y puesto en 'display: none' de forma segura por resetGame().
 }
+
 
 
 // Vincular los selectores de límite de tiempo para el modo multijugador (ACTUALIZADO)
