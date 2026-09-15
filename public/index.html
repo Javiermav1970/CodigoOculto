@@ -4,6 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CÓDIGO OCULTO</title>
+    <!-- Vincular el archivo manifest -->
+    <link rel="manifest" href="./manifest.json">
+    
+    <!-- Registrar el Service Worker mediante un micro-script -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('./sw.js')
+            .then(reg => console.log('📡 Antena de Aplicación PWA activada con éxito.'))
+            .catch(err => console.error('❌ Error de registro PWA:', err));
+        });
+      }
+    </script>
+
     <link rel="icon" type="image/png" href="favicon.png">
     <link rel="shortcut icon" type="image/png" href="favicon.png">
     <link rel="stylesheet" href="style.css">
