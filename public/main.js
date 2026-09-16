@@ -17,6 +17,26 @@ import { sfx, emitirVozTerminal } from './audio.js';
 import './mode-ia.js';
 import './mode-multi.js';
 
+/* ---------- PROTOCOLO DE FORZADO HORIZONTAL REMOTO ---------- */
+function asegurarOrientacionHorizontal() {
+  // Comprobamos si el navegador del celular soporta la API moderna de orientación
+  if (screen.orientation && typeof screen.orientation.lock === 'function') {
+    screen.orientation.lock('landscape').then(() => {
+      console.log("📡 Protocolo de pantalla: Mainframe bloqueado en Horizontal de forma exitosa.");
+    }).catch((err) => {
+      // Nota: Algunos navegadores exigen que el usuario haga al menos un clic antes de girar la pantalla
+      console.log("⏳ Orientación en espera de interacción táctil del hacker.");
+    });
+  }
+}
+
+// Intentamos ejecutar el giro de inmediato al cargar la página
+asegurarOrientacionHorizontal();
+
+// Y por si acaso el navegador lo frena, lo volvemos a intentar en el primer clic del usuario
+document.addEventListener('click', asegurarOrientacionHorizontal, { once: true });
+
+
 /* ---------- PROTOCOLO DE DESPERTAR MOTOR DE AUDIO CYBERPUNK ---------- */
 function desbloquearEcosistemaAudio() {
   // Disparamos la inicialización del contexto matemático de ondas
