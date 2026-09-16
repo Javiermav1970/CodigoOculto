@@ -128,38 +128,66 @@ export const sfx = {
   }
 };
 
-/**
- * 🎙 SÍNTESIS DE VOZ DE INTELIGENCIA ARTIFICIAL EN ESPAÑOL NATIVO
- */
+// =============================================================================
+// OPTIMIZACIÓN DE VOZ ROBÓTICA LOCAL DE ALTA VELOCIDAD (SIN LAG DE RED)
+// =============================================================================
+
 export function emitirVozTerminal(texto) {
   if (!('speechSynthesis' in window)) return;
-  window.speechSynthesis.cancel(); // Cancelar cualquier audio previo en cola para evitar retrasos
+  
+  // 1. CANCELACIÓN INMEDIATA: Corta cualquier audio en cola al instante para evitar acumulaciones
+  window.speechSynthesis.cancel(); 
   
   const mensaje = new SpeechSynthesisUtterance(texto);
-  
-  // 1. CONFIGURACIÓN IDIOMA MAESTRO: Forzamos la fonética al español neutro/castellano
-  mensaje.lang = 'es-ES'; 
-  
-  // 2. PARÁMETROS PSICOACÚSTICOS CIBERPUNK
-  mensaje.rate = 1.05; // Un toque más rápido para dar sensación de procesamiento informático veloz
-  mensaje.pitch = 0.75; // Voz más grave de lo normal, emulando una supercomputadora fría o un Mainframe militar
-  mensaje.volume = 0.9;
+  mensaje.lang = 'es-ES'; // Forzar fonética castellano/neutro
+  mensaje.rate = 1.15;    // Un toque más rápido para dar sensación de procesamiento instantáneo
+  mensaje.pitch = 0.70;   // Tono grave militar cyberpunk
+  mensaje.volume = 0.95;
 
-  // 3. SELECCIÓN DE MOTOR NATIVO EN ESPAÑOL
-  // Escaneamos la base de datos de voces del sistema operativo del jugador (Windows, Linux, Android o iOS)
-  const vocesDisponibles = window.speechSynthesis.getVoices();
-  
-  // Buscamos prioritariamente voces de Microsoft, Google o Apple que hablen español ("es")
-  const vozEspañola = vocesDisponibles.find(v => v.lang.startsWith('es') && (v.name.includes('Sabina') || v.name.includes('Google') || v.name.includes('Helena') || v.name.includes('Microsoft'))) 
-                      || vocesDisponibles.find(v => v.lang.startsWith('es')); // Alternativa si no encuentra las principales
+  // 2. EXTRAER VOCES DISPONIBLES EN EL SISTEMA
+  const voces = window.speechSynthesis.getVoices();
 
-  if (vozEspañola) {
-    mensaje.voice = vozEspañola; // Anclamos de forma mandatoria la voz en castellano hallada
-    console.log(`🎙️ Voz de Terminal establecida: ${vozEspañola.name} (${vozEspañola.lang})`);
+  // 💡 ESTRATEGIA ANTILAG: Filtramos y EXCLUIMOS las voces de la nube de Google que viajan por internet.
+  // Buscamos voces nativas integradas directamente en el hardware del dispositivo (ej. las de Samsung, Apple o Microsoft locales).
+  let vozLocalRapida = voces.find(v => 
+    v.lang.startsWith('es') && 
+    !v.name.toLowerCase().includes('google') && 
+    !v.localService === false
+  );
+
+  // Si el teléfono no tiene una voz local alternativa, tomamos la primera en español disponible como respaldo
+  if (!vozLocalRapida) {
+    vozLocalRapida = voces.find(v => v.lang.startsWith('es'));
   }
 
+  if (vozLocalRapida) {
+    mensaje.voice = vozLocalRapida;
+  }
+
+  // 3. INYECCIÓN DIRECTA AL MOTOR
   window.speechSynthesis.speak(mensaje);
 }
+
+/**
+ * 💡 PROTOCOLO DE PRE-CALENTAMIENTO (Warmup):
+ * Fuerza al motor de voz del celular a encenderse y cargar la lista de sonidos en caché 
+ * de manera oculta apenas abre el juego, evitando el retardo del primer turno.
+ */
+function precalentarMotorDeVoz() {
+  if (!('speechSynthesis' in window)) return;
+  
+  // Realizamos una llamada en frío vacía para despertar los nodos acústicos
+  window.speechSynthesis.getVoices();
+  
+  // Chrome y Android exigen escuchar este evento para rellenar la base de datos de audio de forma segura
+  window.speechSynthesis.onvoiceschanged = () => {
+    window.speechSynthesis.getVoices();
+    console.log("🎙️ Nodos de voz locales indexados y listos para transmisión instantánea.");
+  };
+}
+
+// Ejecutamos el pre-calentamiento al cargar el archivo de audio de forma atómica
+precalentarMotorDeVoz();
 
 // =============================================================================
 // MOTOR DE MÚSICA DE FONDO CIBERPUNK CONTINUA (Bucle infinito)
