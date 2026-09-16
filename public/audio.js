@@ -182,7 +182,7 @@ export function encenderMusicaDeFondo() {
   const gainNode = ctx.createGain();
 
   // Ajustamos el volumen de fondo (0.15 = 15% de potencia para que no opaque los efectos sfx ni la voz)
-  gainNode.gain.setValueAtTime(0.15, ctx.currentTime);
+  gainNode.gain.setValueAtTime(0.05, ctx.currentTime);
 
   // Enlazamos: Música -> Control Volumen -> Parlantes del Dispositivo
   fuente.connect(gainNode);
