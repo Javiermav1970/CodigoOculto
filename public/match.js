@@ -33,7 +33,7 @@ export function startGame() {
 
   // >> 🎙 SÍNTESIS DE VOZ: La IA del mainframe desafía al jugador al arrancar
   import('./audio.js').then(audio => {
-    audio.emitirVozTerminal("Mainframe  asegurado. Intenta  burlar  mi  cifrado, hacker.");
+    audio.emitirVozTerminal("código asegurado. Intenta  burlar  mi  cifrado, hacker.");
   });
 }
 
