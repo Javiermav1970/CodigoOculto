@@ -812,6 +812,17 @@ window.addEventListener('popstate', (event) => {
 history.pushState(null, null, window.location.href);
 
 window.addEventListener('popstate', () => {
+    // 1. EVALUACIÓN A: Si el cuaderno de notas deductivas está abierto, lo cerramos de inmediato
+  const modalNotas = document.getElementById('modalNotasDeduccion');
+  if (modalNotas) {
+    modalNotas.remove(); // Elimina el modal de la pantalla al presionar Atrás en el celular
+    console.log("📝 Protocolo de notas: Ventana deductiva replegada mediante botón atrás físico.");
+    
+    // Volvemos a inyectar el escudo protector y salimos de la función
+    history.pushState(null, null, window.location.href);
+    return;
+  }
+
   // 1. Si los teclados flotantes están abiertos, los cerramos primero de forma segura
   const tecladoIaVisible = el.keypadPanel && !el.keypadPanel.classList.contains('hidden');
   const tecladoMultiVisible = el.statusMultiKeypadPanel && !el.statusMultiKeypadPanel.classList.contains('hidden');
