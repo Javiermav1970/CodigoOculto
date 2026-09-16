@@ -21,7 +21,8 @@ const ASSETS = [
   './timer.js',
   './ui.js',
   './audio.js',
-  './favicon.png'
+  './favicon.png',
+  './musica_fondo.mp3'
 ];
 
 self.addEventListener('install', (e) => {

@@ -161,3 +161,38 @@ export function emitirVozTerminal(texto) {
   window.speechSynthesis.speak(mensaje);
 }
 
+// =============================================================================
+// MOTOR DE MÚSICA DE FONDO CIBERPUNK CONTINUA (Bucle infinito)
+// =============================================================================
+let nodoMusicaGlobal = null;
+
+export function encenderMusicaDeFondo() {
+  // Evitamos duplicar la música si ya está sonando
+  if (nodoMusicaGlobal) return;
+
+  const ctx = obtenerAudioContext();
+  
+  // Creamos un elemento de audio nativo oculto
+  const audioHtml = new Audio('./musica_fondo.mp3');
+  audioHtml.loop = true; // Forzamos el bucle infinito continuo
+  audioHtml.crossOrigin = "anonymous";
+
+  // Conectamos el audio al contexto matemático del juego
+  const fuente = ctx.createMediaElementSource(audioHtml);
+  const gainNode = ctx.createGain();
+
+  // Ajustamos el volumen de fondo (0.15 = 15% de potencia para que no opaque los efectos sfx ni la voz)
+  gainNode.gain.setValueAtTime(0.15, ctx.currentTime);
+
+  // Enlazamos: Música -> Control Volumen -> Parlantes del Dispositivo
+  fuente.connect(gainNode);
+  gainNode.connect(ctx.destination);
+
+  // Arrancamos la reproducción
+  audioHtml.play().then(() => {
+    nodoMusicaGlobal = audioHtml;
+    console.log("🎵 Banda sonora del Mainframe inicializada en bucle continuo.");
+  }).catch((err) => {
+    console.warn("⚠️ Esperando interacción para liberar el canal de música:", err);
+  });
+}

@@ -17,7 +17,6 @@ import { sfx, emitirVozTerminal } from './audio.js';
 import './mode-ia.js';
 import './mode-multi.js';
 
-// >> INYECTAR ESTE BLOQUE DESPERTADOR AL INICIO DE MAIN.JS <<
 /* ---------- PROTOCOLO DE DESPERTAR MOTOR DE AUDIO CYBERPUNK ---------- */
 function desbloquearEcosistemaAudio() {
   // Disparamos la inicialización del contexto matemático de ondas
@@ -30,6 +29,12 @@ function desbloquearEcosistemaAudio() {
       console.log("Esperando interacción de red para inicializar nodos acústicos...");
     }
     
+    // >> INYECTAMOS LA MÚSICA CONTINUA AQUÍ <<
+    // Activa la banda sonora en bucle usando el canal de audio liberado
+    if (typeof modulo.encencodeMusicaDeFondo === 'function' || modulo.encenderMusicaDeFondo) {
+      modulo.encenderMusicaDeFondo();
+    }
+
     // Despierta de una vez el motor de síntesis de voz nativa (Speech)
     if ('speechSynthesis' in window) {
       window.speechSynthesis.getVoices();
@@ -40,6 +45,7 @@ function desbloquearEcosistemaAudio() {
   document.removeEventListener('click', desbloquearEcosistemaAudio);
   document.removeEventListener('keydown', desbloquearEcosistemaAudio);
 }
+
 
 // Escuchar el primer clic o pulsación de teclado del usuario en la web para encender los parlantes
 document.addEventListener('click', desbloquearEcosistemaAudio);
