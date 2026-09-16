@@ -789,7 +789,7 @@ const instanciaSocket = io(urlServidorPruebas);
 inicializarConexionSocket(instanciaSocket);
 vincularEventosGraficosDeRed();
 
-/* ---------- CONTROL PROTOCOLO BOTÓN ATRÁS EN CELULARES ---------- */
+/* ---------- CONTROL PROTOCOLO BOTÓN ATRÁS EN CELULARES ---------- 
 window.addEventListener('popstate', (event) => {
   // Verificamos si los teclados flotantes están visibles en pantalla
   const tecladoIaVisible = el.keypadPanel && !el.keypadPanel.classList.contains('hidden');
@@ -803,4 +803,73 @@ window.addEventListener('popstate', (event) => {
     
     console.log("📡 GESTO MÓVIL DETECTADO: Consola replegada con éxito.");
   }
+});*/
+/* =============================================================================
+   🎮 PROTOCOLO DE ENRUTAMIENTO INVERSO (CONTROL BOTÓN ATRÁS DEL CELULAR)
+   ============================================================================= */
+
+/**
+ * Inyecta un estado virtual en el historial del celular para "engañar" al botón atrás
+ */
+export function registrarPasoHistorial(nombrePanel) {
+  // Guardamos en el historial qué panel se está abriendo actualmente
+  history.pushState({ panelActivo: nombrePanel }, "");
+  console.log(`📡 HISTORIAL CLENT: Registrado estado virtual para [${nombrePanel}]`);
+}
+
+// 1. CAPTURAR EL EVENTO CUANDO EL USUARIO PRESIONA "ATRÁS" EN SU TELÉFONO
+window.addEventListener('popstate', (event) => {
+  
+  // ESCENARIO A: Si los teclados flotantes están abiertos, los cerramos primero
+  const tecladoIaVisible = el.keypadPanel && !el.keypadPanel.classList.contains('hidden');
+  const tecladoMultiVisible = el.statusMultiKeypadPanel && !el.statusMultiKeypadPanel.classList.contains('hidden');
+
+  if (tecladoIaVisible || tecladoMultiVisible) {
+    if (el.keypadPanel) el.keypadPanel.classList.add('hidden');
+    if (el.statusMultiKeypadPanel) el.statusMultiKeypadPanel.classList.add('hidden');
+    state.presionado = "";
+    // Volvemos a inyectar un estado para que el próximo "atrás" no lo saque del juego
+    history.pushState({ panelActivo: "teclado_replegado" }, "");
+    return;
+  }
+
+  // ESCENARIO B: Si el jugador está dentro de la pantalla de CONFIGURACIÓN VS IA (setupPanel)
+  if (el.setupPanel && !el.setupPanel.classList.contains('hidden')) {
+    if (el.backToModeBtn) el.backToModeBtn.click(); // Simulamos un clic real para volver al menú de modos
+    return;
+  }
+
+  // ESCENARIO C: Si el jugador está dentro del LOBBY MULTIJUGADOR (lobbyPanel)
+  if (el.lobbyPanel && !el.lobbyPanel.classList.contains('hidden')) {
+    if (el.backToModeFromLobbyBtn) el.backToModeFromLobbyBtn.click(); // Volver al menú de modos principal
+    return;
+  }
+
+  // ESCENARIO D: Si está configurando una SALA NUEVA o es INVITADO esperando (createRoomPanel)
+  if (el.createRoomPanel && !el.createRoomPanel.classList.contains('hidden')) {
+    if (el.backToLobbyFromCreateBtn) el.backToLobbyFromCreateBtn.click(); // Volver al listado de salas público
+    return;
+  }
+
+  // ESCENARIO E: Si está en PLENA PARTIDA ONLINE (MultistatusPanel)
+  if (el.multiStatusPanel && !el.multiStatusPanel.classList.contains('hidden')) {
+    // Para evitar que abandone la partida por accidente con un roce del dedo, 
+    // le advertimos mediante tu popup ciberpunk y no lo dejamos salir a menos que use el botón restart
+    mostrarAlertaCyber("PROTOCOLO ACTIVO: Para abortar la transmisión de red actual utiliza el botón de reinicio industrial.", true);
+    history.pushState({ panelActivo: "partida_bloqueada" }, "");
+    return;
+  }
+});
+
+// 2. CONECTAR LOS DISPARADORES VISUALES
+// Debemos asegurarnos de que cada vez que el usuario presione un botón que AVANCE de pantalla,
+// el teléfono registre el punto de retorno. Añadiremos esto a los clics principales:
+
+el.vsIaBtn?.addEventListener('click', () => registrarPasoHistorial('setupPanel'));
+el.vsPlayerBtn?.addEventListener('click', () => registrarPasoHistorial('lobbyPanel'));
+el.createRoomBtn?.addEventListener('click', () => registrarPasoHistorial('createRoomPanel'));
+
+// En el enlazador de salas (cuando el invitado hace clic en conectar a una sala seleccionada)
+el.connectSelectedBtn?.addEventListener('click', () => {
+  setTimeout(() => registrarPasoHistorial('createRoomPanel'), 100);
 });
