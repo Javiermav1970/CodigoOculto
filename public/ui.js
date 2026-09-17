@@ -1,460 +1,395 @@
-/* =========================================================
-   CÓDIGO OCULTO - Módulo de Interfaces y Renderizado (UI) - CORREGIDO
-   ========================================================= */
-
-import { BANK, isFigure, state } from './config.js';
-import { renderizarCuadernoNotas } from './notes.js';
-import { el } from './dom.js';
-import { sfx } from './audio.js';
-
-// Helper para actualizar mensajes de estado
-export function setStatus(msg, isError) {
-  if (el.statusMsg) {
-    el.statusMsg.textContent = msg;
-    el.statusMsg.classList.toggle('error', !!isError);
+import { BANK, isFigure, state } from "\u002E\u002F\u0063\u006F\u006E\u0066\u0069\u0067\u002E\u006A\u0073";
+import { renderizarCuadernoNotas } from "\u002E\u002F\u006E\u006F\u0074\u0065\u0073\u002E\u006A\u0073";
+import { el } from "\u002E\u002F\u0064\u006F\u006D\u002E\u006A\u0073";
+import { sfx } from "\u002E\u002F\u0061\u0075\u0064\u0069\u006F\u002E\u006A\u0073";
+function _0x28efb(msg, isError) {
+  if (el['\u0073\u0074\u0061\u0074\u0075\u0073\u004D\u0073\u0067']) {
+    el['\u0073\u0074\u0061\u0074\u0075\u0073\u004D\u0073\u0067']['\u0074\u0065\u0078\u0074\u0043\u006F\u006E\u0074\u0065\u006E\u0074'] = msg;
+    el['\u0073\u0074\u0061\u0074\u0075\u0073\u004D\u0073\u0067']['\u0063\u006C\u0061\u0073\u0073\u004C\u0069\u0073\u0074']['\u0074\u006F\u0067\u0067\u006C\u0065']("\u0065\u0072\u0072\u006F\u0072", !!isError);
   }
 }
-
-export function setMultiSetupMessage(msg, isError) {
-  if (el.multiSetupMsg) {
-    el.multiSetupMsg.textContent = msg;
-    el.multiSetupMsg.classList.toggle('error', !!isError);
+export { _0x28efb as setStatus };
+function _0x13e4cg(msg, isError) {
+  if (el['\u006D\u0075\u006C\u0074\u0069\u0053\u0065\u0074\u0075\u0070\u004D\u0073\u0067']) {
+    el['\u006D\u0075\u006C\u0074\u0069\u0053\u0065\u0074\u0075\u0070\u004D\u0073\u0067']['\u0074\u0065\u0078\u0074\u0043\u006F\u006E\u0074\u0065\u006E\u0074'] = msg;
+    el['\u006D\u0075\u006C\u0074\u0069\u0053\u0065\u0074\u0075\u0070\u004D\u0073\u0067']['\u0063\u006C\u0061\u0073\u0073\u004C\u0069\u0073\u0074']['\u0074\u006F\u0067\u0067\u006C\u0065']("rorre".split("").reverse().join(""), !!isError);
   }
 }
-
-export function buildKeypad() {
-  let contenedor = el.keypad; 
-  let panelContenedor = el.keypadPanel; 
-  
-  if (state.gameMode === 'multi') {
-    if (el.createRoomPanel && !el.createRoomPanel.classList.contains('hidden')) {
-      contenedor = el.multiKeypad;
-      panelContenedor = null; 
-    } else if (el.multiStatusPanel && !el.multiStatusPanel.classList.contains('hidden')) {
-      contenedor = el.statusMultiKeypad;
-      panelContenedor = el.statusMultiKeypadPanel; 
+export { _0x13e4cg as setMultiSetupMessage };
+function _0x6745a(_0x14aag) {
+  var _0x2b79e = (650583 ^ 650579) + (497310 ^ 497310);
+  let _0xf3f3c = el['\u006B\u0065\u0079\u0070\u0061\u0064'];
+  _0x2b79e = (564279 ^ 564275) + (582711 ^ 582705);
+  let _0x24857e = el['\u006B\u0065\u0079\u0070\u0061\u0064\u0050\u0061\u006E\u0065\u006C'];
+  _0x14aag = '\u0068\u006B\u006A\u006A\u0063\u006E';
+  if (state['\u0067\u0061\u006D\u0065\u004D\u006F\u0064\u0065'] === "\u006D\u0075\u006C\u0074\u0069") {
+    if (el['\u0063\u0072\u0065\u0061\u0074\u0065\u0052\u006F\u006F\u006D\u0050\u0061\u006E\u0065\u006C'] && !el['\u0063\u0072\u0065\u0061\u0074\u0065\u0052\u006F\u006F\u006D\u0050\u0061\u006E\u0065\u006C']['\u0063\u006C\u0061\u0073\u0073\u004C\u0069\u0073\u0074']['\u0063\u006F\u006E\u0074\u0061\u0069\u006E\u0073']("\u0068\u0069\u0064\u0064\u0065\u006E")) {
+      _0xf3f3c = el['\u006D\u0075\u006C\u0074\u0069\u004B\u0065\u0079\u0070\u0061\u0064'];
+      _0x24857e = null;
+    } else if (el['\u006D\u0075\u006C\u0074\u0069\u0053\u0074\u0061\u0074\u0075\u0073\u0050\u0061\u006E\u0065\u006C'] && !el['\u006D\u0075\u006C\u0074\u0069\u0053\u0074\u0061\u0074\u0075\u0073\u0050\u0061\u006E\u0065\u006C']['\u0063\u006C\u0061\u0073\u0073\u004C\u0069\u0073\u0074']['\u0063\u006F\u006E\u0074\u0061\u0069\u006E\u0073']("\u0068\u0069\u0064\u0064\u0065\u006E")) {
+      _0xf3f3c = el['\u0073\u0074\u0061\u0074\u0075\u0073\u004D\u0075\u006C\u0074\u0069\u004B\u0065\u0079\u0070\u0061\u0064'];
+      _0x24857e = el['\u0073\u0074\u0061\u0074\u0075\u0073\u004D\u0075\u006C\u0074\u0069\u004B\u0065\u0079\u0070\u0061\u0064\u0050\u0061\u006E\u0065\u006C'];
     }
   }
-
-  if (!contenedor) return;
-  contenedor.innerHTML = '';
-
-  if (panelContenedor) {
-    const barraPrevia = panelContenedor.querySelector('.keypad-close-bar');
-    if (barraPrevia) barraPrevia.remove();
-
-    const barraCierre = document.createElement('div');
-    barraCierre.className = 'keypad-close-bar';
-    barraCierre.style.cssText = `display: flex; justify-content: flex-end; margin-bottom: 8px; width: 100%;`;
-
-    const btnCierre = document.createElement('button');
-    btnCierre.className = 'ghost-btn';
-    btnCierre.textContent = '▼ CLOSE CONSOLE';
-    btnCierre.style.cssText = `font-size: 10px; padding: 4px 10px; border-color: rgba(255,255,255,0.15); letter-spacing: 1px;`;
-    
-    btnCierre.addEventListener('click', () => {
-      panelContenedor.classList.add('hidden');
+  if (!_0xf3f3c) return;
+  _0xf3f3c['\u0069\u006E\u006E\u0065\u0072\u0048\u0054\u004D\u004C'] = '';
+  if (_0x24857e) {
+    const _0x871e9a = _0x24857e['\u0071\u0075\u0065\u0072\u0079\u0053\u0065\u006C\u0065\u0063\u0074\u006F\u0072']("rab-esolc-dapyek.".split("").reverse().join(""));
+    if (_0x871e9a) _0x871e9a['\u0072\u0065\u006D\u006F\u0076\u0065']();
+    const _0xbe0a = document['\u0063\u0072\u0065\u0061\u0074\u0065\u0045\u006C\u0065\u006D\u0065\u006E\u0074']("\u0064\u0069\u0076");
+    _0xbe0a['\u0063\u006C\u0061\u0073\u0073\u004E\u0061\u006D\u0065'] = "rab-esolc-dapyek".split("").reverse().join("");
+    _0xbe0a['\u0073\u0074\u0079\u006C\u0065']['\u0063\u0073\u0073\u0054\u0065\u0078\u0074'] = `display: flex; justify-content: flex-end; margin-bottom: 8px; width: 100%;`;
+    const _0x1e9ffd = document['\u0063\u0072\u0065\u0061\u0074\u0065\u0045\u006C\u0065\u006D\u0065\u006E\u0074']("nottub".split("").reverse().join(""));
+    _0x1e9ffd['\u0063\u006C\u0061\u0073\u0073\u004E\u0061\u006D\u0065'] = "\u0067\u0068\u006F\u0073\u0074\u002D\u0062\u0074\u006E";
+    _0x1e9ffd['\u0074\u0065\u0078\u0074\u0043\u006F\u006E\u0074\u0065\u006E\u0074'] = "ELOSNOC ESOLC \u25BC".split("").reverse().join("");
+    _0x1e9ffd['\u0073\u0074\u0079\u006C\u0065']['\u0063\u0073\u0073\u0054\u0065\u0078\u0074'] = `font-size: 10px; padding: 4px 10px; border-color: rgba(255,255,255,0.15); letter-spacing: 1px;`;
+    _0x1e9ffd['\u0061\u0064\u0064\u0045\u0076\u0065\u006E\u0074\u004C\u0069\u0073\u0074\u0065\u006E\u0065\u0072']("\u0063\u006C\u0069\u0063\u006B", () => {
+      _0x24857e['\u0063\u006C\u0061\u0073\u0073\u004C\u0069\u0073\u0074']['\u0061\u0064\u0064']("\u0068\u0069\u0064\u0064\u0065\u006E");
     });
-
-    barraCierre.appendChild(btnCierre);
-    panelContenedor.insertBefore(barraCierre, contenedor);
+    _0xbe0a['\u0061\u0070\u0070\u0065\u006E\u0064\u0043\u0068\u0069\u006C\u0064'](_0x1e9ffd);
+    _0x24857e['\u0069\u006E\u0073\u0065\u0072\u0074\u0042\u0065\u0066\u006F\u0072\u0065'](_0xbe0a, _0xf3f3c);
   }
-
-  BANK.forEach(value => {
-    const tecla = document.createElement('button');
-    tecla.className = `key ${isFigure(value) ? 'figure' : ''}`;
-    tecla.textContent = value;
-    tecla.dataset.value = value;
-    
-    tecla.addEventListener('click', () => {
-      if (state.gameMode === 'ia') {
-        if (el.keypadPanel) el.keypadPanel.classList.add('hidden');
-        addElement(value); 
-      } 
-      else if (state.gameMode === 'multi') {
-        // AUTOFOCU LOGIC: Si el usuario pulsa el teclado directamente sin elegir slot, buscamos el primer espacio vacío
-        if (!state.presionado) {
-          const limitePool = state.multiLength;
-          const poolObjetivo = (el.createRoomPanel && !el.createRoomPanel.classList.contains('hidden')) ? state.mySecretCode : state.intentoMulti;
-          
-          let primerVacio = -1;
-          for (let i = 0; i < limitePool; i++) {
-            if (poolObjetivo[i] === undefined || poolObjetivo[i] === null || poolObjetivo[i] === '') {
-              primerVacio = i;
+  BANK['\u0066\u006F\u0072\u0045\u0061\u0063\u0068'](value => {
+    const _0x9ab0ae = document['\u0063\u0072\u0065\u0061\u0074\u0065\u0045\u006C\u0065\u006D\u0065\u006E\u0074']("\u0062\u0075\u0074\u0074\u006F\u006E");
+    _0x9ab0ae['\u0063\u006C\u0061\u0073\u0073\u004E\u0061\u006D\u0065'] = `key ${isFigure(value) ? "\u0066\u0069\u0067\u0075\u0072\u0065" : ''}`;
+    _0x9ab0ae['\u0074\u0065\u0078\u0074\u0043\u006F\u006E\u0074\u0065\u006E\u0074'] = value;
+    _0x9ab0ae['\u0064\u0061\u0074\u0061\u0073\u0065\u0074']['\u0076\u0061\u006C\u0075\u0065'] = value;
+    _0x9ab0ae['\u0061\u0064\u0064\u0045\u0076\u0065\u006E\u0074\u004C\u0069\u0073\u0074\u0065\u006E\u0065\u0072']("kcilc".split("").reverse().join(""), () => {
+      if (state['\u0067\u0061\u006D\u0065\u004D\u006F\u0064\u0065'] === "\u0069\u0061") {
+        if (el['\u006B\u0065\u0079\u0070\u0061\u0064\u0050\u0061\u006E\u0065\u006C']) el['\u006B\u0065\u0079\u0070\u0061\u0064\u0050\u0061\u006E\u0065\u006C']['\u0063\u006C\u0061\u0073\u0073\u004C\u0069\u0073\u0074']['\u0061\u0064\u0064']("neddih".split("").reverse().join(""));
+        _0xdc_0xa7f(value);
+      } else if (state['\u0067\u0061\u006D\u0065\u004D\u006F\u0064\u0065'] === "\u006D\u0075\u006C\u0074\u0069") {
+        if (!state['\u0070\u0072\u0065\u0073\u0069\u006F\u006E\u0061\u0064\u006F']) {
+          const _0x985d = state['\u006D\u0075\u006C\u0074\u0069\u004C\u0065\u006E\u0067\u0074\u0068'];
+          let _0xd3f49b;
+          const _0xb30ee = el['\u0063\u0072\u0065\u0061\u0074\u0065\u0052\u006F\u006F\u006D\u0050\u0061\u006E\u0065\u006C'] && !el['\u0063\u0072\u0065\u0061\u0074\u0065\u0052\u006F\u006F\u006D\u0050\u0061\u006E\u0065\u006C']['\u0063\u006C\u0061\u0073\u0073\u004C\u0069\u0073\u0074']['\u0063\u006F\u006E\u0074\u0061\u0069\u006E\u0073']("\u0068\u0069\u0064\u0064\u0065\u006E") ? state['\u006D\u0079\u0053\u0065\u0063\u0072\u0065\u0074\u0043\u006F\u0064\u0065'] : state['\u0069\u006E\u0074\u0065\u006E\u0074\u006F\u004D\u0075\u006C\u0074\u0069'];
+          _0xd3f49b = (712931 ^ 712932) + (410308 ^ 410309);
+          let _0x26325c = -(192430 ^ 192431);
+          for (let i = 202283 ^ 202283; i < _0x985d; i++) {
+            if (_0xb30ee[i] === undefined || _0xb30ee[i] === null || _0xb30ee[i] === '') {
+              _0x26325c = i;
               break;
             }
           }
-          if (primerVacio !== -1) {
-            state.presionado = `numero-${primerVacio}`;
+          if (_0x26325c !== -(525801 ^ 525800)) {
+            state['\u0070\u0072\u0065\u0073\u0069\u006F\u006E\u0061\u0064\u006F'] = `numero-${_0x26325c}`;
           }
         }
-
-        if (state.presionado) {
-          const indiceSlot = parseInt(state.presionado.replace('numero-', ''), 10);
-          
-          if (!isNaN(indiceSlot)) {
-            if (el.multiStatusPanel && !el.multiStatusPanel.classList.contains('hidden')) {
-              if (!state.intentoMulti.includes(value)) {
-                state.intentoMulti[indiceSlot] = value;
+        if (state['\u0070\u0072\u0065\u0073\u0069\u006F\u006E\u0061\u0064\u006F']) {
+          var _0x4f47e = (736068 ^ 736067) + (619253 ^ 619260);
+          const _0xaaffb = parseInt(state['\u0070\u0072\u0065\u0073\u0069\u006F\u006E\u0061\u0064\u006F']['\u0072\u0065\u0070\u006C\u0061\u0063\u0065']("-oremun".split("").reverse().join(""), ''), 575400 ^ 575394);
+          _0x4f47e = "pgdbpe".split("").reverse().join("");
+          if (!isNaN(_0xaaffb)) {
+            if (el['\u006D\u0075\u006C\u0074\u0069\u0053\u0074\u0061\u0074\u0075\u0073\u0050\u0061\u006E\u0065\u006C'] && !el['\u006D\u0075\u006C\u0074\u0069\u0053\u0074\u0061\u0074\u0075\u0073\u0050\u0061\u006E\u0065\u006C']['\u0063\u006C\u0061\u0073\u0073\u004C\u0069\u0073\u0074']['\u0063\u006F\u006E\u0074\u0061\u0069\u006E\u0073']("\u0068\u0069\u0064\u0064\u0065\u006E")) {
+              if (!state['\u0069\u006E\u0074\u0065\u006E\u0074\u006F\u004D\u0075\u006C\u0074\u0069']['\u0069\u006E\u0063\u006C\u0075\u0064\u0065\u0073'](value)) {
+                state['\u0069\u006E\u0074\u0065\u006E\u0074\u006F\u004D\u0075\u006C\u0074\u0069'][_0xaaffb] = value;
               }
-              if (el.statusMultiKeypadPanel) el.statusMultiKeypadPanel.classList.add('hidden');
-              state.presionado = ""; 
-            } else if (el.createRoomPanel && !el.createRoomPanel.classList.contains('hidden')) {
-              // ¡SOPORTE REPARADO PARA CONFIGURACIÓN!: Evitar caracteres duplicados si tu juego es tipo Mastermind estricto
-              if (!state.isCodeLocked && !state.mySecretCode.includes(value)) {
-                state.mySecretCode[indiceSlot] = value;
-                
-                // Salto automático inteligente al siguiente slot vacío para mejorar la UX
-                let sig = indiceSlot + 1;
-                if (sig < state.multiLength) {
-                  state.presionado = `numero-${sig}`;
+              if (el['\u0073\u0074\u0061\u0074\u0075\u0073\u004D\u0075\u006C\u0074\u0069\u004B\u0065\u0079\u0070\u0061\u0064\u0050\u0061\u006E\u0065\u006C']) el['\u0073\u0074\u0061\u0074\u0075\u0073\u004D\u0075\u006C\u0074\u0069\u004B\u0065\u0079\u0070\u0061\u0064\u0050\u0061\u006E\u0065\u006C']['\u0063\u006C\u0061\u0073\u0073\u004C\u0069\u0073\u0074']['\u0061\u0064\u0064']("\u0068\u0069\u0064\u0064\u0065\u006E");
+              state['\u0070\u0072\u0065\u0073\u0069\u006F\u006E\u0061\u0064\u006F'] = "";
+            } else if (el['\u0063\u0072\u0065\u0061\u0074\u0065\u0052\u006F\u006F\u006D\u0050\u0061\u006E\u0065\u006C'] && !el['\u0063\u0072\u0065\u0061\u0074\u0065\u0052\u006F\u006F\u006D\u0050\u0061\u006E\u0065\u006C']['\u0063\u006C\u0061\u0073\u0073\u004C\u0069\u0073\u0074']['\u0063\u006F\u006E\u0074\u0061\u0069\u006E\u0073']("\u0068\u0069\u0064\u0064\u0065\u006E")) {
+              if (!state['\u0069\u0073\u0043\u006F\u0064\u0065\u004C\u006F\u0063\u006B\u0065\u0064'] && !state['\u006D\u0079\u0053\u0065\u0063\u0072\u0065\u0074\u0043\u006F\u0064\u0065']['\u0069\u006E\u0063\u006C\u0075\u0064\u0065\u0073'](value)) {
+                state['\u006D\u0079\u0053\u0065\u0063\u0072\u0065\u0074\u0043\u006F\u0064\u0065'][_0xaaffb] = value;
+                let _0xd29e = _0xaaffb + (707214 ^ 707215);
+                if (_0xd29e < state['\u006D\u0075\u006C\u0074\u0069\u004C\u0065\u006E\u0067\u0074\u0068']) {
+                  state['\u0070\u0072\u0065\u0073\u0069\u006F\u006E\u0061\u0064\u006F'] = `numero-${_0xd29e}`;
                 } else {
-                  state.presionado = "";
+                  state['\u0070\u0072\u0065\u0073\u0069\u006F\u006E\u0061\u0064\u006F'] = "";
                 }
               }
             }
-            
-            sfx.slotIngreso(); // Feedback acústico ciberpunk
-            crearSlots();
-            refreshKeypad();
+            sfx['\u0073\u006C\u006F\u0074\u0049\u006E\u0067\u0072\u0065\u0073\u006F']();
+            _0xb5ed3b();
+            _0xa3ddc();
           }
         }
       }
     });
-    
-    contenedor.appendChild(tecla);      
+    _0xf3f3c['\u0061\u0070\u0070\u0065\u006E\u0064\u0043\u0068\u0069\u006C\u0064'](_0x9ab0ae);
   });
-
-  refreshKeypad();
+  _0xa3ddc();
 }
-
-
-// Deshabilita o resalta las teclas que ya están en uso
-export function refreshKeypad() {
-  let targetKeypad = el.keypad;
-  let poolVerificacion = state.current;
-
-  if (state.gameMode === 'multi') {
-    if (el.createRoomPanel && !el.createRoomPanel.classList.contains('hidden')) {
-      targetKeypad = el.multiKeypad;
-      poolVerificacion = state.mySecretCode;
-    } else if (el.multiStatusPanel && !el.multiStatusPanel.classList.contains('hidden')) {
-      targetKeypad = el.statusMultiKeypad;
-      poolVerificacion = state.intentoMulti;
+export { _0x6745a as buildKeypad };
+function _0xa3ddc(_0xbcd) {
+  let _0x615gf = el['\u006B\u0065\u0079\u0070\u0061\u0064'];
+  let _0xd_0xa86 = state['\u0063\u0075\u0072\u0072\u0065\u006E\u0074'];
+  _0xbcd = (327679 ^ 327671) + (340154 ^ 340146);
+  if (state['\u0067\u0061\u006D\u0065\u004D\u006F\u0064\u0065'] === "itlum".split("").reverse().join("")) {
+    if (el['\u0063\u0072\u0065\u0061\u0074\u0065\u0052\u006F\u006F\u006D\u0050\u0061\u006E\u0065\u006C'] && !el['\u0063\u0072\u0065\u0061\u0074\u0065\u0052\u006F\u006F\u006D\u0050\u0061\u006E\u0065\u006C']['\u0063\u006C\u0061\u0073\u0073\u004C\u0069\u0073\u0074']['\u0063\u006F\u006E\u0074\u0061\u0069\u006E\u0073']("\u0068\u0069\u0064\u0064\u0065\u006E")) {
+      _0x615gf = el['\u006D\u0075\u006C\u0074\u0069\u004B\u0065\u0079\u0070\u0061\u0064'];
+      _0xd_0xa86 = state['\u006D\u0079\u0053\u0065\u0063\u0072\u0065\u0074\u0043\u006F\u0064\u0065'];
+    } else if (el['\u006D\u0075\u006C\u0074\u0069\u0053\u0074\u0061\u0074\u0075\u0073\u0050\u0061\u006E\u0065\u006C'] && !el['\u006D\u0075\u006C\u0074\u0069\u0053\u0074\u0061\u0074\u0075\u0073\u0050\u0061\u006E\u0065\u006C']['\u0063\u006C\u0061\u0073\u0073\u004C\u0069\u0073\u0074']['\u0063\u006F\u006E\u0074\u0061\u0069\u006E\u0073']("\u0068\u0069\u0064\u0064\u0065\u006E")) {
+      _0x615gf = el['\u0073\u0074\u0061\u0074\u0075\u0073\u004D\u0075\u006C\u0074\u0069\u004B\u0065\u0079\u0070\u0061\u0064'];
+      _0xd_0xa86 = state['\u0069\u006E\u0074\u0065\u006E\u0074\u006F\u004D\u0075\u006C\u0074\u0069'];
     }
   }
-
-  if (!targetKeypad) return;
-
-  targetKeypad.querySelectorAll('.key').forEach(k => {
-    const used = poolVerificacion.includes(k.dataset.value);
-    k.classList.toggle('used', used);
-    k.disabled = used;
+  if (!_0x615gf) return;
+  _0x615gf['\u0071\u0075\u0065\u0072\u0079\u0053\u0065\u006C\u0065\u0063\u0074\u006F\u0072\u0041\u006C\u006C']("\u002E\u006B\u0065\u0079")['\u0066\u006F\u0072\u0045\u0061\u0063\u0068'](k => {
+    const _0xe_0x9c8 = _0xd_0xa86['\u0069\u006E\u0063\u006C\u0075\u0064\u0065\u0073'](k['\u0064\u0061\u0074\u0061\u0073\u0065\u0074']['\u0076\u0061\u006C\u0075\u0065']);
+    k['\u0063\u006C\u0061\u0073\u0073\u004C\u0069\u0073\u0074']['\u0074\u006F\u0067\u0067\u006C\u0065']("\u0075\u0073\u0065\u0064", _0xe_0x9c8);
+    k['\u0064\u0069\u0073\u0061\u0062\u006C\u0065\u0064'] = _0xe_0x9c8;
   });
 }
-
-export function crearSlots() {
-  // 1. MODO VS IA
-  if (state.gameMode === 'ia' && el.slots) {
-    el.slots.innerHTML = '';
-    for (let i = 0; i < state.length; i++) {
-      const candado = document.createElement('div');
-      const val = state.current[i];
-      candado.className = `slot ${val ? 'filled' : 'locked'}`;
-      if (state.presionado === `numero-${i}`) candado.classList.add('selected'); // Resaltar celda activa
-      candado.textContent = val ? val : '🔒';
-      candado.id = `numero-${i}`;
-      candado.addEventListener('click', function() {
-        state.presionado = this.id;
-        if (el.keypadPanel) {
-          el.keypadPanel.classList.remove('hidden');
-          history.pushState({ tecladoAbierto: true }, "");
+export { _0xa3ddc as refreshKeypad };
+function _0xb5ed3b() {
+  if (state['\u0067\u0061\u006D\u0065\u004D\u006F\u0064\u0065'] === "\u0069\u0061" && el['\u0073\u006C\u006F\u0074\u0073']) {
+    el['\u0073\u006C\u006F\u0074\u0073']['\u0069\u006E\u006E\u0065\u0072\u0048\u0054\u004D\u004C'] = '';
+    for (let i = 737762 ^ 737762; i < state['\u006C\u0065\u006E\u0067\u0074\u0068']; i++) {
+      let _0x8e87f;
+      const candado = document['\u0063\u0072\u0065\u0061\u0074\u0065\u0045\u006C\u0065\u006D\u0065\u006E\u0074']("\u0064\u0069\u0076");
+      _0x8e87f = (830530 ^ 830528) + (344226 ^ 344225);
+      const val = state['\u0063\u0075\u0072\u0072\u0065\u006E\u0074'][i];
+      candado['\u0063\u006C\u0061\u0073\u0073\u004E\u0061\u006D\u0065'] = `slot ${val ? "\u0066\u0069\u006C\u006C\u0065\u0064" : "dekcol".split("").reverse().join("")}`;
+      if (state['\u0070\u0072\u0065\u0073\u0069\u006F\u006E\u0061\u0064\u006F'] === `numero-${i}`) candado['\u0063\u006C\u0061\u0073\u0073\u004C\u0069\u0073\u0074']['\u0061\u0064\u0064']("\u0073\u0065\u006C\u0065\u0063\u0074\u0065\u0064");
+      candado['\u0074\u0065\u0078\u0074\u0043\u006F\u006E\u0074\u0065\u006E\u0074'] = val ? val : "\uD83D\uDD12";
+      candado['\u0069\u0064'] = `numero-${i}`;
+      candado['\u0061\u0064\u0064\u0045\u0076\u0065\u006E\u0074\u004C\u0069\u0073\u0074\u0065\u006E\u0065\u0072']("\u0063\u006C\u0069\u0063\u006B", function () {
+        state['\u0070\u0072\u0065\u0073\u0069\u006F\u006E\u0061\u0064\u006F'] = this['\u0069\u0064'];
+        if (el['\u006B\u0065\u0079\u0070\u0061\u0064\u0050\u0061\u006E\u0065\u006C']) {
+          el['\u006B\u0065\u0079\u0070\u0061\u0064\u0050\u0061\u006E\u0065\u006C']['\u0063\u006C\u0061\u0073\u0073\u004C\u0069\u0073\u0074']['\u0072\u0065\u006D\u006F\u0076\u0065']("\u0068\u0069\u0064\u0064\u0065\u006E");
+          history['\u0070\u0075\u0073\u0068\u0053\u0074\u0061\u0074\u0065']({
+            '\u0074\u0065\u0063\u006C\u0061\u0064\u006F\u0041\u0062\u0069\u0065\u0072\u0074\u006F': !![]
+          }, "");
         }
-        crearSlots(); // Redibujar para actualizar indicador visual de selección
+        _0xb5ed3b();
       });
-      el.slots.appendChild(candado);
+      el['\u0073\u006C\u006F\u0074\u0073']['\u0061\u0070\u0070\u0065\u006E\u0064\u0043\u0068\u0069\u006C\u0064'](candado);
     }
-  } 
-  // 2. MODO MULTIJUGADOR
-  else if (state.gameMode === 'multi') {
-    // Escenario A: Partida en vivo (Atacando)
-    if (el.multiStatusPanel && !el.multiStatusPanel.classList.contains('hidden') && el.statusMultiSlots) {   
-      el.statusMultiSlots.innerHTML = '';
-      for (let i = 0; i < state.multiLength; i++) {
-        const candado = document.createElement('div');
-        const val = state.intentoMulti[i];
-        candado.className = `slot ${val ? 'filled' : 'locked'}`;
-        if (state.presionado === `numero-${i}`) candado.classList.add('selected');
-        candado.textContent = val ? val : '🔒';
-        candado.id = `numero-${i}`;
-        candado.addEventListener('click', function() {
-          state.presionado = this.id;
-          if (el.statusMultiKeypadPanel) {
-            el.statusMultiKeypadPanel.classList.remove('hidden');
-            history.pushState({ tecladoAbierto: true }, "");
+  } else if (state['\u0067\u0061\u006D\u0065\u004D\u006F\u0064\u0065'] === "itlum".split("").reverse().join("")) {
+    if (el['\u006D\u0075\u006C\u0074\u0069\u0053\u0074\u0061\u0074\u0075\u0073\u0050\u0061\u006E\u0065\u006C'] && !el['\u006D\u0075\u006C\u0074\u0069\u0053\u0074\u0061\u0074\u0075\u0073\u0050\u0061\u006E\u0065\u006C']['\u0063\u006C\u0061\u0073\u0073\u004C\u0069\u0073\u0074']['\u0063\u006F\u006E\u0074\u0061\u0069\u006E\u0073']("neddih".split("").reverse().join("")) && el['\u0073\u0074\u0061\u0074\u0075\u0073\u004D\u0075\u006C\u0074\u0069\u0053\u006C\u006F\u0074\u0073']) {
+      el['\u0073\u0074\u0061\u0074\u0075\u0073\u004D\u0075\u006C\u0074\u0069\u0053\u006C\u006F\u0074\u0073']['\u0069\u006E\u006E\u0065\u0072\u0048\u0054\u004D\u004C'] = '';
+      for (let i = 461743 ^ 461743; i < state['\u006D\u0075\u006C\u0074\u0069\u004C\u0065\u006E\u0067\u0074\u0068']; i++) {
+        const candado = document['\u0063\u0072\u0065\u0061\u0074\u0065\u0045\u006C\u0065\u006D\u0065\u006E\u0074']("\u0064\u0069\u0076");
+        var _0x22gb = (689067 ^ 689065) + (501532 ^ 501535);
+        const val = state['\u0069\u006E\u0074\u0065\u006E\u0074\u006F\u004D\u0075\u006C\u0074\u0069'][i];
+        _0x22gb = '\u0062\u0064\u0068\u0066\u0067\u006E';
+        candado['\u0063\u006C\u0061\u0073\u0073\u004E\u0061\u006D\u0065'] = `slot ${val ? "\u0066\u0069\u006C\u006C\u0065\u0064" : "\u006C\u006F\u0063\u006B\u0065\u0064"}`;
+        if (state['\u0070\u0072\u0065\u0073\u0069\u006F\u006E\u0061\u0064\u006F'] === `numero-${i}`) candado['\u0063\u006C\u0061\u0073\u0073\u004C\u0069\u0073\u0074']['\u0061\u0064\u0064']("\u0073\u0065\u006C\u0065\u0063\u0074\u0065\u0064");
+        candado['\u0074\u0065\u0078\u0074\u0043\u006F\u006E\u0074\u0065\u006E\u0074'] = val ? val : "\uD83D\uDD12";
+        candado['\u0069\u0064'] = `numero-${i}`;
+        candado['\u0061\u0064\u0064\u0045\u0076\u0065\u006E\u0074\u004C\u0069\u0073\u0074\u0065\u006E\u0065\u0072']("\u0063\u006C\u0069\u0063\u006B", function () {
+          state['\u0070\u0072\u0065\u0073\u0069\u006F\u006E\u0061\u0064\u006F'] = this['\u0069\u0064'];
+          if (el['\u0073\u0074\u0061\u0074\u0075\u0073\u004D\u0075\u006C\u0074\u0069\u004B\u0065\u0079\u0070\u0061\u0064\u0050\u0061\u006E\u0065\u006C']) {
+            el['\u0073\u0074\u0061\u0074\u0075\u0073\u004D\u0075\u006C\u0074\u0069\u004B\u0065\u0079\u0070\u0061\u0064\u0050\u0061\u006E\u0065\u006C']['\u0063\u006C\u0061\u0073\u0073\u004C\u0069\u0073\u0074']['\u0072\u0065\u006D\u006F\u0076\u0065']("neddih".split("").reverse().join(""));
+            history['\u0070\u0075\u0073\u0068\u0053\u0074\u0061\u0074\u0065']({
+              "tecladoAbierto": !![]
+            }, "");
           }
-          crearSlots();
+          _0xb5ed3b();
         });
-        el.statusMultiSlots.appendChild(candado);
+        el['\u0073\u0074\u0061\u0074\u0075\u0073\u004D\u0075\u006C\u0074\u0069\u0053\u006C\u006F\u0074\u0073']['\u0061\u0070\u0070\u0065\u006E\u0064\u0043\u0068\u0069\u006C\u0064'](candado);
       }
-    }
-    // Escenario B: Configuración de sala nueva (Escribiendo código secreto inicial)
-    else if (el.createRoomPanel && !el.createRoomPanel.classList.contains('hidden') && el.multiSlots) {
-      el.multiSlots.innerHTML = '';
-      for (let i = 0; i < state.multiLength; i++) {
-        const candado = document.createElement('div');
-        const val = state.mySecretCode[i];
-        
-        candado.className = `slot ${val ? 'filled' : 'locked'}`;
-        // ¡CORRECCIÓN MAESTRA!: Si esta casilla es la seleccionada actualmente, añadir clase CSS
-        if (state.presionado === `numero-${i}`) candado.classList.add('selected');
-        
-        candado.textContent = val ? (state.isCodeLocked ? '★' : val) : '🔒';
-        candado.id = `numero-${i}`; // Asignamos ID único
-        
-        // ¡CONEXIÓN DE EVENTO CLIC!: Permitir seleccionar la casilla para escribir
-        candado.addEventListener('click', function() {
-          if (state.isCodeLocked) return;
-          state.presionado = this.id;
-          crearSlots(); // Refrescar visualmente qué celda tiene el foco
+    } else if (el['\u0063\u0072\u0065\u0061\u0074\u0065\u0052\u006F\u006F\u006D\u0050\u0061\u006E\u0065\u006C'] && !el['\u0063\u0072\u0065\u0061\u0074\u0065\u0052\u006F\u006F\u006D\u0050\u0061\u006E\u0065\u006C']['\u0063\u006C\u0061\u0073\u0073\u004C\u0069\u0073\u0074']['\u0063\u006F\u006E\u0074\u0061\u0069\u006E\u0073']("\u0068\u0069\u0064\u0064\u0065\u006E") && el['\u006D\u0075\u006C\u0074\u0069\u0053\u006C\u006F\u0074\u0073']) {
+      el['\u006D\u0075\u006C\u0074\u0069\u0053\u006C\u006F\u0074\u0073']['\u0069\u006E\u006E\u0065\u0072\u0048\u0054\u004D\u004C'] = '';
+      for (let i = 943870 ^ 943870; i < state['\u006D\u0075\u006C\u0074\u0069\u004C\u0065\u006E\u0067\u0074\u0068']; i++) {
+        let _0x41caa;
+        const candado = document['\u0063\u0072\u0065\u0061\u0074\u0065\u0045\u006C\u0065\u006D\u0065\u006E\u0074']("\u0064\u0069\u0076");
+        _0x41caa = (906761 ^ 906762) + (367443 ^ 367441);
+        var _0xee11bf = (992740 ^ 992739) + (202347 ^ 202348);
+        const val = state['\u006D\u0079\u0053\u0065\u0063\u0072\u0065\u0074\u0043\u006F\u0064\u0065'][i];
+        _0xee11bf = (153795 ^ 153794) + (370157 ^ 370155);
+        candado['\u0063\u006C\u0061\u0073\u0073\u004E\u0061\u006D\u0065'] = `slot ${val ? "\u0066\u0069\u006C\u006C\u0065\u0064" : "\u006C\u006F\u0063\u006B\u0065\u0064"}`;
+        if (state['\u0070\u0072\u0065\u0073\u0069\u006F\u006E\u0061\u0064\u006F'] === `numero-${i}`) candado['\u0063\u006C\u0061\u0073\u0073\u004C\u0069\u0073\u0074']['\u0061\u0064\u0064']("\u0073\u0065\u006C\u0065\u0063\u0074\u0065\u0064");
+        candado['\u0074\u0065\u0078\u0074\u0043\u006F\u006E\u0074\u0065\u006E\u0074'] = val ? state['\u0069\u0073\u0043\u006F\u0064\u0065\u004C\u006F\u0063\u006B\u0065\u0064'] ? "\u2605" : val : "\uD83D\uDD12";
+        candado['\u0069\u0064'] = `numero-${i}`;
+        candado['\u0061\u0064\u0064\u0045\u0076\u0065\u006E\u0074\u004C\u0069\u0073\u0074\u0065\u006E\u0065\u0072']("\u0063\u006C\u0069\u0063\u006B", function () {
+          if (state['\u0069\u0073\u0043\u006F\u0064\u0065\u004C\u006F\u0063\u006B\u0065\u0064']) return;
+          state['\u0070\u0072\u0065\u0073\u0069\u006F\u006E\u0061\u0064\u006F'] = this['\u0069\u0064'];
+          _0xb5ed3b();
         });
-        
-        el.multiSlots.appendChild(candado);
+        el['\u006D\u0075\u006C\u0074\u0069\u0053\u006C\u006F\u0074\u0073']['\u0061\u0070\u0070\u0065\u006E\u0064\u0043\u0068\u0069\u006C\u0064'](candado);
       }
     }
   }
 }
-
-
-// Renderiza el historial detallado de ataques recibidos de un rival específico
-export function renderizarBitacoraFiltrada() {
-  const targetLog = el.statusMultiLog || el.log;
-  if (!targetLog) return;
-
-  targetLog.innerHTML = '';
-
-  if (!state.multiplayerHistory) {
-    state.multiplayerHistory = [];
+export { _0xb5ed3b as crearSlots };
+function _0x8e2a(_0xd24e) {
+  const _0x3f1fb = el['\u0073\u0074\u0061\u0074\u0075\u0073\u004D\u0075\u006C\u0074\u0069\u004C\u006F\u0067'] || el['\u006C\u006F\u0067'];
+  _0xd24e = 301281 ^ 301283;
+  if (!_0x3f1fb) return;
+  _0x3f1fb['\u0069\u006E\u006E\u0065\u0072\u0048\u0054\u004D\u004C'] = '';
+  if (!state['\u006D\u0075\u006C\u0074\u0069\u0070\u006C\u0061\u0079\u0065\u0072\u0048\u0069\u0073\u0074\u006F\u0072\u0079']) {
+    state['\u006D\u0075\u006C\u0074\u0069\u0070\u006C\u0061\u0079\u0065\u0072\u0048\u0069\u0073\u0074\u006F\u0072\u0079'] = [];
   }
-
-  if (!state.selectedTargetFilter) {
-    targetLog.innerHTML = '<div class="log-empty">Selecciona un hacker de la lista para ver su historial de seguridad...</div>';
+  if (!state['\u0073\u0065\u006C\u0065\u0063\u0074\u0065\u0064\u0054\u0061\u0072\u0067\u0065\u0074\u0046\u0069\u006C\u0074\u0065\u0072']) {
+    _0x3f1fb['\u0069\u006E\u006E\u0065\u0072\u0048\u0054\u004D\u004C'] = "\u003C\u0064\u0069\u0076\u0020\u0063\u006C\u0061\u0073\u0073\u003D\u0022\u006C\u006F\u0067\u002D\u0065\u006D\u0070\u0074\u0079\u0022\u003E\u0053\u0065\u006C\u0065\u0063\u0063\u0069\u006F\u006E\u0061\u0020\u0075\u006E\u0020\u0068\u0061\u0063\u006B\u0065\u0072\u0020\u0064\u0065\u0020\u006C\u0061\u0020\u006C\u0069\u0073\u0074\u0061\u0020\u0070\u0061\u0072\u0061\u0020\u0076\u0065\u0072\u0020\u0073\u0075\u0020\u0068\u0069\u0073\u0074\u006F\u0072\u0069\u0061\u006C\u0020\u0064\u0065\u0020\u0073\u0065\u0067\u0075\u0072\u0069\u0064\u0061\u0064\u002E\u002E\u002E\u003C\u002F\u0064\u0069\u0076\u003E";
     renderizarCuadernoNotas();
     return;
   }
-
-  const ataquesRecibidos = state.multiplayerHistory.filter(item => item.target === state.selectedTargetFilter);
-
-  if (ataquesRecibidos.length === 0) {
-    targetLog.innerHTML = `<div class="log-empty">El terminal de ${state.selectedTargetFilter.toUpperCase()} no registra ataques recibidos...</div>`;
+  const _0x2f181e = state['\u006D\u0075\u006C\u0074\u0069\u0070\u006C\u0061\u0079\u0065\u0072\u0048\u0069\u0073\u0074\u006F\u0072\u0079']['\u0066\u0069\u006C\u0074\u0065\u0072'](item => item['\u0074\u0061\u0072\u0067\u0065\u0074'] === state['\u0073\u0065\u006C\u0065\u0063\u0074\u0065\u0064\u0054\u0061\u0072\u0067\u0065\u0074\u0046\u0069\u006C\u0074\u0065\u0072']);
+  if (_0x2f181e['\u006C\u0065\u006E\u0067\u0074\u0068'] === (157272 ^ 157272)) {
+    _0x3f1fb['\u0069\u006E\u006E\u0065\u0072\u0048\u0054\u004D\u004C'] = `<div class="log-empty">El terminal de ${state['\u0073\u0065\u006C\u0065\u0063\u0074\u0065\u0064\u0054\u0061\u0072\u0067\u0065\u0074\u0046\u0069\u006C\u0074\u0065\u0072']['\u0074\u006F\u0055\u0070\u0070\u0065\u0072\u0043\u0061\u0073\u0065']()} no registra ataques recibidos...</div>`;
     renderizarCuadernoNotas();
     return;
   }
-
-  ataquesRecibidos.forEach((item, index) => {
-    const row = document.createElement('div');
-    row.className = 'log-row';
-    
-    const guessHtml = item.guess.map(v => `<div class="log-el ${isFigure(v) ? 'fig' : 'num'}">${v}</div>`).join('');
-
-    row.innerHTML = `
-      <div class="log-index" title="Atacante: ${item.player}">
-        #${String(index + 1).padStart(2, '0')} 
-        <small style="display:block;font-size:9px;color:#00f5d4;margin-top:2px;">ATK POR:<br>${item.player}</small>
+  _0x2f181e['\u0066\u006F\u0072\u0045\u0061\u0063\u0068']((item, index) => {
+    const _0xe17ddd = document['\u0063\u0072\u0065\u0061\u0074\u0065\u0045\u006C\u0065\u006D\u0065\u006E\u0074']("\u0064\u0069\u0076");
+    _0xe17ddd['\u0063\u006C\u0061\u0073\u0073\u004E\u0061\u006D\u0065'] = "\u006C\u006F\u0067\u002D\u0072\u006F\u0077";
+    const _0x25495b = item['\u0067\u0075\u0065\u0073\u0073']['\u006D\u0061\u0070'](v => `<div class="log-el ${isFigure(v) ? "gif".split("").reverse().join("") : "\u006E\u0075\u006D"}">${v}</div>`)['\u006A\u006F\u0069\u006E']('');
+    _0xe17ddd['\u0069\u006E\u006E\u0065\u0072\u0048\u0054\u004D\u004C'] = `
+      <div class="log-index" title="Atacante: ${item['\u0070\u006C\u0061\u0079\u0065\u0072']}">
+        #${String(index + (878558 ^ 878559))['\u0070\u0061\u0064\u0053\u0074\u0061\u0072\u0074'](406587 ^ 406585, "\u0030")} 
+        <small style="display:block;font-size:9px;color:#00f5d4;margin-top:2px;">ATK POR:<br>${item['\u0070\u006C\u0061\u0079\u0065\u0072']}</small>
       </div> 
-      <div class="log-guess">${guessHtml}</div> 
+      <div class="log-guess">${_0x25495b}</div> 
       <div class="hints"> 
-        <div class="hint correct"><span class="dot"></span>${item.correct}</div> 
-        <div class="hint present"><span class="dot"></span>${item.present}</div> 
+        <div class="hint correct"><span class="dot"></span>${item['\u0063\u006F\u0072\u0072\u0065\u0063\u0074']}</div> 
+        <div class="hint present"><span class="dot"></span>${item['\u0070\u0072\u0065\u0073\u0065\u006E\u0074']}</div> 
       </div>`;
-      
-    targetLog.appendChild(row);
+    _0x3f1fb['\u0061\u0070\u0070\u0065\u006E\u0064\u0043\u0068\u0069\u006C\u0064'](_0xe17ddd);
   });
-
-  targetLog.scrollTop = targetLog.scrollHeight;
+  _0x3f1fb['\u0073\u0063\u0072\u006F\u006C\u006C\u0054\u006F\u0070'] = _0x3f1fb['\u0073\u0063\u0072\u006F\u006C\u006C\u0048\u0065\u0069\u0067\u0068\u0074'];
   renderizarCuadernoNotas();
 }
-
-export function addElement(value) {
-  // 1. CASO: MODO VS IA ACTIVO
-  if (state.gameMode === 'ia') {
-    if (!state.playing || state.current.includes(value)) return;
-    
-    if (!state.presionado) {
-      const primerVacio = state.current.findIndex(v => v === undefined || v === null);
-      if (primerVacio !== -1 && primerVacio < state.length) {
-        state.presionado = `numero-${primerVacio}`;
-      } else if (state.current.length < state.length) {
-        state.presionado = `numero-${state.current.length}`;
+export { _0x8e2a as renderizarBitacoraFiltrada };
+function _0xdc_0xa7f(value) {
+  if (state['\u0067\u0061\u006D\u0065\u004D\u006F\u0064\u0065'] === "ai".split("").reverse().join("")) {
+    if (!state['\u0070\u006C\u0061\u0079\u0069\u006E\u0067'] || state['\u0063\u0075\u0072\u0072\u0065\u006E\u0074']['\u0069\u006E\u0063\u006C\u0075\u0064\u0065\u0073'](value)) return;
+    if (!state['\u0070\u0072\u0065\u0073\u0069\u006F\u006E\u0061\u0064\u006F']) {
+      const primerVacio = state['\u0063\u0075\u0072\u0072\u0065\u006E\u0074']['\u0066\u0069\u006E\u0064\u0049\u006E\u0064\u0065\u0078'](v => v === undefined || v === null);
+      if (primerVacio !== -(738649 ^ 738648) && primerVacio < state['\u006C\u0065\u006E\u0067\u0074\u0068']) {
+        state['\u0070\u0072\u0065\u0073\u0069\u006F\u006E\u0061\u0064\u006F'] = `numero-${primerVacio}`;
+      } else if (state['\u0063\u0075\u0072\u0072\u0065\u006E\u0074']['\u006C\u0065\u006E\u0067\u0074\u0068'] < state['\u006C\u0065\u006E\u0067\u0074\u0068']) {
+        state['\u0070\u0072\u0065\u0073\u0069\u006F\u006E\u0061\u0064\u006F'] = `numero-${state['\u0063\u0075\u0072\u0072\u0065\u006E\u0074']['\u006C\u0065\u006E\u0067\u0074\u0068']}`;
       } else {
         return;
       }
     }
-
-    const idSlot = document.getElementById(state.presionado);
+    var _0xf9c4fg = (585700 ^ 585696) + (407254 ^ 407253);
+    const idSlot = document['\u0067\u0065\u0074\u0045\u006C\u0065\u006D\u0065\u006E\u0074\u0042\u0079\u0049\u0064'](state['\u0070\u0072\u0065\u0073\u0069\u006F\u006E\u0061\u0064\u006F']);
+    _0xf9c4fg = "hlgcci".split("").reverse().join("");
     if (!idSlot) return;
-    
-    let indice = parseInt(state.presionado.split('-')[1], 10);
-    state.current[indice] = value;
-    idSlot.classList.replace('locked', 'filled');
-    idSlot.textContent = value;
-    
-    state.presionado = ""; 
-    
-    sfx.slotIngreso(); // <--- 🔊 AUDIO: Clic táctil al llenar slot en Modo IA
-    
-    refreshKeypad();
-    setStatus('', false);
-  } 
-  // 2. CASO MODO MULTIJUGADOR
-  else if (state.gameMode === 'multi') {
-    if (el.multiStatusPanel && !el.multiStatusPanel.classList.contains('hidden')) {
-      if (!state.playing || state.intentoMulti.includes(value)) return;
-      
-      if (!state.presionado) {
-        let primerVacio = -1;
-        for (let i = 0; i < state.multiLength; i++) {
-          if (!state.intentoMulti[i]) {
+    let indice = parseInt(state['\u0070\u0072\u0065\u0073\u0069\u006F\u006E\u0061\u0064\u006F']['\u0073\u0070\u006C\u0069\u0074']("\u002D")[854741 ^ 854740], 837318 ^ 837324);
+    state['\u0063\u0075\u0072\u0072\u0065\u006E\u0074'][indice] = value;
+    idSlot['\u0063\u006C\u0061\u0073\u0073\u004C\u0069\u0073\u0074']['\u0072\u0065\u0070\u006C\u0061\u0063\u0065']("\u006C\u006F\u0063\u006B\u0065\u0064", "dellif".split("").reverse().join(""));
+    idSlot['\u0074\u0065\u0078\u0074\u0043\u006F\u006E\u0074\u0065\u006E\u0074'] = value;
+    state['\u0070\u0072\u0065\u0073\u0069\u006F\u006E\u0061\u0064\u006F'] = "";
+    sfx['\u0073\u006C\u006F\u0074\u0049\u006E\u0067\u0072\u0065\u0073\u006F']();
+    _0xa3ddc();
+    _0x28efb('', false);
+  } else if (state['\u0067\u0061\u006D\u0065\u004D\u006F\u0064\u0065'] === "\u006D\u0075\u006C\u0074\u0069") {
+    if (el['\u006D\u0075\u006C\u0074\u0069\u0053\u0074\u0061\u0074\u0075\u0073\u0050\u0061\u006E\u0065\u006C'] && !el['\u006D\u0075\u006C\u0074\u0069\u0053\u0074\u0061\u0074\u0075\u0073\u0050\u0061\u006E\u0065\u006C']['\u0063\u006C\u0061\u0073\u0073\u004C\u0069\u0073\u0074']['\u0063\u006F\u006E\u0074\u0061\u0069\u006E\u0073']("neddih".split("").reverse().join(""))) {
+      if (!state['\u0070\u006C\u0061\u0079\u0069\u006E\u0067'] || state['\u0069\u006E\u0074\u0065\u006E\u0074\u006F\u004D\u0075\u006C\u0074\u0069']['\u0069\u006E\u0063\u006C\u0075\u0064\u0065\u0073'](value)) return;
+      if (!state['\u0070\u0072\u0065\u0073\u0069\u006F\u006E\u0061\u0064\u006F']) {
+        let primerVacio = -(366760 ^ 366761);
+        for (let i = 851515 ^ 851515; i < state['\u006D\u0075\u006C\u0074\u0069\u004C\u0065\u006E\u0067\u0074\u0068']; i++) {
+          if (!state['\u0069\u006E\u0074\u0065\u006E\u0074\u006F\u004D\u0075\u006C\u0074\u0069'][i]) {
             primerVacio = i;
             break;
           }
         }
-        if (primerVacio !== -1) {
-          state.presionado = `numero-${primerVacio}`;
+        if (primerVacio !== -(877157 ^ 877156)) {
+          state['\u0070\u0072\u0065\u0073\u0069\u006F\u006E\u0061\u0064\u006F'] = `numero-${primerVacio}`;
         } else {
           return;
         }
       }
-
-      const idSlot = document.getElementById(state.presionado);
-      if (!idSlot) return; 
-
-      let indice = parseInt(state.presionado.split('-')[1], 10);
-      state.intentoMulti[indice] = value;
-      idSlot.classList.replace('locked', 'filled');
-      idSlot.textContent = value;
-      
-      state.presionado = ""; 
-      
-      sfx.slotIngreso(); // <--- 🔊 AUDIO: Clic táctil al llenar slot en plena Partida Online
-      
-      refreshKeypad();
-      setStatus('', false);
-    }
-    else if (el.createRoomPanel && !el.createRoomPanel.classList.contains('hidden')) {
-      if (state.isCodeLocked || state.mySecretCode.length >= state.multiLength || state.mySecretCode.includes(value)) return;
-      state.mySecretCode.push(value);
-      
-      sfx.slotIngreso(); // <--- 🔊 AUDIO: Clic táctil al configurar tu contraseña inicial
-      
-      crearSlots();
-      refreshKeypad();
+      const idSlot = document['\u0067\u0065\u0074\u0045\u006C\u0065\u006D\u0065\u006E\u0074\u0042\u0079\u0049\u0064'](state['\u0070\u0072\u0065\u0073\u0069\u006F\u006E\u0061\u0064\u006F']);
+      if (!idSlot) return;
+      let _0x573ed;
+      let indice = parseInt(state['\u0070\u0072\u0065\u0073\u0069\u006F\u006E\u0061\u0064\u006F']['\u0073\u0070\u006C\u0069\u0074']("\u002D")[178937 ^ 178936], 867167 ^ 867157);
+      _0x573ed = '\u0067\u0070\u0068\u006C\u0068\u006B';
+      state['\u0069\u006E\u0074\u0065\u006E\u0074\u006F\u004D\u0075\u006C\u0074\u0069'][indice] = value;
+      idSlot['\u0063\u006C\u0061\u0073\u0073\u004C\u0069\u0073\u0074']['\u0072\u0065\u0070\u006C\u0061\u0063\u0065']("dekcol".split("").reverse().join(""), "dellif".split("").reverse().join(""));
+      idSlot['\u0074\u0065\u0078\u0074\u0043\u006F\u006E\u0074\u0065\u006E\u0074'] = value;
+      state['\u0070\u0072\u0065\u0073\u0069\u006F\u006E\u0061\u0064\u006F'] = "";
+      sfx['\u0073\u006C\u006F\u0074\u0049\u006E\u0067\u0072\u0065\u0073\u006F']();
+      _0xa3ddc();
+      _0x28efb('', false);
+    } else if (el['\u0063\u0072\u0065\u0061\u0074\u0065\u0052\u006F\u006F\u006D\u0050\u0061\u006E\u0065\u006C'] && !el['\u0063\u0072\u0065\u0061\u0074\u0065\u0052\u006F\u006F\u006D\u0050\u0061\u006E\u0065\u006C']['\u0063\u006C\u0061\u0073\u0073\u004C\u0069\u0073\u0074']['\u0063\u006F\u006E\u0074\u0061\u0069\u006E\u0073']("\u0068\u0069\u0064\u0064\u0065\u006E")) {
+      if (state['\u0069\u0073\u0043\u006F\u0064\u0065\u004C\u006F\u0063\u006B\u0065\u0064'] || state['\u006D\u0079\u0053\u0065\u0063\u0072\u0065\u0074\u0043\u006F\u0064\u0065']['\u006C\u0065\u006E\u0067\u0074\u0068'] >= state['\u006D\u0075\u006C\u0074\u0069\u004C\u0065\u006E\u0067\u0074\u0068'] || state['\u006D\u0079\u0053\u0065\u0063\u0072\u0065\u0074\u0043\u006F\u0064\u0065']['\u0069\u006E\u0063\u006C\u0075\u0064\u0065\u0073'](value)) return;
+      state['\u006D\u0079\u0053\u0065\u0063\u0072\u0065\u0074\u0043\u006F\u0064\u0065']['\u0070\u0075\u0073\u0068'](value);
+      sfx['\u0073\u006C\u006F\u0074\u0049\u006E\u0067\u0072\u0065\u0073\u006F']();
+      _0xb5ed3b();
+      _0xa3ddc();
     }
   }
 }
-
-
-export function deleteElement() {
-  
-  if (state.gameMode === 'ia') {
-    if (!state.playing) return;
-    // Si no hay seleccionado un slot, borra el último elemento ingresado en el pool
-    if (!state.presionado) {
-      for (let i = state.length - 1; i >= 0; i--) {
-        if (state.current[i] !== undefined && state.current[i] !== null) {
-          state.presionado = `numero-${i}`;
+export { _0xdc_0xa7f as addElement };
+function _0xg7363b() {
+  if (state['\u0067\u0061\u006D\u0065\u004D\u006F\u0064\u0065'] === "ai".split("").reverse().join("")) {
+    if (!state['\u0070\u006C\u0061\u0079\u0069\u006E\u0067']) return;
+    if (!state['\u0070\u0072\u0065\u0073\u0069\u006F\u006E\u0061\u0064\u006F']) {
+      for (let i = state['\u006C\u0065\u006E\u0067\u0074\u0068'] - (910977 ^ 910976); i >= (165888 ^ 165888); i--) {
+        if (state['\u0063\u0075\u0072\u0072\u0065\u006E\u0074'][i] !== undefined && state['\u0063\u0075\u0072\u0072\u0065\u006E\u0074'][i] !== null) {
+          state['\u0070\u0072\u0065\u0073\u0069\u006F\u006E\u0061\u0064\u006F'] = `numero-${i}`;
           break;
         }
       }
     }
-
-    if (state.presionado) {
-      let indice = parseInt(state.presionado.split('-')[1], 10);
-      state.current[indice] = undefined;
-      const idSlot = document.getElementById(state.presionado);
+    if (state['\u0070\u0072\u0065\u0073\u0069\u006F\u006E\u0061\u0064\u006F']) {
+      let _0xf3bb;
+      let indice = parseInt(state['\u0070\u0072\u0065\u0073\u0069\u006F\u006E\u0061\u0064\u006F']['\u0073\u0070\u006C\u0069\u0074']("\u002D")[111965 ^ 111964], 110634 ^ 110624);
+      _0xf3bb = (799276 ^ 799277) + (249137 ^ 249143);
+      state['\u0063\u0075\u0072\u0072\u0065\u006E\u0074'][indice] = undefined;
+      let _0x2ffff;
+      const idSlot = document['\u0067\u0065\u0074\u0045\u006C\u0065\u006D\u0065\u006E\u0074\u0042\u0079\u0049\u0064'](state['\u0070\u0072\u0065\u0073\u0069\u006F\u006E\u0061\u0064\u006F']);
+      _0x2ffff = (128342 ^ 128351) + (267896 ^ 267902);
       if (idSlot) {
-        idSlot.classList.replace('filled', 'locked');
-        idSlot.textContent = '🔒';
+        idSlot['\u0063\u006C\u0061\u0073\u0073\u004C\u0069\u0073\u0074']['\u0072\u0065\u0070\u006C\u0061\u0063\u0065']("dellif".split("").reverse().join(""), "\u006C\u006F\u0063\u006B\u0065\u0064");
+        idSlot['\u0074\u0065\u0078\u0074\u0043\u006F\u006E\u0074\u0065\u006E\u0074'] = "\uD83D\uDD12";
       }
-      state.presionado = "";
-      refreshKeypad();
+      state['\u0070\u0072\u0065\u0073\u0069\u006F\u006E\u0061\u0064\u006F'] = "";
+      _0xa3ddc();
     }
-    if (el.keypadPanel) el.keypadPanel.classList.add('hidden');
-  } 
-  else if (state.gameMode === 'multi') {
-    //if (!state.playing) return;
-    if (el.multiStatusPanel && !el.multiStatusPanel.classList.contains('hidden')) {
-      // Auto-selección del último candado lleno si no se presionó uno directamente
-      if (!state.presionado) {
-        for (let i = state.multiLength - 1; i >= 0; i--) {
-          if (state.intentoMulti[i]) {
-            state.presionado = `numero-${i}`;
+    if (el['\u006B\u0065\u0079\u0070\u0061\u0064\u0050\u0061\u006E\u0065\u006C']) el['\u006B\u0065\u0079\u0070\u0061\u0064\u0050\u0061\u006E\u0065\u006C']['\u0063\u006C\u0061\u0073\u0073\u004C\u0069\u0073\u0074']['\u0061\u0064\u0064']("\u0068\u0069\u0064\u0064\u0065\u006E");
+  } else if (state['\u0067\u0061\u006D\u0065\u004D\u006F\u0064\u0065'] === "\u006D\u0075\u006C\u0074\u0069") {
+    if (el['\u006D\u0075\u006C\u0074\u0069\u0053\u0074\u0061\u0074\u0075\u0073\u0050\u0061\u006E\u0065\u006C'] && !el['\u006D\u0075\u006C\u0074\u0069\u0053\u0074\u0061\u0074\u0075\u0073\u0050\u0061\u006E\u0065\u006C']['\u0063\u006C\u0061\u0073\u0073\u004C\u0069\u0073\u0074']['\u0063\u006F\u006E\u0074\u0061\u0069\u006E\u0073']("neddih".split("").reverse().join(""))) {
+      if (!state['\u0070\u0072\u0065\u0073\u0069\u006F\u006E\u0061\u0064\u006F']) {
+        for (let i = state['\u006D\u0075\u006C\u0074\u0069\u004C\u0065\u006E\u0067\u0074\u0068'] - (204995 ^ 204994); i >= (350039 ^ 350039); i--) {
+          if (state['\u0069\u006E\u0074\u0065\u006E\u0074\u006F\u004D\u0075\u006C\u0074\u0069'][i]) {
+            state['\u0070\u0072\u0065\u0073\u0069\u006F\u006E\u0061\u0064\u006F'] = `numero-${i}`;
             break;
           }
         }
       }
-
-      if (state.presionado) {
-        let indice = parseInt(state.presionado.split('-')[1], 10);
-        state.intentoMulti[indice] = undefined;
-        const idSlot = document.getElementById(state.presionado);
+      if (state['\u0070\u0072\u0065\u0073\u0069\u006F\u006E\u0061\u0064\u006F']) {
+        let indice = parseInt(state['\u0070\u0072\u0065\u0073\u0069\u006F\u006E\u0061\u0064\u006F']['\u0073\u0070\u006C\u0069\u0074']("\u002D")[684140 ^ 684141], 157501 ^ 157495);
+        state['\u0069\u006E\u0074\u0065\u006E\u0074\u006F\u004D\u0075\u006C\u0074\u0069'][indice] = undefined;
+        const idSlot = document['\u0067\u0065\u0074\u0045\u006C\u0065\u006D\u0065\u006E\u0074\u0042\u0079\u0049\u0064'](state['\u0070\u0072\u0065\u0073\u0069\u006F\u006E\u0061\u0064\u006F']);
         if (idSlot) {
-          idSlot.classList.replace('filled', 'locked');
-          idSlot.textContent = '🔒';
+          idSlot['\u0063\u006C\u0061\u0073\u0073\u004C\u0069\u0073\u0074']['\u0072\u0065\u0070\u006C\u0061\u0063\u0065']("\u0066\u0069\u006C\u006C\u0065\u0064", "\u006C\u006F\u0063\u006B\u0065\u0064");
+          idSlot['\u0074\u0065\u0078\u0074\u0043\u006F\u006E\u0074\u0065\u006E\u0074'] = "\uD83D\uDD12";
         }
-        state.presionado = "";
-        refreshKeypad();
+        state['\u0070\u0072\u0065\u0073\u0069\u006F\u006E\u0061\u0064\u006F'] = "";
+        _0xa3ddc();
       }
-      
-      if (el.statusMultiKeypadPanel) el.statusMultiKeypadPanel.classList.add('hidden');
-    } 
-    else if (el.createRoomPanel && !el.createRoomPanel.classList.contains('hidden')) {
-      if (state.isCodeLocked) return;
-      state.mySecretCode.pop();
-      crearSlots();
-      refreshKeypad();
+      if (el['\u0073\u0074\u0061\u0074\u0075\u0073\u004D\u0075\u006C\u0074\u0069\u004B\u0065\u0079\u0070\u0061\u0064\u0050\u0061\u006E\u0065\u006C']) el['\u0073\u0074\u0061\u0074\u0075\u0073\u004D\u0075\u006C\u0074\u0069\u004B\u0065\u0079\u0070\u0061\u0064\u0050\u0061\u006E\u0065\u006C']['\u0063\u006C\u0061\u0073\u0073\u004C\u0069\u0073\u0074']['\u0061\u0064\u0064']("neddih".split("").reverse().join(""));
+    } else if (el['\u0063\u0072\u0065\u0061\u0074\u0065\u0052\u006F\u006F\u006D\u0050\u0061\u006E\u0065\u006C'] && !el['\u0063\u0072\u0065\u0061\u0074\u0065\u0052\u006F\u006F\u006D\u0050\u0061\u006E\u0065\u006C']['\u0063\u006C\u0061\u0073\u0073\u004C\u0069\u0073\u0074']['\u0063\u006F\u006E\u0074\u0061\u0069\u006E\u0073']("neddih".split("").reverse().join(""))) {
+      if (state['\u0069\u0073\u0043\u006F\u0064\u0065\u004C\u006F\u0063\u006B\u0065\u0064']) return;
+      state['\u006D\u0079\u0053\u0065\u0063\u0072\u0065\u0074\u0043\u006F\u0064\u0065']['\u0070\u006F\u0070']();
+      _0xb5ed3b();
+      _0xa3ddc();
     }
   }
 }
-/**
- * Inyecta una alerta flotante ciberpunk temporal en el DOM
- * Reemplazo directo y seguro para el alert() nativo
- */
-export function mostrarAlertaCyber(mensaje, esError = true) {
-  // Eliminar si ya existe una alerta activa para no encimarlas
-  const alertaPrevia = document.getElementById('pop-alerta-cyber');
-  if (alertaPrevia) alertaPrevia.remove();
-
-  const popup = document.createElement('div');
-  popup.id = 'pop-alerta-cyber';
-  popup.className = 'broadcast-popup';
-  
-  // Aplicar estilos dinámicos basados en la gravedad del mensaje
-  popup.style.borderColor = esError ? 'var(--danger)' : 'var(--neon)';
-  popup.style.boxShadow = esError ? '0 0 25px rgba(255, 77, 109, 0.4)' : '0 0 25px rgba(0, 245, 212, 0.4)';
-  popup.style.pointerEvents = 'auto'; // Permitir interactividad si se desea cerrar al hacer clic
-
-  const titulo = esError ? '⚠️ ERROR DE PROTOCOLO' : '📡 NOTIFICACIÓN DE RED';
-  const colorTitulo = esError ? 'var(--danger)' : 'var(--neon)';
-
-  popup.innerHTML = `
+export { _0xg7363b as deleteElement };
+function _0x5dg3cf(mensaje, esError = !![]) {
+  const _0xeafbe = document['\u0067\u0065\u0074\u0045\u006C\u0065\u006D\u0065\u006E\u0074\u0042\u0079\u0049\u0064']("rebyc-atrela-pop".split("").reverse().join(""));
+  if (_0xeafbe) _0xeafbe['\u0072\u0065\u006D\u006F\u0076\u0065']();
+  const _0xb_0x9b4 = document['\u0063\u0072\u0065\u0061\u0074\u0065\u0045\u006C\u0065\u006D\u0065\u006E\u0074']("\u0064\u0069\u0076");
+  _0xb_0x9b4['\u0069\u0064'] = "rebyc-atrela-pop".split("").reverse().join("");
+  _0xb_0x9b4['\u0063\u006C\u0061\u0073\u0073\u004E\u0061\u006D\u0065'] = "\u0062\u0072\u006F\u0061\u0064\u0063\u0061\u0073\u0074\u002D\u0070\u006F\u0070\u0075\u0070";
+  _0xb_0x9b4['\u0073\u0074\u0079\u006C\u0065']['\u0062\u006F\u0072\u0064\u0065\u0072\u0043\u006F\u006C\u006F\u0072'] = esError ? ")regnad--(rav".split("").reverse().join("") : ")noen--(rav".split("").reverse().join("");
+  _0xb_0x9b4['\u0073\u0074\u0079\u006C\u0065']['\u0062\u006F\u0078\u0053\u0068\u0061\u0064\u006F\u0077'] = esError ? ")4.0 ,901 ,77 ,552(abgr xp52 0 0".split("").reverse().join("") : "\u0030\u0020\u0030\u0020\u0032\u0035\u0070\u0078\u0020\u0072\u0067\u0062\u0061\u0028\u0030\u002C\u0020\u0032\u0034\u0035\u002C\u0020\u0032\u0031\u0032\u002C\u0020\u0030\u002E\u0034\u0029";
+  _0xb_0x9b4['\u0073\u0074\u0079\u006C\u0065']['\u0070\u006F\u0069\u006E\u0074\u0065\u0072\u0045\u0076\u0065\u006E\u0074\u0073'] = "\u0061\u0075\u0074\u006F";
+  var _0xf9d = (421404 ^ 421396) + (799645 ^ 799645);
+  const _0x_0x97f = esError ? "OLOCOTORP ED RORRE \uFE0F\u26A0".split("").reverse().join("") : "\uD83D\uDCE1\u0020\u004E\u004F\u0054\u0049\u0046\u0049\u0043\u0041\u0043\u0049\u00D3\u004E\u0020\u0044\u0045\u0020\u0052\u0045\u0044";
+  _0xf9d = (475936 ^ 475943) + (117730 ^ 117733);
+  const _0x1g45ac = esError ? ")regnad--(rav".split("").reverse().join("") : "\u0076\u0061\u0072\u0028\u002D\u002D\u006E\u0065\u006F\u006E\u0029";
+  _0xb_0x9b4['\u0069\u006E\u006E\u0065\u0072\u0048\u0054\u004D\u004C'] = `
     <div class="broadcast-content">
-      <div class="broadcast-header" style="color: ${colorTitulo}; letter-spacing: 2px;">${titulo}</div>
+      <div class="broadcast-header" style="color: ${_0x1g45ac}; letter-spacing: 2px;">${_0x_0x97f}</div>
       <p style="margin-top: 10px; font-size: 13px; line-height: 1.4; color: var(--text);">${mensaje}</p>
     </div>
   `;
-
-  document.body.appendChild(popup);
-
-  // Permitir cierre inmediato al hacer clic sobre la alerta
-  popup.addEventListener('click', () => popup.remove());
-
-  // Auto-eliminación suave tras 3.5 segundos
+  document['\u0062\u006F\u0064\u0079']['\u0061\u0070\u0070\u0065\u006E\u0064\u0043\u0068\u0069\u006C\u0064'](_0xb_0x9b4);
+  _0xb_0x9b4['\u0061\u0064\u0064\u0045\u0076\u0065\u006E\u0074\u004C\u0069\u0073\u0074\u0065\u006E\u0065\u0072']("kcilc".split("").reverse().join(""), () => _0xb_0x9b4['\u0072\u0065\u006D\u006F\u0076\u0065']());
   setTimeout(() => {
-    if (document.body.contains(popup)) {
-      popup.style.opacity = '0';
-      popup.style.transform = 'translate(-50%, -60%) scale(0.9)';
-      setTimeout(() => popup.remove(), 400);
+    if (document['\u0062\u006F\u0064\u0079']['\u0063\u006F\u006E\u0074\u0061\u0069\u006E\u0073'](_0xb_0x9b4)) {
+      _0xb_0x9b4['\u0073\u0074\u0079\u006C\u0065']['\u006F\u0070\u0061\u0063\u0069\u0074\u0079'] = "\u0030";
+      _0xb_0x9b4['\u0073\u0074\u0079\u006C\u0065']['\u0074\u0072\u0061\u006E\u0073\u0066\u006F\u0072\u006D'] = "\u0074\u0072\u0061\u006E\u0073\u006C\u0061\u0074\u0065\u0028\u002D\u0035\u0030\u0025\u002C\u0020\u002D\u0036\u0030\u0025\u0029\u0020\u0073\u0063\u0061\u006C\u0065\u0028\u0030\u002E\u0039\u0029";
+      setTimeout(() => _0xb_0x9b4['\u0072\u0065\u006D\u006F\u0076\u0065'](), 125642 ^ 125786);
     }
-  }, 3500);
+  }, 583916 ^ 582976);
 }
+export { _0x5dg3cf as mostrarAlertaCyber };
