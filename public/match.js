@@ -1,248 +1,196 @@
-/* =========================================================
-   CÓDIGO OCULTO - Controlador de Partidas (Modo IA y Red en Línea)
-   ========================================================= */
-import { state, loadRecords, saveRecords } from './config.js';
-import { el } from './dom.js';
-import { buildKeypad, crearSlots, refreshKeypad, renderizarBitacoraFiltrada, setStatus, mostrarAlertaCyber } from './ui.js';
-import { actualizarVisualSalaJugadores, showVictory, addLogRow } from './main.js';
-import { startTimer, stopTimer } from './timer.js';
-import { generateSecret } from './rooms.js';
-import { removeOverlay } from './fx.js';
-import { socket } from './mode-multi.js'; // Importamos la instancia del WebSocket activo
-import { sfx } from './audio.js';
-
-export function startGame() {
-  state.secret = generateSecret(state.length);
-  state.tipoPanel = "setupPanel";
-  state.current = [];
-  state.attempts = 0;
-  state.playing = true;
-  
-  el.botones.classList.remove('hidden');
-  el.botones.disabled = true;
-  el.setupPanel.classList.add('hidden');
-  el.statusPanel.classList.remove('hidden');
-  el.logPanel.classList.remove('hidden');
-  el.log.innerHTML = '<div class="log-empty">Sin intentos registrados...</div>';
-
+import { state, loadRecords, saveRecords } from "\u002E\u002F\u0063\u006F\u006E\u0066\u0069\u0067\u002E\u006A\u0073";
+import { el } from "\u002E\u002F\u0064\u006F\u006D\u002E\u006A\u0073";
+import { buildKeypad, crearSlots, refreshKeypad, renderizarBitacoraFiltrada, setStatus, mostrarAlertaCyber } from "\u002E\u002F\u0075\u0069\u002E\u006A\u0073";
+import { actualizarVisualSalaJugadores, showVictory, addLogRow } from "\u002E\u002F\u006D\u0061\u0069\u006E\u002E\u006A\u0073";
+import { startTimer, stopTimer } from "\u002E\u002F\u0074\u0069\u006D\u0065\u0072\u002E\u006A\u0073";
+import { generateSecret } from "\u002E\u002F\u0072\u006F\u006F\u006D\u0073\u002E\u006A\u0073";
+import { removeOverlay } from "\u002E\u002F\u0066\u0078\u002E\u006A\u0073";
+import { socket } from "\u002E\u002F\u006D\u006F\u0064\u0065\u002D\u006D\u0075\u006C\u0074\u0069\u002E\u006A\u0073";
+import { sfx } from "\u002E\u002F\u0061\u0075\u0064\u0069\u006F\u002E\u006A\u0073";
+function _0x55ac() {
+  state['\u0073\u0065\u0063\u0072\u0065\u0074'] = generateSecret(state['\u006C\u0065\u006E\u0067\u0074\u0068']);
+  state['\u0074\u0069\u0070\u006F\u0050\u0061\u006E\u0065\u006C'] = "\u0073\u0065\u0074\u0075\u0070\u0050\u0061\u006E\u0065\u006C";
+  state['\u0063\u0075\u0072\u0072\u0065\u006E\u0074'] = [];
+  state['\u0061\u0074\u0074\u0065\u006D\u0070\u0074\u0073'] = 572300 ^ 572300;
+  state['\u0070\u006C\u0061\u0079\u0069\u006E\u0067'] = !![];
+  el['\u0062\u006F\u0074\u006F\u006E\u0065\u0073']['\u0063\u006C\u0061\u0073\u0073\u004C\u0069\u0073\u0074']['\u0072\u0065\u006D\u006F\u0076\u0065']("\u0068\u0069\u0064\u0064\u0065\u006E");
+  el['\u0062\u006F\u0074\u006F\u006E\u0065\u0073']['\u0064\u0069\u0073\u0061\u0062\u006C\u0065\u0064'] = !![];
+  el['\u0073\u0065\u0074\u0075\u0070\u0050\u0061\u006E\u0065\u006C']['\u0063\u006C\u0061\u0073\u0073\u004C\u0069\u0073\u0074']['\u0061\u0064\u0064']("\u0068\u0069\u0064\u0064\u0065\u006E");
+  el['\u0073\u0074\u0061\u0074\u0075\u0073\u0050\u0061\u006E\u0065\u006C']['\u0063\u006C\u0061\u0073\u0073\u004C\u0069\u0073\u0074']['\u0072\u0065\u006D\u006F\u0076\u0065']("neddih".split("").reverse().join(""));
+  el['\u006C\u006F\u0067\u0050\u0061\u006E\u0065\u006C']['\u0063\u006C\u0061\u0073\u0073\u004C\u0069\u0073\u0074']['\u0072\u0065\u006D\u006F\u0076\u0065']("\u0068\u0069\u0064\u0064\u0065\u006E");
+  el['\u006C\u006F\u0067']['\u0069\u006E\u006E\u0065\u0072\u0048\u0054\u004D\u004C'] = "\u003C\u0064\u0069\u0076\u0020\u0063\u006C\u0061\u0073\u0073\u003D\u0022\u006C\u006F\u0067\u002D\u0065\u006D\u0070\u0074\u0079\u0022\u003E\u0053\u0069\u006E\u0020\u0069\u006E\u0074\u0065\u006E\u0074\u006F\u0073\u0020\u0072\u0065\u0067\u0069\u0073\u0074\u0072\u0061\u0064\u006F\u0073\u002E\u002E\u002E\u003C\u002F\u0064\u0069\u0076\u003E";
   buildKeypad();
   crearSlots();
-  setStatus('Arma tu intento con el teclado.', false);
+  setStatus(".odalcet le noc otnetni ut amrA".split("").reverse().join(""), false);
   removeOverlay();
   startTimer();
-
-  // >> 🎙 SÍNTESIS DE VOZ: La IA del mainframe desafía al jugador al arrancar
-  import('./audio.js').then(audio => {
-    audio.emitirVozTerminal("código asegurado. Intenta  burlar  mi  cifrado, hacker.");
+  import("sj.oidua/.".split("").reverse().join(""))['\u0074\u0068\u0065\u006E'](audio => {
+    audio['\u0065\u006D\u0069\u0074\u0069\u0072\u0056\u006F\u007A\u0054\u0065\u0072\u006D\u0069\u006E\u0061\u006C']("\u0063\u00F3\u0064\u0069\u0067\u006F\u0020\u0061\u0073\u0065\u0067\u0075\u0072\u0061\u0064\u006F\u002E\u0020\u0049\u006E\u0074\u0065\u006E\u0074\u0061\u0020\u0020\u0062\u0075\u0072\u006C\u0061\u0072\u0020\u0020\u006D\u0069\u0020\u0020\u0063\u0069\u0066\u0072\u0061\u0064\u006F\u002C\u0020\u0068\u0061\u0063\u006B\u0065\u0072\u002E");
   });
 }
-
-export function lanzarPartidaMultijugador(mensaje) {
-  if (el.createRoomPanel) el.createRoomPanel.classList.add('hidden');
-  if (el.lobbyPanel) el.lobbyPanel.classList.add('hidden');
-
-  state.playing = true;
-  state.intentoMulti = [];
-  if (el.setupPanel) el.setupPanel.classList.add('hidden');
-  if (el.multiStatusPanel) el.multiStatusPanel.classList.remove('hidden');
-  if (el.statusMultiLogPanel) el.statusMultiLogPanel.classList.remove('hidden');
-  
-  // 💻 CORRECCIÓN MAESTRA: Limpiar visualmente la bitácora para la nueva partida
-  // Vaciamos tanto el contenedor multijugador como el genérico por seguridad
-  if (el.statusMultiLog) el.statusMultiLog.innerHTML = '<div class="log-empty">Sin intentos registrados...</div>';
-  if (el.log) el.log.innerHTML = '<div class="log-empty">Sin intentos registrados...</div>';
-
-  // Hacer visible el contenedor del panel lateral en el DOM antes de ordenar su redibujado
-  if (el.jugadorespanel) {
-    el.jugadorespanel.classList.remove('hidden');
+export { _0x55ac as startGame };
+function _0xdaag5a(mensaje) {
+  if (el['\u0063\u0072\u0065\u0061\u0074\u0065\u0052\u006F\u006F\u006D\u0050\u0061\u006E\u0065\u006C']) el['\u0063\u0072\u0065\u0061\u0074\u0065\u0052\u006F\u006F\u006D\u0050\u0061\u006E\u0065\u006C']['\u0063\u006C\u0061\u0073\u0073\u004C\u0069\u0073\u0074']['\u0061\u0064\u0064']("\u0068\u0069\u0064\u0064\u0065\u006E");
+  if (el['\u006C\u006F\u0062\u0062\u0079\u0050\u0061\u006E\u0065\u006C']) el['\u006C\u006F\u0062\u0062\u0079\u0050\u0061\u006E\u0065\u006C']['\u0063\u006C\u0061\u0073\u0073\u004C\u0069\u0073\u0074']['\u0061\u0064\u0064']("neddih".split("").reverse().join(""));
+  state['\u0070\u006C\u0061\u0079\u0069\u006E\u0067'] = !![];
+  state['\u0069\u006E\u0074\u0065\u006E\u0074\u006F\u004D\u0075\u006C\u0074\u0069'] = [];
+  if (el['\u0073\u0065\u0074\u0075\u0070\u0050\u0061\u006E\u0065\u006C']) el['\u0073\u0065\u0074\u0075\u0070\u0050\u0061\u006E\u0065\u006C']['\u0063\u006C\u0061\u0073\u0073\u004C\u0069\u0073\u0074']['\u0061\u0064\u0064']("neddih".split("").reverse().join(""));
+  if (el['\u006D\u0075\u006C\u0074\u0069\u0053\u0074\u0061\u0074\u0075\u0073\u0050\u0061\u006E\u0065\u006C']) el['\u006D\u0075\u006C\u0074\u0069\u0053\u0074\u0061\u0074\u0075\u0073\u0050\u0061\u006E\u0065\u006C']['\u0063\u006C\u0061\u0073\u0073\u004C\u0069\u0073\u0074']['\u0072\u0065\u006D\u006F\u0076\u0065']("\u0068\u0069\u0064\u0064\u0065\u006E");
+  if (el['\u0073\u0074\u0061\u0074\u0075\u0073\u004D\u0075\u006C\u0074\u0069\u004C\u006F\u0067\u0050\u0061\u006E\u0065\u006C']) el['\u0073\u0074\u0061\u0074\u0075\u0073\u004D\u0075\u006C\u0074\u0069\u004C\u006F\u0067\u0050\u0061\u006E\u0065\u006C']['\u0063\u006C\u0061\u0073\u0073\u004C\u0069\u0073\u0074']['\u0072\u0065\u006D\u006F\u0076\u0065']("neddih".split("").reverse().join(""));
+  if (el['\u0073\u0074\u0061\u0074\u0075\u0073\u004D\u0075\u006C\u0074\u0069\u004C\u006F\u0067']) el['\u0073\u0074\u0061\u0074\u0075\u0073\u004D\u0075\u006C\u0074\u0069\u004C\u006F\u0067']['\u0069\u006E\u006E\u0065\u0072\u0048\u0054\u004D\u004C'] = "\u003C\u0064\u0069\u0076\u0020\u0063\u006C\u0061\u0073\u0073\u003D\u0022\u006C\u006F\u0067\u002D\u0065\u006D\u0070\u0074\u0079\u0022\u003E\u0053\u0069\u006E\u0020\u0069\u006E\u0074\u0065\u006E\u0074\u006F\u0073\u0020\u0072\u0065\u0067\u0069\u0073\u0074\u0072\u0061\u0064\u006F\u0073\u002E\u002E\u002E\u003C\u002F\u0064\u0069\u0076\u003E";
+  if (el['\u006C\u006F\u0067']) el['\u006C\u006F\u0067']['\u0069\u006E\u006E\u0065\u0072\u0048\u0054\u004D\u004C'] = "\u003C\u0064\u0069\u0076\u0020\u0063\u006C\u0061\u0073\u0073\u003D\u0022\u006C\u006F\u0067\u002D\u0065\u006D\u0070\u0074\u0079\u0022\u003E\u0053\u0069\u006E\u0020\u0069\u006E\u0074\u0065\u006E\u0074\u006F\u0073\u0020\u0072\u0065\u0067\u0069\u0073\u0074\u0072\u0061\u0064\u006F\u0073\u002E\u002E\u002E\u003C\u002F\u0064\u0069\u0076\u003E";
+  if (el['\u006A\u0075\u0067\u0061\u0064\u006F\u0072\u0065\u0073\u0070\u0061\u006E\u0065\u006C']) {
+    el['\u006A\u0075\u0067\u0061\u0064\u006F\u0072\u0065\u0073\u0070\u0061\u006E\u0065\u006C']['\u0063\u006C\u0061\u0073\u0073\u004C\u0069\u0073\u0074']['\u0072\u0065\u006D\u006F\u0076\u0065']("neddih".split("").reverse().join(""));
   }
-
-  // Ahora sí, llamamos de golpe al renderizador común ya corregido
   actualizarVisualSalaJugadores();
-
-  if (el.multibotones) el.multibotones.classList.remove('hidden');
+  if (el['\u006D\u0075\u006C\u0074\u0069\u0062\u006F\u0074\u006F\u006E\u0065\u0073']) el['\u006D\u0075\u006C\u0074\u0069\u0062\u006F\u0074\u006F\u006E\u0065\u0073']['\u0063\u006C\u0061\u0073\u0073\u004C\u0069\u0073\u0074']['\u0072\u0065\u006D\u006F\u0076\u0065']("neddih".split("").reverse().join(""));
   buildKeypad();
   crearSlots();
-  setStatus('Arma tu intento con el teclado.', false);
+  setStatus(".odalcet le noc otnetni ut amrA".split("").reverse().join(""), false);
   removeOverlay();
-  state.playing = true; 
+  state['\u0070\u006C\u0061\u0079\u0069\u006E\u0067'] = !![];
   startTimer();
 }
-
-
-export function organizarCodigo() {
-  for (let i = 0; i < state.current.length; i++) {
-    const node = document.getElementById(`numero-${i}`);
-    if (node) state.current[i] = node.textContent;
+export { _0xdaag5a as lanzarPartidaMultijugador };
+function _0x273g() {
+  for (let i = 296779 ^ 296779; i < state['\u0063\u0075\u0072\u0072\u0065\u006E\u0074']['\u006C\u0065\u006E\u0067\u0074\u0068']; i++) {
+    let _0xabbc;
+    const _0xebc6ab = document['\u0067\u0065\u0074\u0045\u006C\u0065\u006D\u0065\u006E\u0074\u0042\u0079\u0049\u0064'](`numero-${i}`);
+    _0xabbc = "ojbdme".split("").reverse().join("");
+    if (_0xebc6ab) state['\u0063\u0075\u0072\u0072\u0065\u006E\u0074'][i] = _0xebc6ab['\u0074\u0065\u0078\u0074\u0043\u006F\u006E\u0074\u0065\u006E\u0074'];
   }
 }
-
-export function submitGuess() {
-  if (!state.playing) return;
-  organizarCodigo();
-
-  if (state.current.length < state.length) {
-    setStatus(`⚠ Completa los ${state.length} campos antes de enviar.`, true);
+export { _0x273g as organizarCodigo };
+function _0xge1ec(_0x_0xb2b) {
+  if (!state['\u0070\u006C\u0061\u0079\u0069\u006E\u0067']) return;
+  _0x273g();
+  if (state['\u0063\u0075\u0072\u0072\u0065\u006E\u0074']['\u006C\u0065\u006E\u0067\u0074\u0068'] < state['\u006C\u0065\u006E\u0067\u0074\u0068']) {
+    setStatus(`⚠ Completa los ${state['\u006C\u0065\u006E\u0067\u0074\u0068']} campos antes de enviar.`, !![]);
     return;
   }
-  if (new Set(state.current).size !== state.current.length) {
-    setStatus('⚠ No se permiten elementos repetidos.', true);
+  if (new Set(state['\u0063\u0075\u0072\u0072\u0065\u006E\u0074'])['\u0073\u0069\u007A\u0065'] !== state['\u0063\u0075\u0072\u0072\u0065\u006E\u0074']['\u006C\u0065\u006E\u0067\u0074\u0068']) {
+    setStatus(".soditeper sotnemele netimrep es oN \u26A0".split("").reverse().join(""), !![]);
     return;
   }
-
-  // >> 🔊 AUDIO: Suena el latigazo digital al lanzar el ataque a la IA
-  sfx.ataque();
-
-  const guess = [...state.current];
-  const { correct, present } = calculateHints(guess, state.secret);
-  state.attempts++;
-
-  addLogRow(guess, correct, present, state.attempts);
-
-  if (correct === state.length) {
+  sfx['\u0061\u0074\u0061\u0071\u0075\u0065']();
+  const _0xd55edc = [...state['\u0063\u0075\u0072\u0072\u0065\u006E\u0074']];
+  _0x_0xb2b = 687228 ^ 687226;
+  const {
+    '\u0063\u006F\u0072\u0072\u0065\u0063\u0074': correct,
+    '\u0070\u0072\u0065\u0073\u0065\u006E\u0074': present
+  } = _0x616e(_0xd55edc, state['\u0073\u0065\u0063\u0072\u0065\u0074']);
+  state['\u0061\u0074\u0074\u0065\u006D\u0070\u0074\u0073']++;
+  addLogRow(_0xd55edc, correct, present, state['\u0061\u0074\u0074\u0065\u006D\u0070\u0074\u0073']);
+  if (correct === state['\u006C\u0065\u006E\u0067\u0074\u0068']) {
     stopTimer();
-    state.elapsed = Math.floor((Date.now() - state.startTime) / 1000);
-    state.playing = false;
-
-    const records = loadRecords();
-    const isRecord = (records[state.length] == null || state.elapsed < records[state.length]);
-    if (isRecord) {
-      records[state.length] = state.elapsed;
-      saveRecords(records);
+    state['\u0065\u006C\u0061\u0070\u0073\u0065\u0064'] = Math['\u0066\u006C\u006F\u006F\u0072']((Date['\u006E\u006F\u0077']() - state['\u0073\u0074\u0061\u0072\u0074\u0054\u0069\u006D\u0065']) / (691978 ^ 691426));
+    state['\u0070\u006C\u0061\u0079\u0069\u006E\u0067'] = false;
+    const _0x63a = loadRecords();
+    const _0xf591a = _0x63a[state['\u006C\u0065\u006E\u0067\u0074\u0068']] == null || state['\u0065\u006C\u0061\u0070\u0073\u0065\u0064'] < _0x63a[state['\u006C\u0065\u006E\u0067\u0074\u0068']];
+    if (_0xf591a) {
+      _0x63a[state['\u006C\u0065\u006E\u0067\u0074\u0068']] = state['\u0065\u006C\u0061\u0070\u0073\u0065\u0064'];
+      saveRecords(_0x63a);
     }
-
-    setStatus(`✔ CÓDIGO DESCIFRADO en ${state.attempts} intento(s).`, false);
-    
-    // >> 🔊 AUDIO: Sonido de victoria contra la IA
-    sfx.victoria(); 
-    showVictory(isRecord);
+    setStatus(`✔ CÓDIGO DESCIFRADO en ${state['\u0061\u0074\u0074\u0065\u006D\u0070\u0074\u0073']} intento(s).`, false);
+    sfx['\u0076\u0069\u0063\u0074\u006F\u0072\u0069\u0061']();
+    showVictory(_0xf591a);
   } else {
     setStatus(`Aciertos exactos: ${correct} · Presentes: ${present}`, false);
-
-    // >> 🔊 AUDIO: Feedback adaptativo contra la IA
-    if (correct >= state.length - 1) {
-      sfx.aciertoBueno(); // Arpegio brillante si estás a punto de descifrarlo
-    } else if (correct === 0 && present === 0) {
-      sfx.falloTotal(); // Zumbido sordo si fallaste todas las casillas
+    if (correct >= state['\u006C\u0065\u006E\u0067\u0074\u0068'] - (838588 ^ 838589)) {
+      sfx['\u0061\u0063\u0069\u0065\u0072\u0074\u006F\u0042\u0075\u0065\u006E\u006F']();
+    } else if (correct === (631244 ^ 631244) && present === (953268 ^ 953268)) {
+      sfx['\u0066\u0061\u006C\u006C\u006F\u0054\u006F\u0074\u0061\u006C']();
     }
   }
-
-  state.current = [];
+  state['\u0063\u0075\u0072\u0072\u0065\u006E\u0074'] = [];
   crearSlots();
   refreshKeypad();
 }
-
-
-// =============================================================================
-// MODIFICACIÓN CRÍTICA EN match.js: LECTURA DIRECTA DESDE ESTADO EN RED
-// =============================================================================
-
-export function submitGuessMulti() {
-  if (!state.playing) return;
-
-  // VERIFICACIÓN DE SEGURIDAD INTERNA: Validar si es realmente el turno del jugador humano
-  const jugadorActual = state.connectedPlayers[state.currentPlayerIndex];
-  if (!jugadorActual || jugadorActual.name !== state.username) {
-    mostrarAlertaCyber("No es tu turno de transmisión. Espera a que los demás terminales concluyan.", true);
+export { _0xge1ec as submitGuess };
+function _0xb_0x8e3(_0xaegea) {
+  if (!state['\u0070\u006C\u0061\u0079\u0069\u006E\u0067']) return;
+  const _0x60a = state['\u0063\u006F\u006E\u006E\u0065\u0063\u0074\u0065\u0064\u0050\u006C\u0061\u0079\u0065\u0072\u0073'][state['\u0063\u0075\u0072\u0072\u0065\u006E\u0074\u0050\u006C\u0061\u0079\u0065\u0072\u0049\u006E\u0064\u0065\u0078']];
+  _0xaegea = (808442 ^ 808443) + (359011 ^ 359014);
+  if (!_0x60a || _0x60a['\u006E\u0061\u006D\u0065'] !== state['\u0075\u0073\u0065\u0072\u006E\u0061\u006D\u0065']) {
+    mostrarAlertaCyber("\u004E\u006F\u0020\u0065\u0073\u0020\u0074\u0075\u0020\u0074\u0075\u0072\u006E\u006F\u0020\u0064\u0065\u0020\u0074\u0072\u0061\u006E\u0073\u006D\u0069\u0073\u0069\u00F3\u006E\u002E\u0020\u0045\u0073\u0070\u0065\u0072\u0061\u0020\u0061\u0020\u0071\u0075\u0065\u0020\u006C\u006F\u0073\u0020\u0064\u0065\u006D\u00E1\u0073\u0020\u0074\u0065\u0072\u006D\u0069\u006E\u0061\u006C\u0065\u0073\u0020\u0063\u006F\u006E\u0063\u006C\u0075\u0079\u0061\u006E\u002E", !![]);
     return;
   }
-
-  // 1. Validar que haya un jugador objetivo seleccionado
-  if (!state.selectedTargetFilter) {
-    mostrarAlertaCyber("PROTOCOLO COMPROMETIDO: Debes seleccionar un Hacker objetivo de la lista lateral antes de lanzar el ataque.", true);
+  if (!state['\u0073\u0065\u006C\u0065\u0063\u0074\u0065\u0064\u0054\u0061\u0072\u0067\u0065\u0074\u0046\u0069\u006C\u0074\u0065\u0072']) {
+    mostrarAlertaCyber(".euqata le raznal ed setna laretal atsil al ed ovitejbo rekcaH nu ranoicceles sebeD :ODITEMORPMOC OLOCOTORP".split("").reverse().join(""), !![]);
     return;
   }
-
-  const atacante = state.username;
-  const objetivo = state.selectedTargetFilter;
-
-  // VERIFICACIÓN DE REPETICIÓN: Validar si el humano ya atacó a este objetivo en el turno actual
-  if (!state.playerTargetBlocks[atacante]) state.playerTargetBlocks[atacante] = [];
-  if (state.playerTargetBlocks[atacante].includes(objetivo)) {
-    mostrarAlertaCyber(`OBJETIVO BLOQUEADO: Ya has inyectado un código en el nodo de ${objetivo.toUpperCase()} durante esta fase.`, true);
+  const _0xe4dd = state['\u0075\u0073\u0065\u0072\u006E\u0061\u006D\u0065'];
+  var _0xg22gee = (642206 ^ 642206) + (200384 ^ 200389);
+  const _0xg5956f = state['\u0073\u0065\u006C\u0065\u0063\u0074\u0065\u0064\u0054\u0061\u0072\u0067\u0065\u0074\u0046\u0069\u006C\u0074\u0065\u0072'];
+  _0xg22gee = (656012 ^ 656010) + (139893 ^ 139888);
+  if (!state['\u0070\u006C\u0061\u0079\u0065\u0072\u0054\u0061\u0072\u0067\u0065\u0074\u0042\u006C\u006F\u0063\u006B\u0073'][_0xe4dd]) state['\u0070\u006C\u0061\u0079\u0065\u0072\u0054\u0061\u0072\u0067\u0065\u0074\u0042\u006C\u006F\u0063\u006B\u0073'][_0xe4dd] = [];
+  if (state['\u0070\u006C\u0061\u0079\u0065\u0072\u0054\u0061\u0072\u0067\u0065\u0074\u0042\u006C\u006F\u0063\u006B\u0073'][_0xe4dd]['\u0069\u006E\u0063\u006C\u0075\u0064\u0065\u0073'](_0xg5956f)) {
+    mostrarAlertaCyber(`OBJETIVO BLOQUEADO: Ya has inyectado un código en el nodo de ${_0xg5956f['\u0074\u006F\u0055\u0070\u0070\u0065\u0072\u0043\u0061\u0073\u0065']()} durante esta fase.`, !![]);
     return;
   }
-
-  // ¡CORRECCIÓN MAESTRA!: En lugar de buscar los elementos en el HTML mediante document.getElementById,
-  // leemos directamente el array de memoria 'state.intentoMulti' que ya está purificado por el teclado.
-  // Filtramos cualquier valor nulo, indefinido o vacío para asegurar un envío limpio.
-  const digitosIngresados = state.intentoMulti.filter(v => v !== undefined && v !== null && v !== '');
-
-  // 2. Validar que el código esté completo comparando contra la longitud requerida de la sala
-  if (digitosIngresados.length < state.multiLength) {
-    mostrarAlertaCyber(`SECUENCIA INCOMPLETA: Se requieren exactamente ${state.multiLength} elementos para ejecutar el descifrado.`, true);
+  const _0xb8cc4a = state['\u0069\u006E\u0074\u0065\u006E\u0074\u006F\u004D\u0075\u006C\u0074\u0069']['\u0066\u0069\u006C\u0074\u0065\u0072'](v => v !== undefined && v !== null && v !== '');
+  if (_0xb8cc4a['\u006C\u0065\u006E\u0067\u0074\u0068'] < state['\u006D\u0075\u006C\u0074\u0069\u004C\u0065\u006E\u0067\u0074\u0068']) {
+    mostrarAlertaCyber(`SECUENCIA INCOMPLETA: Se requieren exactamente ${state['\u006D\u0075\u006C\u0074\u0069\u004C\u0065\u006E\u0067\u0074\u0068']} elementos para ejecutar el descifrado.`, !![]);
     return;
   }
-
-  // 3. Validar elementos repetidos (Regla Mastermind)
-  if (new Set(digitosIngresados).size !== digitosIngresados.length) {
-    mostrarAlertaCyber('ERROR DE CONFIGURACIÓN: No se permiten elementos repetidos en la secuencia de ataque.', true);
+  if (new Set(_0xb8cc4a)['\u0073\u0069\u007A\u0065'] !== _0xb8cc4a['\u006C\u0065\u006E\u0067\u0074\u0068']) {
+    mostrarAlertaCyber("\u0045\u0052\u0052\u004F\u0052\u0020\u0044\u0045\u0020\u0043\u004F\u004E\u0046\u0049\u0047\u0055\u0052\u0041\u0043\u0049\u00D3\u004E\u003A\u0020\u004E\u006F\u0020\u0073\u0065\u0020\u0070\u0065\u0072\u006D\u0069\u0074\u0065\u006E\u0020\u0065\u006C\u0065\u006D\u0065\u006E\u0074\u006F\u0073\u0020\u0072\u0065\u0070\u0065\u0074\u0069\u0064\u006F\u0073\u0020\u0065\u006E\u0020\u006C\u0061\u0020\u0073\u0065\u0063\u0075\u0065\u006E\u0063\u0069\u0061\u0020\u0064\u0065\u0020\u0061\u0074\u0061\u0071\u0075\u0065\u002E", !![]);
     return;
   }
-
-  // ¡BARRERA DE SEGURIDAD ABSOLUTA EN RED!
-  if (objetivo === state.username) {
-    mostrarAlertaCyber("Acceso rechazado. Protocolo de seguridad activado. No puedes inyectar un ataque a tu propia terminal.", true);
+  if (_0xg5956f === state['\u0075\u0073\u0065\u0072\u006E\u0061\u006D\u0065']) {
+    mostrarAlertaCyber("\u0041\u0063\u0063\u0065\u0073\u006F\u0020\u0072\u0065\u0063\u0068\u0061\u007A\u0061\u0064\u006F\u002E\u0020\u0050\u0072\u006F\u0074\u006F\u0063\u006F\u006C\u006F\u0020\u0064\u0065\u0020\u0073\u0065\u0067\u0075\u0072\u0069\u0064\u0061\u0064\u0020\u0061\u0063\u0074\u0069\u0076\u0061\u0064\u006F\u002E\u0020\u004E\u006F\u0020\u0070\u0075\u0065\u0064\u0065\u0073\u0020\u0069\u006E\u0079\u0065\u0063\u0074\u0061\u0072\u0020\u0075\u006E\u0020\u0061\u0074\u0061\u0071\u0075\u0065\u0020\u0061\u0020\u0074\u0075\u0020\u0070\u0072\u006F\u0070\u0069\u0061\u0020\u0074\u0065\u0072\u006D\u0069\u006E\u0061\u006C\u002E", !![]);
     return;
   }
-
-  const codigoAtaque = [...digitosIngresados];
-
-  // REGISTRO CRÍTICO: Bloquear local e inmediatamente al objetivo en esta ronda
-  state.playerTargetBlocks[atacante].push(objetivo);
-
-  // TRANSMISIÓN EN TIEMPO REAL: Emitir el intento al servidor central de Render
-  sfx.ataque();
-  
-  let nombreSalaActive = state.isHost 
-    ? (el.roomNameInput.value.trim().toUpperCase() || `SERVER_${state.username.toUpperCase()}`) 
-    : state.selectedRoomCode;
-
-  // Si por alguna razón el texto de la interfaz tiene el código en vivo real (ej. SALA: X9F2R), lo extraemos de forma segura
-  if (el.roomLiveCode && el.roomLiveCode.textContent.includes('SALA:') && !el.roomLiveCode.textContent.includes('PENDIENTE')) {
-    nombreSalaActive = el.roomLiveCode.textContent.replace('SALA:', '').trim();
+  const _0xa276cb = [..._0xb8cc4a];
+  state['\u0070\u006C\u0061\u0079\u0065\u0072\u0054\u0061\u0072\u0067\u0065\u0074\u0042\u006C\u006F\u0063\u006B\u0073'][_0xe4dd]['\u0070\u0075\u0073\u0068'](_0xg5956f);
+  sfx['\u0061\u0074\u0061\u0071\u0075\u0065']();
+  var _0xcf0db = (356521 ^ 356521) + (873016 ^ 873018);
+  let _0xe78ef = state['\u0069\u0073\u0048\u006F\u0073\u0074'] ? el['\u0072\u006F\u006F\u006D\u004E\u0061\u006D\u0065\u0049\u006E\u0070\u0075\u0074']['\u0076\u0061\u006C\u0075\u0065']['\u0074\u0072\u0069\u006D']()['\u0074\u006F\u0055\u0070\u0070\u0065\u0072\u0043\u0061\u0073\u0065']() || `SERVER_${state['\u0075\u0073\u0065\u0072\u006E\u0061\u006D\u0065']['\u0074\u006F\u0055\u0070\u0070\u0065\u0072\u0043\u0061\u0073\u0065']()}` : state['\u0073\u0065\u006C\u0065\u0063\u0074\u0065\u0064\u0052\u006F\u006F\u006D\u0043\u006F\u0064\u0065'];
+  _0xcf0db = (358603 ^ 358605) + (654463 ^ 654461);
+  if (el['\u0072\u006F\u006F\u006D\u004C\u0069\u0076\u0065\u0043\u006F\u0064\u0065'] && el['\u0072\u006F\u006F\u006D\u004C\u0069\u0076\u0065\u0043\u006F\u0064\u0065']['\u0074\u0065\u0078\u0074\u0043\u006F\u006E\u0074\u0065\u006E\u0074']['\u0069\u006E\u0063\u006C\u0075\u0064\u0065\u0073']("\u0053\u0041\u004C\u0041\u003A") && !el['\u0072\u006F\u006F\u006D\u004C\u0069\u0076\u0065\u0043\u006F\u0064\u0065']['\u0074\u0065\u0078\u0074\u0043\u006F\u006E\u0074\u0065\u006E\u0074']['\u0069\u006E\u0063\u006C\u0075\u0064\u0065\u0073']("\u0050\u0045\u004E\u0044\u0049\u0045\u004E\u0054\u0045")) {
+    _0xe78ef = el['\u0072\u006F\u006F\u006D\u004C\u0069\u0076\u0065\u0043\u006F\u0064\u0065']['\u0074\u0065\u0078\u0074\u0043\u006F\u006E\u0074\u0065\u006E\u0074']['\u0072\u0065\u0070\u006C\u0061\u0063\u0065'](":ALAS".split("").reverse().join(""), '')['\u0074\u0072\u0069\u006D']();
   }
-
-  socket.emit('inyectar_ataque', {
-    roomCode: nombreSalaActive,
-    atacante: atacante,
-    objetivo: objetivo,
-    guess: codigoAtaque
+  socket['\u0065\u006D\u0069\u0074']("euqata_ratceyni".split("").reverse().join(""), {
+    "roomCode": _0xe78ef,
+    "atacante": _0xe4dd,
+    '\u006F\u0062\u006A\u0065\u0074\u0069\u0076\u006F': _0xg5956f,
+    '\u0067\u0075\u0065\u0073\u0073': _0xa276cb
   });
-
-  // Limpiar y resetear las casillas de entrada locales inmediatamente para el siguiente ataque de la partida
-  state.intentoMulti = [];
-  state.presionado = ""; // Liberar el foco del slot para que el auto-foco del teclado vuelva a empezar desde cero
-  
+  state['\u0069\u006E\u0074\u0065\u006E\u0074\u006F\u004D\u0075\u006C\u0074\u0069'] = [];
+  state['\u0070\u0072\u0065\u0073\u0069\u006F\u006E\u0061\u0064\u006F'] = "";
   crearSlots();
   refreshKeypad();
 }
-
-// Pega esto al final de match.js para respaldar el Modo Solo de Práctica
-export function calculateHints(guess, secret) {
-  let correct = 0;
-  let present = 0;
-  const secretUsed = new Array(secret.length).fill(false);
-  const guessResolved = new Array(guess.length).fill(false);
-
-  for (let i = 0; i < guess.length; i++) {
+export { _0xb_0x8e3 as submitGuessMulti };
+function _0x616e(guess, secret, _0xf68f, _0xb2_0x958) {
+  var _0x6b34d = (368758 ^ 368758) + (760202 ^ 760206);
+  _0xf68f = 975880 ^ 975880;
+  _0x6b34d = '\u0065\u0067\u0068\u006D\u0067\u0064';
+  _0xb2_0x958 = 798733 ^ 798733;
+  const _0xa883c = new Array(secret['\u006C\u0065\u006E\u0067\u0074\u0068'])['\u0066\u0069\u006C\u006C'](false);
+  var _0x0429aa = (771734 ^ 771728) + (526425 ^ 526425);
+  const _0x21744e = new Array(guess['\u006C\u0065\u006E\u0067\u0074\u0068'])['\u0066\u0069\u006C\u006C'](false);
+  _0x0429aa = 168242 ^ 168241;
+  for (let i = 380772 ^ 380772; i < guess['\u006C\u0065\u006E\u0067\u0074\u0068']; i++) {
     if (guess[i] === secret[i]) {
-      correct++;
-      secretUsed[i] = true;
-      guessResolved[i] = true;
+      _0xf68f++;
+      _0xa883c[i] = !![];
+      _0x21744e[i] = !![];
     }
   }
-
-  for (let i = 0; i < guess.length; i++) {
-    if (guessResolved[i]) continue;
-    for (let j = 0; j < secret.length; j++) {
-      if (!secretUsed[j] && guess[i] === secret[j]) {
-        present++;
-        secretUsed[j] = true;
+  for (let i = 346747 ^ 346747; i < guess['\u006C\u0065\u006E\u0067\u0074\u0068']; i++) {
+    if (_0x21744e[i]) continue;
+    for (let j = 560088 ^ 560088; j < secret['\u006C\u0065\u006E\u0067\u0074\u0068']; j++) {
+      if (!_0xa883c[j] && guess[i] === secret[j]) {
+        _0xb2_0x958++;
+        _0xa883c[j] = !![];
         break;
       }
     }
   }
-  return { correct, present };
+  return {
+    '\u0063\u006F\u0072\u0072\u0065\u0063\u0074': _0xf68f,
+    '\u0070\u0072\u0065\u0073\u0065\u006E\u0074': _0xb2_0x958
+  };
 }
-
+export { _0x616e as calculateHints };
