@@ -1,841 +1,695 @@
-/* =========================================================
-   CÓDIGO OCULTO - Juego de deducción tipo Mastermind (Cliente de Red Real-Time)
-   ========================================================= */
-import { state, BANK, MOCK_ROOMS, isFigure, loadRecords, limpiarEstadoMemoriaCompleto } from './config.js';
-import { formatTime,  stopTimer } from './timer.js';
-import { el } from './dom.js';
-import { renderizarCuadernoNotas } from './notes.js';
-import { setStatus, setMultiSetupMessage, buildKeypad, crearSlots, renderizarBitacoraFiltrada, addElement, deleteElement, mostrarAlertaCyber  } from './ui.js';
-import { renderRoomsList, renderConnectedPlayers } from './rooms.js';
-import { launchConfetti, removeOverlay } from './fx.js';
-import { startGame, submitGuess, submitGuessMulti } from './match.js';
-import { abandonarPartidaMultijugador, socket } from './mode-multi.js'; // Importación del canal de red activo
-import { celebrarDescifradoIntermedio, mostrarVentanaFlotanteAtaque, ejecutarVictoriaGlobal } from './referee.js';
-import { sfx, emitirVozTerminal } from './audio.js';
-
-// Importamos la inicialización de los manejadores de eventos de cada modo para que se ejecuten
-import './mode-ia.js';
-import './mode-multi.js';
-
-/* ---------- PROTOCOLO DE FORZADO HORIZONTAL REMOTO ---------- */
+import { state, BANK, MOCK_ROOMS, isFigure, loadRecords, limpiarEstadoMemoriaCompleto } from "\u002E\u002F\u0063\u006F\u006E\u0066\u0069\u0067\u002E\u006A\u0073";
+import { formatTime, stopTimer } from "\u002E\u002F\u0074\u0069\u006D\u0065\u0072\u002E\u006A\u0073";
+import { el } from "\u002E\u002F\u0064\u006F\u006D\u002E\u006A\u0073";
+import { renderizarCuadernoNotas } from "\u002E\u002F\u006E\u006F\u0074\u0065\u0073\u002E\u006A\u0073";
+import { setStatus, setMultiSetupMessage, buildKeypad, crearSlots, renderizarBitacoraFiltrada, addElement, deleteElement, mostrarAlertaCyber } from "\u002E\u002F\u0075\u0069\u002E\u006A\u0073";
+import { renderRoomsList, renderConnectedPlayers } from "\u002E\u002F\u0072\u006F\u006F\u006D\u0073\u002E\u006A\u0073";
+import { launchConfetti, removeOverlay } from "\u002E\u002F\u0066\u0078\u002E\u006A\u0073";
+import { startGame, submitGuess, submitGuessMulti } from "\u002E\u002F\u006D\u0061\u0074\u0063\u0068\u002E\u006A\u0073";
+import { abandonarPartidaMultijugador, socket } from "\u002E\u002F\u006D\u006F\u0064\u0065\u002D\u006D\u0075\u006C\u0074\u0069\u002E\u006A\u0073";
+import { celebrarDescifradoIntermedio, mostrarVentanaFlotanteAtaque, ejecutarVictoriaGlobal } from "\u002E\u002F\u0072\u0065\u0066\u0065\u0072\u0065\u0065\u002E\u006A\u0073";
+import { sfx, emitirVozTerminal } from "\u002E\u002F\u0061\u0075\u0064\u0069\u006F\u002E\u006A\u0073";
+import "\u002E\u002F\u006D\u006F\u0064\u0065\u002D\u0069\u0061\u002E\u006A\u0073";
+import "\u002E\u002F\u006D\u006F\u0064\u0065\u002D\u006D\u0075\u006C\u0074\u0069\u002E\u006A\u0073";
 function asegurarOrientacionHorizontal() {
-  // Comprobamos si el navegador del celular soporta la API moderna de orientación
-  if (screen.orientation && typeof screen.orientation.lock === 'function') {
-    screen.orientation.lock('landscape').then(() => {
-      console.log("📡 Protocolo de pantalla: Mainframe bloqueado en Horizontal de forma exitosa.");
-    }).catch((err) => {
-      // Nota: Algunos navegadores exigen que el usuario haga al menos un clic antes de girar la pantalla
-      console.log("⏳ Orientación en espera de interacción táctil del hacker.");
+  if (screen['\u006F\u0072\u0069\u0065\u006E\u0074\u0061\u0074\u0069\u006F\u006E'] && typeof screen['\u006F\u0072\u0069\u0065\u006E\u0074\u0061\u0074\u0069\u006F\u006E']['\u006C\u006F\u0063\u006B'] === "noitcnuf".split("").reverse().join("")) {
+    screen['\u006F\u0072\u0069\u0065\u006E\u0074\u0061\u0074\u0069\u006F\u006E']['\u006C\u006F\u0063\u006B']("epacsdnal".split("").reverse().join(""))['\u0074\u0068\u0065\u006E'](() => {
+      console['\u006C\u006F\u0067'](".asotixe amrof ed latnoziroH ne odaeuqolb emarfniaM :allatnap ed olocotorP \uDCE1\uD83D".split("").reverse().join(""));
+    })['\u0063\u0061\u0074\u0063\u0068'](err => {
+      console['\u006C\u006F\u0067'](".rekcah led litc\xE1t n\xF3iccaretni ed arepse ne n\xF3icatneirO \u23F3".split("").reverse().join(""));
     });
   }
 }
-
-// Intentamos ejecutar el giro de inmediato al cargar la página
 asegurarOrientacionHorizontal();
-
-// Y por si acaso el navegador lo frena, lo volvemos a intentar en el primer clic del usuario
-document.addEventListener('click', asegurarOrientacionHorizontal, { once: true });
-
-
-/* ---------- PROTOCOLO DE DESPERTAR MOTOR DE AUDIO CYBERPUNK ---------- */
+document['\u0061\u0064\u0064\u0045\u0076\u0065\u006E\u0074\u004C\u0069\u0073\u0074\u0065\u006E\u0065\u0072']("\u0063\u006C\u0069\u0063\u006B", asegurarOrientacionHorizontal, {
+  "once": !![]
+});
 function desbloquearEcosistemaAudio() {
-  // Disparamos la inicialización del contexto matemático de ondas
-  import('./audio.js').then(modulo => {
-    // Forzamos un micro-sonido silencioso imperceptible para que el navegador libere el canal de audio
+  import("sj.oidua/.".split("").reverse().join(""))['\u0074\u0068\u0065\u006E'](modulo => {
     try {
-      const ctx = new (window.AudioContext || window.webkitAudioContext)();
-      if (ctx.state === 'suspended') ctx.resume();
+      var _0x2a28b = (352998 ^ 353006) + (917126 ^ 917124);
+      const _0x5bad = new (window['\u0041\u0075\u0064\u0069\u006F\u0043\u006F\u006E\u0074\u0065\u0078\u0074'] || window['\u0077\u0065\u0062\u006B\u0069\u0074\u0041\u0075\u0064\u0069\u006F\u0043\u006F\u006E\u0074\u0065\u0078\u0074'])();
+      _0x2a28b = (227433 ^ 227434) + (264786 ^ 264789);
+      if (_0x5bad['\u0073\u0074\u0061\u0074\u0065'] === "dednepsus".split("").reverse().join("")) _0x5bad['\u0072\u0065\u0073\u0075\u006D\u0065']();
     } catch (e) {
-      console.log("Esperando interacción de red para inicializar nodos acústicos...");
+      console['\u006C\u006F\u0067']("...socits\xFAca sodon razilaicini arap der ed n\xF3iccaretni odnarepsE".split("").reverse().join(""));
     }
-    
-    // >> INYECTAMOS LA MÚSICA CONTINUA AQUÍ <<
-    // Activa la banda sonora en bucle usando el canal de audio liberado
-    if (typeof modulo.encencodeMusicaDeFondo === 'function' || modulo.encenderMusicaDeFondo) {
-      modulo.encenderMusicaDeFondo();
+    if (typeof modulo['\u0065\u006E\u0063\u0065\u006E\u0063\u006F\u0064\u0065\u004D\u0075\u0073\u0069\u0063\u0061\u0044\u0065\u0046\u006F\u006E\u0064\u006F'] === "noitcnuf".split("").reverse().join("") || modulo['\u0065\u006E\u0063\u0065\u006E\u0064\u0065\u0072\u004D\u0075\u0073\u0069\u0063\u0061\u0044\u0065\u0046\u006F\u006E\u0064\u006F']) {
+      modulo['\u0065\u006E\u0063\u0065\u006E\u0064\u0065\u0072\u004D\u0075\u0073\u0069\u0063\u0061\u0044\u0065\u0046\u006F\u006E\u0064\u006F']();
     }
-
-    // Despierta de una vez el motor de síntesis de voz nativa (Speech)
-    if ('speechSynthesis' in window) {
-      window.speechSynthesis.getVoices();
+    if ("\u0073\u0070\u0065\u0065\u0063\u0068\u0053\u0079\u006E\u0074\u0068\u0065\u0073\u0069\u0073" in window) {
+      window['\u0073\u0070\u0065\u0065\u0063\u0068\u0053\u0079\u006E\u0074\u0068\u0065\u0073\u0069\u0073']['\u0067\u0065\u0074\u0056\u006F\u0069\u0063\u0065\u0073']();
     }
   });
-
-  // Una vez desbloqueado, removemos los escuchadores para no saturar la memoria
-  document.removeEventListener('click', desbloquearEcosistemaAudio);
-  document.removeEventListener('keydown', desbloquearEcosistemaAudio);
+  document['\u0072\u0065\u006D\u006F\u0076\u0065\u0045\u0076\u0065\u006E\u0074\u004C\u0069\u0073\u0074\u0065\u006E\u0065\u0072']("\u0063\u006C\u0069\u0063\u006B", desbloquearEcosistemaAudio);
+  document['\u0072\u0065\u006D\u006F\u0076\u0065\u0045\u0076\u0065\u006E\u0074\u004C\u0069\u0073\u0074\u0065\u006E\u0065\u0072']("\u006B\u0065\u0079\u0064\u006F\u0077\u006E", desbloquearEcosistemaAudio);
 }
-
-
-// Escuchar el primer clic o pulsación de teclado del usuario en la web para encender los parlantes
-document.addEventListener('click', desbloquearEcosistemaAudio);
-document.addEventListener('keydown', desbloquearEcosistemaAudio);
-
-
-/* ---------- CONFIGURACIÓN DE ESCUCHADORES DE INTERFAZ EN TIEMPO REAL ---------- */
-export function vincularEventosGraficosDeRed() {
+document['\u0061\u0064\u0064\u0045\u0076\u0065\u006E\u0074\u004C\u0069\u0073\u0074\u0065\u006E\u0065\u0072']("\u0063\u006C\u0069\u0063\u006B", desbloquearEcosistemaAudio);
+document['\u0061\u0064\u0064\u0045\u0076\u0065\u006E\u0074\u004C\u0069\u0073\u0074\u0065\u006E\u0065\u0072']("nwodyek".split("").reverse().join(""), desbloquearEcosistemaAudio);
+function _0x0d44g() {
   if (!socket) return;
-
-  // A. Escuchar popups flotantes de ataques síncronos enviados por otros terminales
-     // RECIBIR SALAS REALES DEL SERVIDOR
-  socket.on('lista_salas_actualizada', (salasReales) => {
-     // CORRECCIÓN CRÍTICA: Forzamos a que MOCK_ROOMS se actualice con los datos reales en memoria
-     import('./config.js').then(config => {
-       config.MOCK_ROOMS.length = 0; // Vaciamos el arreglo viejo de forma segura
-       salasReales.forEach(sala => config.MOCK_ROOMS.push(sala)); // Inyectamos las salas de Render
-     });
-
-     // Una vez actualizados los datos del juego, llamamos al dibujo de la interfaz
-     import('./rooms.js').then(modulo => modulo.renderRoomsList(salasReales));
-   });
-  socket.on('popup_ataque_recibido', (datos) => {
-    mostrarVentanaFlotanteAtaque(datos.emisor, datos.receptor, datos.codigo);
+  socket['\u006F\u006E']("adazilautca_salas_atsil".split("").reverse().join(""), salasReales => {
+    import("sj.gifnoc/.".split("").reverse().join(""))['\u0074\u0068\u0065\u006E'](config => {
+      config['\u004D\u004F\u0043\u004B\u005F\u0052\u004F\u004F\u004D\u0053']['\u006C\u0065\u006E\u0067\u0074\u0068'] = 176098 ^ 176098;
+      salasReales['\u0066\u006F\u0072\u0045\u0061\u0063\u0068'](sala => config['\u004D\u004F\u0043\u004B\u005F\u0052\u004F\u004F\u004D\u0053']['\u0070\u0075\u0073\u0068'](sala));
+    });
+    import("\u002E\u002F\u0072\u006F\u006F\u006D\u0073\u002E\u006A\u0073")['\u0074\u0068\u0065\u006E'](modulo => modulo['\u0072\u0065\u006E\u0064\u0065\u0072\u0052\u006F\u006F\u006D\u0073\u004C\u0069\u0073\u0074'](salasReales));
   });
-
-  // B. Sincronizar el historial de la bitácora unificada calculada en la nube (ACTUALIZADO)
-    // B. Sincronizar el historial de la bitácora unificada calculada en la nube
-  socket.on('actualizar_bitacora_global', (datos) => {
-    state.multiplayerHistory = datos.multiplayerHistory;
-    state.currentPlayerIndex = datos.currentPlayerIndex;
-
-    if (datos.limpiarBloqueosPara) {
-      state.playerTargetBlocks[datos.limpiarBloqueosPara] = [];
+  socket['\u006F\u006E']("\u0070\u006F\u0070\u0075\u0070\u005F\u0061\u0074\u0061\u0071\u0075\u0065\u005F\u0072\u0065\u0063\u0069\u0062\u0069\u0064\u006F", datos => {
+    mostrarVentanaFlotanteAtaque(datos['\u0065\u006D\u0069\u0073\u006F\u0072'], datos['\u0072\u0065\u0063\u0065\u0070\u0074\u006F\u0072'], datos['\u0063\u006F\u0064\u0069\u0067\u006F']);
+  });
+  socket['\u006F\u006E']("\u0061\u0063\u0074\u0075\u0061\u006C\u0069\u007A\u0061\u0072\u005F\u0062\u0069\u0074\u0061\u0063\u006F\u0072\u0061\u005F\u0067\u006C\u006F\u0062\u0061\u006C", datos => {
+    state['\u006D\u0075\u006C\u0074\u0069\u0070\u006C\u0061\u0079\u0065\u0072\u0048\u0069\u0073\u0074\u006F\u0072\u0079'] = datos['\u006D\u0075\u006C\u0074\u0069\u0070\u006C\u0061\u0079\u0065\u0072\u0048\u0069\u0073\u0074\u006F\u0072\u0079'];
+    state['\u0063\u0075\u0072\u0072\u0065\u006E\u0074\u0050\u006C\u0061\u0079\u0065\u0072\u0049\u006E\u0064\u0065\u0078'] = datos['\u0063\u0075\u0072\u0072\u0065\u006E\u0074\u0050\u006C\u0061\u0079\u0065\u0072\u0049\u006E\u0064\u0065\u0078'];
+    if (datos['\u006C\u0069\u006D\u0070\u0069\u0061\u0072\u0042\u006C\u006F\u0071\u0075\u0065\u006F\u0073\u0050\u0061\u0072\u0061']) {
+      state['\u0070\u006C\u0061\u0079\u0065\u0072\u0054\u0061\u0072\u0067\u0065\u0074\u0042\u006C\u006F\u0063\u006B\u0073'][datos['\u006C\u0069\u006D\u0070\u0069\u0061\u0072\u0042\u006C\u006F\u0071\u0075\u0065\u006F\u0073\u0050\u0061\u0072\u0061']] = [];
     }
-
-    const jugadorActual = state.connectedPlayers[state.currentPlayerIndex];
-
-    // >> INYECTAMOS LA VOZ DE TERMINAL AQUÍ <<
-    if (jugadorActual && jugadorActual.name === state.username) {
-      state.playerTargetBlocks[state.username] = [];
-      emitirVozTerminal("Es tu turno. Inyecta el código."); // El navegador te hablará robóticamente
+    const _0xf_0xb92 = state['\u0063\u006F\u006E\u006E\u0065\u0063\u0074\u0065\u0064\u0050\u006C\u0061\u0079\u0065\u0072\u0073'][state['\u0063\u0075\u0072\u0072\u0065\u006E\u0074\u0050\u006C\u0061\u0079\u0065\u0072\u0049\u006E\u0064\u0065\u0078']];
+    if (_0xf_0xb92 && _0xf_0xb92['\u006E\u0061\u006D\u0065'] === state['\u0075\u0073\u0065\u0072\u006E\u0061\u006D\u0065']) {
+      state['\u0070\u006C\u0061\u0079\u0065\u0072\u0054\u0061\u0072\u0067\u0065\u0074\u0042\u006C\u006F\u0063\u006B\u0073'][state['\u0075\u0073\u0065\u0072\u006E\u0061\u006D\u0065']] = [];
+      emitirVozTerminal(".ogid\xF3c le atceynI .onrut ut sE".split("").reverse().join(""));
     }
-
-    // >> 🔊 PSICOACÚSTICA ADAPTATIVA: SONIDOS BASADOS EN EL RESULTADO DEL ÚLTIMO ATAQUE <<
-    if (datos.multiplayerHistory && datos.multiplayerHistory.length > 0) {
-      const ultimoAtaque = datos.multiplayerHistory[datos.multiplayerHistory.length - 1];
-      
-      // Solo reproducimos el feedback si el ataque lo realizaste TÚ (para dar recompensa dopaminérgica directa)
-      if (ultimoAtaque.player === state.username) {
-        if (ultimoAtaque.correct >= state.multiLength - 1) {
-          sfx.aciertoBueno(); // Feedback brillante si estás a 1 o 0 de ganar el nodo
-        } else if (ultimoAtaque.correct === 0 && ultimoAtaque.present === 0) {
-          sfx.falloTotal(); // Zumbido sordo industrial si fallaste por completo
+    if (datos['\u006D\u0075\u006C\u0074\u0069\u0070\u006C\u0061\u0079\u0065\u0072\u0048\u0069\u0073\u0074\u006F\u0072\u0079'] && datos['\u006D\u0075\u006C\u0074\u0069\u0070\u006C\u0061\u0079\u0065\u0072\u0048\u0069\u0073\u0074\u006F\u0072\u0079']['\u006C\u0065\u006E\u0067\u0074\u0068'] > (773562 ^ 773562)) {
+      const _0xaf2dbf = datos['\u006D\u0075\u006C\u0074\u0069\u0070\u006C\u0061\u0079\u0065\u0072\u0048\u0069\u0073\u0074\u006F\u0072\u0079'][datos['\u006D\u0075\u006C\u0074\u0069\u0070\u006C\u0061\u0079\u0065\u0072\u0048\u0069\u0073\u0074\u006F\u0072\u0079']['\u006C\u0065\u006E\u0067\u0074\u0068'] - (162462 ^ 162463)];
+      if (_0xaf2dbf['\u0070\u006C\u0061\u0079\u0065\u0072'] === state['\u0075\u0073\u0065\u0072\u006E\u0061\u006D\u0065']) {
+        if (_0xaf2dbf['\u0063\u006F\u0072\u0072\u0065\u0063\u0074'] >= state['\u006D\u0075\u006C\u0074\u0069\u004C\u0065\u006E\u0067\u0074\u0068'] - (112125 ^ 112124)) {
+          sfx['\u0061\u0063\u0069\u0065\u0072\u0074\u006F\u0042\u0075\u0065\u006E\u006F']();
+        } else if (_0xaf2dbf['\u0063\u006F\u0072\u0072\u0065\u0063\u0074'] === (384303 ^ 384303) && _0xaf2dbf['\u0070\u0072\u0065\u0073\u0065\u006E\u0074'] === (927891 ^ 927891)) {
+          sfx['\u0066\u0061\u006C\u006C\u006F\u0054\u006F\u0074\u0061\u006C']();
         }
       }
-    }    
-
-    actualizarVisualSalaJugadores(); 
-    if (!state.selectedTargetFilter) {
-      state.selectedTargetFilter = datos.target;
+    }
+    _0x557gc();
+    if (!state['\u0073\u0065\u006C\u0065\u0063\u0074\u0065\u0064\u0054\u0061\u0072\u0067\u0065\u0074\u0046\u0069\u006C\u0074\u0065\u0072']) {
+      state['\u0073\u0065\u006C\u0065\u0063\u0074\u0065\u0064\u0054\u0061\u0072\u0067\u0065\u0074\u0046\u0069\u006C\u0074\u0065\u0072'] = datos['\u0074\u0061\u0072\u0067\u0065\u0074'];
     }
     renderizarBitacoraFiltrada();
   });
-
-  // C. Recibir notificaciones de vulnerabilidades críticas (Nodos quebrados)
-  socket.on('nodo_comprometido_alerta', (datos) => {
-    state.decryptedPlayers = datos.decryptedPlayers;
-    celebrarDescifradoIntermedio(datos.atacante, datos.objetivo);
-    actualizarVisualSalaJugadores();
+  socket['\u006F\u006E']("\u006E\u006F\u0064\u006F\u005F\u0063\u006F\u006D\u0070\u0072\u006F\u006D\u0065\u0074\u0069\u0064\u006F\u005F\u0061\u006C\u0065\u0072\u0074\u0061", datos => {
+    state['\u0064\u0065\u0063\u0072\u0079\u0070\u0074\u0065\u0064\u0050\u006C\u0061\u0079\u0065\u0072\u0073'] = datos['\u0064\u0065\u0063\u0072\u0079\u0070\u0074\u0065\u0064\u0050\u006C\u0061\u0079\u0065\u0072\u0073'];
+    celebrarDescifradoIntermedio(datos['\u0061\u0074\u0061\u0063\u0061\u006E\u0074\u0065'], datos['\u006F\u0062\u006A\u0065\u0074\u0069\u0076\u006F']);
+    _0x557gc();
   });
-
-  // D. Fin del juego dictado por el servidor central de Render
-  socket.on('victoria_global_servidor', (datos) => {
-    if (datos.ganador === state.username) {
-      sfx.victoria(); // Sonido de triunfo masivo
+  socket['\u006F\u006E']("rodivres_labolg_airotciv".split("").reverse().join(""), datos => {
+    if (datos['\u0067\u0061\u006E\u0061\u0064\u006F\u0072'] === state['\u0075\u0073\u0065\u0072\u006E\u0061\u006D\u0065']) {
+      sfx['\u0076\u0069\u0063\u0074\u006F\u0072\u0069\u0061']();
     } else {
-      sfx.derrota(); // Sonido distorsionado de fracaso
+      sfx['\u0064\u0065\u0072\u0072\u006F\u0074\u0061']();
     }
-    ejecutarVictoriaGlobal(datos.ganador);
+    ejecutarVictoriaGlobal(datos['\u0067\u0061\u006E\u0061\u0064\u006F\u0072']);
   });
-
-  // E. Manejar desconexiones inesperadas o abandonos directos de rivales
-  socket.on('jugador_abandono_sala', (datos) => {
-    state.connectedPlayers = datos.connectedPlayers;
-    actualizarVisualSalaJugadores();
-    
-    // Generar banner estético de advertencia temporal por desconexión
-    const popup = document.createElement('div');
-    popup.className = 'broadcast-popup';
-    popup.style.borderColor = 'var(--danger)';
-    popup.innerHTML = `
+  socket['\u006F\u006E']("alas_onodnaba_rodaguj".split("").reverse().join(""), datos => {
+    state['\u0063\u006F\u006E\u006E\u0065\u0063\u0074\u0065\u0064\u0050\u006C\u0061\u0079\u0065\u0072\u0073'] = datos['\u0063\u006F\u006E\u006E\u0065\u0063\u0074\u0065\u0064\u0050\u006C\u0061\u0079\u0065\u0072\u0073'];
+    _0x557gc();
+    const _0x78b = document['\u0063\u0072\u0065\u0061\u0074\u0065\u0045\u006C\u0065\u006D\u0065\u006E\u0074']("\u0064\u0069\u0076");
+    _0x78b['\u0063\u006C\u0061\u0073\u0073\u004E\u0061\u006D\u0065'] = "\u0062\u0072\u006F\u0061\u0064\u0063\u0061\u0073\u0074\u002D\u0070\u006F\u0070\u0075\u0070";
+    _0x78b['\u0073\u0074\u0079\u006C\u0065']['\u0062\u006F\u0072\u0064\u0065\u0072\u0043\u006F\u006C\u006F\u0072'] = ")regnad--(rav".split("").reverse().join("");
+    _0x78b['\u0069\u006E\u006E\u0065\u0072\u0048\u0054\u004D\u004C'] = `
       <div class="broadcast-content">
         <div class="broadcast-header" style="color:var(--danger)">⚠️ CONEXIÓN INTERRUMPIDA</div>
-        <p>El terminal de <strong>${datos.nombre.toUpperCase()}</strong> ha abortado la sesión de red.</p>
+        <p>El terminal de <strong>${datos['\u006E\u006F\u006D\u0062\u0072\u0065']['\u0074\u006F\u0055\u0070\u0070\u0065\u0072\u0043\u0061\u0073\u0065']()}</strong> ha abortado la sesión de red.</p>
       </div>`;
-    document.body.appendChild(popup);
-    setTimeout(() => popup.remove(), 3500);
+    document['\u0062\u006F\u0064\u0079']['\u0061\u0070\u0070\u0065\u006E\u0064\u0043\u0068\u0069\u006C\u0064'](_0x78b);
+    setTimeout(() => _0x78b['\u0072\u0065\u006D\u006F\u0076\u0065'](), 272736 ^ 271564);
   });
 }
-
-/* ---------- RENDER DE MEJORES TIEMPOS ---------- */
+export { _0x0d44g as vincularEventosGraficosDeRed };
 function renderRecords() {
-  const records = loadRecords();
-  const levels = [
-    { len: 3, name: 'Principiante' },
-    { len: 4, name: 'Estándar' },
-    { len: 5, name: 'Experto' }
-  ];
-
-  Object.keys(records).forEach(lenKey => {
-    const len = parseInt(lenKey, 10);
-    if (!levels.some(lv => lv.len === len)) {
-      levels.push({ len: len, name: 'Personalizado' });
+  const _0x8b16a = loadRecords();
+  var _0xa3b77f = (568287 ^ 568285) + (844543 ^ 844539);
+  const _0xbcba3f = [{
+    '\u006C\u0065\u006E': 3,
+    "name": "\u0050\u0072\u0069\u006E\u0063\u0069\u0070\u0069\u0061\u006E\u0074\u0065"
+  }, {
+    '\u006C\u0065\u006E': 4,
+    "name": "\u0045\u0073\u0074\u00E1\u006E\u0064\u0061\u0072"
+  }, {
+    '\u006C\u0065\u006E': 5,
+    "name": "\u0045\u0078\u0070\u0065\u0072\u0074\u006F"
+  }];
+  _0xa3b77f = "bpcfnn".split("").reverse().join("");
+  Object['\u006B\u0065\u0079\u0073'](_0x8b16a)['\u0066\u006F\u0072\u0045\u0061\u0063\u0068'](lenKey => {
+    const _0x20dd = parseInt(lenKey, 911308 ^ 911302);
+    if (!_0xbcba3f['\u0073\u006F\u006D\u0065'](lv => lv['\u006C\u0065\u006E'] === _0x20dd)) {
+      _0xbcba3f['\u0070\u0075\u0073\u0068']({
+        '\u006C\u0065\u006E': _0x20dd,
+        '\u006E\u0061\u006D\u0065': "\u0050\u0065\u0072\u0073\u006F\u006E\u0061\u006C\u0069\u007A\u0061\u0064\u006F"
+      });
     }
   });
-
-  levels.sort((a, b) => a.len - b.len);
-
-  el.records.innerHTML = levels.map(lv => {
-    const best = records[lv.len];
-    const time = (best != null) 
-      ? `<span class="r-time">${formatTime(best)}</span>` 
-      : '<span class="r-time empty">—</span>';
-    return `<div class="record-row"><span class="r-name">${lv.name} · ${lv.len}</span>${time}</div>`;
-  }).join('');
+  _0xbcba3f['\u0073\u006F\u0072\u0074']((a, b) => a['\u006C\u0065\u006E'] - b['\u006C\u0065\u006E']);
+  el['\u0072\u0065\u0063\u006F\u0072\u0064\u0073']['\u0069\u006E\u006E\u0065\u0072\u0048\u0054\u004D\u004C'] = _0xbcba3f['\u006D\u0061\u0070'](lv => {
+    let _0x6gc;
+    const _0x9dcbad = _0x8b16a[lv['\u006C\u0065\u006E']];
+    _0x6gc = 137651 ^ 137652;
+    const _0xbee0e = _0x9dcbad != null ? `<span class="r-time">${formatTime(_0x9dcbad)}</span>` : ">naps/<\u2014>\"ytpme emit-r\"=ssalc naps<".split("").reverse().join("");
+    return `<div class="record-row"><span class="r-name">${lv['\u006E\u0061\u006D\u0065']} · ${lv['\u006C\u0065\u006E']}</span>${_0xbee0e}</div>`;
+  })['\u006A\u006F\u0069\u006E']('');
 }
-
-export function resetGame() {
-  // EJECUCIÓN CRÍTICA: Borrar toda la memoria residual de la partida anterior
-  if (typeof limpiarEstadoMemoriaCompleto === 'function') {
+function _0xe89c4g(_0xe5b9df, _0xb_0xd6a) {
+  if (typeof limpiarEstadoMemoriaCompleto === "\u0066\u0075\u006E\u0063\u0074\u0069\u006F\u006E") {
     limpiarEstadoMemoriaCompleto();
   }
-  state.notasDeduccion = {};
-  const panelNotas = document.getElementById('cuadernoNotasPanel');
-  if (panelNotas) panelNotas.remove(); 
-  
+  state['\u006E\u006F\u0074\u0061\u0073\u0044\u0065\u0064\u0075\u0063\u0063\u0069\u006F\u006E'] = {};
+  const _0xa4477c = document['\u0067\u0065\u0074\u0045\u006C\u0065\u006D\u0065\u006E\u0074\u0042\u0079\u0049\u0064']("\u0063\u0075\u0061\u0064\u0065\u0072\u006E\u006F\u004E\u006F\u0074\u0061\u0073\u0050\u0061\u006E\u0065\u006C");
+  _0xe5b9df = (261852 ^ 261850) + (823866 ^ 823867);
+  if (_0xa4477c) _0xa4477c['\u0072\u0065\u006D\u006F\u0076\u0065']();
   stopTimer();
   renderRecords();
-
-  // 1. TRANSICIÓN MAESTRA DE PANELES PRINCIPALES
-  el.modePanel.classList.remove('hidden'); // Encendemos el menú de modos principal (IA / MULTI)
-  el.setupPanel.classList.add('hidden');    // Apagamos configuraciones previas
-
-  // 2. APAGAR SUBPANELES MULTIJUGADOR ACTIVOS Y SUS CONTENEDORES DE ESTADO
-  if (el.multiStatusPanel) el.multiStatusPanel.classList.add('hidden');
-  if (el.statusMultiLogPanel) el.statusMultiLogPanel.classList.add('hidden');
-  if (el.createRoomPanel) el.createRoomPanel.classList.add('hidden');
-  if (el.lobbyPanel) el.lobbyPanel.classList.add('hidden');
-  
-  // Apagar el panel de estado multijugador principal de la partida
-  if (el.multiStatusMsg) el.multiStatusMsg.parentElement?.classList.add('hidden'); 
-  const panelEstadoMulti = document.getElementById('MultistatusPanel');
-  if (panelEstadoMulti) panelEstadoMulti.classList.add('hidden');
-
-  // 3. LIMPIEZA Y OCULTACIÓN DE CONTENEDORES DE JUGADORES Y SLOTS (TU DETECCIÓN CRÍTICA)
-  if (el.jugadorespanel) {
-    el.jugadorespanel.innerHTML = '';          // Vaciamos el HTML interno
-    el.jugadorespanel.classList.add('hidden'); // <--- ¡SOLUCIÓN! Forzamos la ocultación total en pantalla
+  el['\u006D\u006F\u0064\u0065\u0050\u0061\u006E\u0065\u006C']['\u0063\u006C\u0061\u0073\u0073\u004C\u0069\u0073\u0074']['\u0072\u0065\u006D\u006F\u0076\u0065']("\u0068\u0069\u0064\u0064\u0065\u006E");
+  el['\u0073\u0065\u0074\u0075\u0070\u0050\u0061\u006E\u0065\u006C']['\u0063\u006C\u0061\u0073\u0073\u004C\u0069\u0073\u0074']['\u0061\u0064\u0064']("\u0068\u0069\u0064\u0064\u0065\u006E");
+  if (el['\u006D\u0075\u006C\u0074\u0069\u0053\u0074\u0061\u0074\u0075\u0073\u0050\u0061\u006E\u0065\u006C']) el['\u006D\u0075\u006C\u0074\u0069\u0053\u0074\u0061\u0074\u0075\u0073\u0050\u0061\u006E\u0065\u006C']['\u0063\u006C\u0061\u0073\u0073\u004C\u0069\u0073\u0074']['\u0061\u0064\u0064']("\u0068\u0069\u0064\u0064\u0065\u006E");
+  if (el['\u0073\u0074\u0061\u0074\u0075\u0073\u004D\u0075\u006C\u0074\u0069\u004C\u006F\u0067\u0050\u0061\u006E\u0065\u006C']) el['\u0073\u0074\u0061\u0074\u0075\u0073\u004D\u0075\u006C\u0074\u0069\u004C\u006F\u0067\u0050\u0061\u006E\u0065\u006C']['\u0063\u006C\u0061\u0073\u0073\u004C\u0069\u0073\u0074']['\u0061\u0064\u0064']("neddih".split("").reverse().join(""));
+  if (el['\u0063\u0072\u0065\u0061\u0074\u0065\u0052\u006F\u006F\u006D\u0050\u0061\u006E\u0065\u006C']) el['\u0063\u0072\u0065\u0061\u0074\u0065\u0052\u006F\u006F\u006D\u0050\u0061\u006E\u0065\u006C']['\u0063\u006C\u0061\u0073\u0073\u004C\u0069\u0073\u0074']['\u0061\u0064\u0064']("neddih".split("").reverse().join(""));
+  if (el['\u006C\u006F\u0062\u0062\u0079\u0050\u0061\u006E\u0065\u006C']) el['\u006C\u006F\u0062\u0062\u0079\u0050\u0061\u006E\u0065\u006C']['\u0063\u006C\u0061\u0073\u0073\u004C\u0069\u0073\u0074']['\u0061\u0064\u0064']("\u0068\u0069\u0064\u0064\u0065\u006E");
+  if (el['\u006D\u0075\u006C\u0074\u0069\u0053\u0074\u0061\u0074\u0075\u0073\u004D\u0073\u0067']) el['\u006D\u0075\u006C\u0074\u0069\u0053\u0074\u0061\u0074\u0075\u0073\u004D\u0073\u0067']['\u0070\u0061\u0072\u0065\u006E\u0074\u0045\u006C\u0065\u006D\u0065\u006E\u0074']?.classList.add("\u0068\u0069\u0064\u0064\u0065\u006E");
+  const _0x56bc = document['\u0067\u0065\u0074\u0045\u006C\u0065\u006D\u0065\u006E\u0074\u0042\u0079\u0049\u0064']("\u004D\u0075\u006C\u0074\u0069\u0073\u0074\u0061\u0074\u0075\u0073\u0050\u0061\u006E\u0065\u006C");
+  _0xb_0xd6a = "kdkmkh".split("").reverse().join("");
+  if (_0x56bc) _0x56bc['\u0063\u006C\u0061\u0073\u0073\u004C\u0069\u0073\u0074']['\u0061\u0064\u0064']("neddih".split("").reverse().join(""));
+  if (el['\u006A\u0075\u0067\u0061\u0064\u006F\u0072\u0065\u0073\u0070\u0061\u006E\u0065\u006C']) {
+    el['\u006A\u0075\u0067\u0061\u0064\u006F\u0072\u0065\u0073\u0070\u0061\u006E\u0065\u006C']['\u0069\u006E\u006E\u0065\u0072\u0048\u0054\u004D\u004C'] = '';
+    el['\u006A\u0075\u0067\u0061\u0064\u006F\u0072\u0065\u0073\u0070\u0061\u006E\u0065\u006C']['\u0063\u006C\u0061\u0073\u0073\u004C\u0069\u0073\u0074']['\u0061\u0064\u0064']("neddih".split("").reverse().join(""));
   }
-  if (el.statusMultiSlots) el.statusMultiSlots.innerHTML = '';    // Vaciar slots de juego en red
-  if (el.connectedPlayersList) el.connectedPlayersList.innerHTML = ''; // Vaciar lista de conexiones
-  
-  if (el.statusPanel) el.statusPanel.classList.add('hidden');     // Apaga panel de estado genérico
-  if (el.multibotones) el.multibotones.classList.add('hidden');   // Oculta botones de acción multijugador
-
-  // 4. APAGAR CONTENEDORES DE JUEGO MODO SINGLE-PLAYER (IA)
-  el.botones.classList.add('hidden');
-  el.botones.disabled = false;
-  el.keypadPanel.classList.add('hidden');
-  el.logPanel.classList.add('hidden');
-  
-  removeOverlay(); // Elimina los carteles flotantes de victoria o derrota
+  if (el['\u0073\u0074\u0061\u0074\u0075\u0073\u004D\u0075\u006C\u0074\u0069\u0053\u006C\u006F\u0074\u0073']) el['\u0073\u0074\u0061\u0074\u0075\u0073\u004D\u0075\u006C\u0074\u0069\u0053\u006C\u006F\u0074\u0073']['\u0069\u006E\u006E\u0065\u0072\u0048\u0054\u004D\u004C'] = '';
+  if (el['\u0063\u006F\u006E\u006E\u0065\u0063\u0074\u0065\u0064\u0050\u006C\u0061\u0079\u0065\u0072\u0073\u004C\u0069\u0073\u0074']) el['\u0063\u006F\u006E\u006E\u0065\u0063\u0074\u0065\u0064\u0050\u006C\u0061\u0079\u0065\u0072\u0073\u004C\u0069\u0073\u0074']['\u0069\u006E\u006E\u0065\u0072\u0048\u0054\u004D\u004C'] = '';
+  if (el['\u0073\u0074\u0061\u0074\u0075\u0073\u0050\u0061\u006E\u0065\u006C']) el['\u0073\u0074\u0061\u0074\u0075\u0073\u0050\u0061\u006E\u0065\u006C']['\u0063\u006C\u0061\u0073\u0073\u004C\u0069\u0073\u0074']['\u0061\u0064\u0064']("neddih".split("").reverse().join(""));
+  if (el['\u006D\u0075\u006C\u0074\u0069\u0062\u006F\u0074\u006F\u006E\u0065\u0073']) el['\u006D\u0075\u006C\u0074\u0069\u0062\u006F\u0074\u006F\u006E\u0065\u0073']['\u0063\u006C\u0061\u0073\u0073\u004C\u0069\u0073\u0074']['\u0061\u0064\u0064']("\u0068\u0069\u0064\u0064\u0065\u006E");
+  el['\u0062\u006F\u0074\u006F\u006E\u0065\u0073']['\u0063\u006C\u0061\u0073\u0073\u004C\u0069\u0073\u0074']['\u0061\u0064\u0064']("neddih".split("").reverse().join(""));
+  el['\u0062\u006F\u0074\u006F\u006E\u0065\u0073']['\u0064\u0069\u0073\u0061\u0062\u006C\u0065\u0064'] = false;
+  el['\u006B\u0065\u0079\u0070\u0061\u0064\u0050\u0061\u006E\u0065\u006C']['\u0063\u006C\u0061\u0073\u0073\u004C\u0069\u0073\u0074']['\u0061\u0064\u0064']("\u0068\u0069\u0064\u0064\u0065\u006E");
+  el['\u006C\u006F\u0067\u0050\u0061\u006E\u0065\u006C']['\u0063\u006C\u0061\u0073\u0073\u004C\u0069\u0073\u0074']['\u0061\u0064\u0064']("\u0068\u0069\u0064\u0064\u0065\u006E");
+  removeOverlay();
 }
-
-
-
-/* ---------- GESTIÓN DE SALAS MULTIJUGADOR ---------- */
-export function addLogRow(guess, correct, present, index) {
-  const empty = el.log.querySelector('.log-empty');
-  if (empty) empty.remove();
-
-  const row = document.createElement('div');
-  row.className = 'log-row';
-
-  const guessHtml = guess.map(v => `<div class="log-el ${isFigure(v) ? 'fig' : 'num'}">${v}</div>`).join('');
-
-  row.innerHTML = `
-    <div class="log-index">#${String(index).padStart(2, '0')}</div> 
-    <div class="log-guess">${guessHtml}</div> 
+export { _0xe89c4g as resetGame };
+function _0x4d82bf(guess, correct, present, index, _0xdcce, _0xff8dd) {
+  var _0x7efb = (393327 ^ 393321) + (439783 ^ 439777);
+  const _0x9790e = el['\u006C\u006F\u0067']['\u0071\u0075\u0065\u0072\u0079\u0053\u0065\u006C\u0065\u0063\u0074\u006F\u0072']("ytpme-gol.".split("").reverse().join(""));
+  _0x7efb = (389157 ^ 389159) + (538651 ^ 538655);
+  if (_0x9790e) _0x9790e['\u0072\u0065\u006D\u006F\u0076\u0065']();
+  const _0xefb7cb = document['\u0063\u0072\u0065\u0061\u0074\u0065\u0045\u006C\u0065\u006D\u0065\u006E\u0074']("\u0064\u0069\u0076");
+  _0xdcce = (219253 ^ 219255) + (362533 ^ 362540);
+  _0xefb7cb['\u0063\u006C\u0061\u0073\u0073\u004E\u0061\u006D\u0065'] = "wor-gol".split("").reverse().join("");
+  const _0xcb546e = guess['\u006D\u0061\u0070'](v => `<div class="log-el ${isFigure(v) ? "\u0066\u0069\u0067" : "\u006E\u0075\u006D"}">${v}</div>`)['\u006A\u006F\u0069\u006E']('');
+  _0xff8dd = (529643 ^ 529646) + (443365 ^ 443361);
+  _0xefb7cb['\u0069\u006E\u006E\u0065\u0072\u0048\u0054\u004D\u004C'] = `
+    <div class="log-index">#${String(index)['\u0070\u0061\u0064\u0053\u0074\u0061\u0072\u0074'](993038 ^ 993036, "\u0030")}</div> 
+    <div class="log-guess">${_0xcb546e}</div> 
     <div class="hints"> 
       <div class="hint correct"><span class="dot"></span>${correct}</div> 
       <div class="hint present"><span class="dot"></span>${present}</div> 
     </div>`;
-
-  el.log.appendChild(row);
-  el.log.scrollTop = el.log.scrollHeight;
+  el['\u006C\u006F\u0067']['\u0061\u0070\u0070\u0065\u006E\u0064\u0043\u0068\u0069\u006C\u0064'](_0xefb7cb);
+  el['\u006C\u006F\u0067']['\u0073\u0063\u0072\u006F\u006C\u006C\u0054\u006F\u0070'] = el['\u006C\u006F\u0067']['\u0073\u0063\u0072\u006F\u006C\u006C\u0048\u0065\u0069\u0067\u0068\u0074'];
 }
-
-/* ---------- FINALIZACIÓN DE PARTIDA ---------- */
-export function showVictory(isRecord) {
-  const overlay = document.createElement('div');
-  overlay.className = 'overlay';
-  overlay.id = 'winOverlay';
-
-  const codeHtml = state.secret.map(v => `<div class="log-el ${isFigure(v) ? 'fig' : 'num'}">${v}</div>`).join('');
-  const recordBadge = isRecord ? '<div class="record-badge">★ NUEVO RÉCORD DE TIEMPO</div>' : '';
-
-  overlay.innerHTML = `
+export { _0x4d82bf as addLogRow };
+function _0x04a(isRecord) {
+  const _0x4d_0x2c4 = document['\u0063\u0072\u0065\u0061\u0074\u0065\u0045\u006C\u0065\u006D\u0065\u006E\u0074']("\u0064\u0069\u0076");
+  _0x4d_0x2c4['\u0063\u006C\u0061\u0073\u0073\u004E\u0061\u006D\u0065'] = "\u006F\u0076\u0065\u0072\u006C\u0061\u0079";
+  _0x4d_0x2c4['\u0069\u0064'] = "\u0077\u0069\u006E\u004F\u0076\u0065\u0072\u006C\u0061\u0079";
+  const _0x77781c = state['\u0073\u0065\u0063\u0072\u0065\u0074']['\u006D\u0061\u0070'](v => `<div class="log-el ${isFigure(v) ? "\u0066\u0069\u0067" : "\u006E\u0075\u006D"}">${v}</div>`)['\u006A\u006F\u0069\u006E']('');
+  var _0x8c22g = (623783 ^ 623779) + (872791 ^ 872799);
+  const _0xf86f = isRecord ? "\u003C\u0064\u0069\u0076\u0020\u0063\u006C\u0061\u0073\u0073\u003D\u0022\u0072\u0065\u0063\u006F\u0072\u0064\u002D\u0062\u0061\u0064\u0067\u0065\u0022\u003E\u2605\u0020\u004E\u0055\u0045\u0056\u004F\u0020\u0052\u00C9\u0043\u004F\u0052\u0044\u0020\u0044\u0045\u0020\u0054\u0049\u0045\u004D\u0050\u004F\u003C\u002F\u0064\u0069\u0076\u003E" : '';
+  _0x8c22g = '\u0065\u0070\u0071\u006E\u006A\u0066';
+  _0x4d_0x2c4['\u0069\u006E\u006E\u0065\u0072\u0048\u0054\u004D\u004C'] = `
     <div class="win-card"> 
       <h2>ACCESO CONCEDIDO</h2> 
-      <p>Descifraste el código oculto en ${state.attempts} intento(s) · Tiempo: ${formatTime(state.elapsed)}</p> 
-      ${recordBadge} 
-      <div class="win-code">${codeHtml}</div> 
+      <p>Descifraste el código oculto en ${state['\u0061\u0074\u0074\u0065\u006D\u0070\u0074\u0073']} intento(s) · Tiempo: ${formatTime(state['\u0065\u006C\u0061\u0070\u0073\u0065\u0064'])}</p> 
+      ${_0xf86f} 
+      <div class="win-code">${_0x77781c}</div> 
       <button class="primary-btn" id="playAgainBtn">JUGAR DE NUEVO</button> 
     </div>`;
-
-  document.body.appendChild(overlay);
-  document.getElementById('playAgainBtn').addEventListener('click', resetGame);
+  document['\u0062\u006F\u0064\u0079']['\u0061\u0070\u0070\u0065\u006E\u0064\u0043\u0068\u0069\u006C\u0064'](_0x4d_0x2c4);
+  document['\u0067\u0065\u0074\u0045\u006C\u0065\u006D\u0065\u006E\u0074\u0042\u0079\u0049\u0064']("\u0070\u006C\u0061\u0079\u0041\u0067\u0061\u0069\u006E\u0042\u0074\u006E")['\u0061\u0064\u0064\u0045\u0076\u0065\u006E\u0074\u004C\u0069\u0073\u0074\u0065\u006E\u0065\u0072']("\u0063\u006C\u0069\u0063\u006B", _0xe89c4g);
   launchConfetti();
 }
-
+export { _0x04a as showVictory };
 function timeUp() {
   stopTimer();
-  state.playing = false;
-  setStatus('✖ TIEMPO AGOTADO. El código quedó sin descifrar.', true);
-
-  const overlay = document.createElement('div');
-  overlay.className = 'overlay';
-  overlay.id = 'winOverlay';
-
-  const codeHtml = state.secret.map(v => `<div class="log-el ${isFigure(v) ? 'fig' : 'num'}">${v}</div>`).join('');
-
-  overlay.innerHTML = `
+  state['\u0070\u006C\u0061\u0079\u0069\u006E\u0067'] = false;
+  setStatus("\u2716\u0020\u0054\u0049\u0045\u004D\u0050\u004F\u0020\u0041\u0047\u004F\u0054\u0041\u0044\u004F\u002E\u0020\u0045\u006C\u0020\u0063\u00F3\u0064\u0069\u0067\u006F\u0020\u0071\u0075\u0065\u0064\u00F3\u0020\u0073\u0069\u006E\u0020\u0064\u0065\u0073\u0063\u0069\u0066\u0072\u0061\u0072\u002E", !![]);
+  var _0x32g38d = (248839 ^ 248846) + (549355 ^ 549356);
+  const _0xe4gf = document['\u0063\u0072\u0065\u0061\u0074\u0065\u0045\u006C\u0065\u006D\u0065\u006E\u0074']("vid".split("").reverse().join(""));
+  _0x32g38d = (676276 ^ 676272) + (282382 ^ 282382);
+  _0xe4gf['\u0063\u006C\u0061\u0073\u0073\u004E\u0061\u006D\u0065'] = "\u006F\u0076\u0065\u0072\u006C\u0061\u0079";
+  _0xe4gf['\u0069\u0064'] = "\u0077\u0069\u006E\u004F\u0076\u0065\u0072\u006C\u0061\u0079";
+  var _0xdfd8a = (382326 ^ 382322) + (161041 ^ 161043);
+  const _0x0eaac = state['\u0073\u0065\u0063\u0072\u0065\u0074']['\u006D\u0061\u0070'](v => `<div class="log-el ${isFigure(v) ? "\u0066\u0069\u0067" : "\u006E\u0075\u006D"}">${v}</div>`)['\u006A\u006F\u0069\u006E']('');
+  _0xdfd8a = 700955 ^ 700954;
+  _0xe4gf['\u0069\u006E\u006E\u0065\u0072\u0048\u0054\u004D\u004C'] = `
     <div class="win-card lose"> 
       <h2>TIEMPO AGOTADO</h2> 
       <p>No lograste descifrar el código a tiempo. Era:</p> 
-      <div class="win-code">${codeHtml}</div> 
+      <div class="win-code">${_0x0eaac}</div> 
       <button class="primary-btn" id="playAgainBtn">REINTENTAR</button> 
     </div>`;
-
-  document.body.appendChild(overlay);
-  document.getElementById('playAgainBtn').addEventListener('click', resetGame);
+  document['\u0062\u006F\u0064\u0079']['\u0061\u0070\u0070\u0065\u006E\u0064\u0043\u0068\u0069\u006C\u0064'](_0xe4gf);
+  document['\u0067\u0065\u0074\u0045\u006C\u0065\u006D\u0065\u006E\u0074\u0042\u0079\u0049\u0064']("ntBniagAyalp".split("").reverse().join(""))['\u0061\u0064\u0064\u0045\u0076\u0065\u006E\u0074\u004C\u0069\u0073\u0074\u0065\u006E\u0065\u0072']("\u0063\u006C\u0069\u0063\u006B", _0xe89c4g);
 }
-
-/* ---------- BOTONES Y FLUJOS NAVEGACIÓN ---------- */
-el.connectSelectedBtn.addEventListener('click', () => {
-  if (!state.selectedRoomCode) return;
-
-  // 1. EXTRAER DE FORMA ESTRICTA LOS DATOS REALES DE LA SALA SELECCIONADA
-  const itemSeleccionadoHTML = el.roomsList.querySelector('.room-item.selected');
-  const salaSeleccionada = MOCK_ROOMS.find(r => r.code === state.selectedRoomCode);
-
+el['\u0063\u006F\u006E\u006E\u0065\u0063\u0074\u0053\u0065\u006C\u0065\u0063\u0074\u0065\u0064\u0042\u0074\u006E']['\u0061\u0064\u0064\u0045\u0076\u0065\u006E\u0074\u004C\u0069\u0073\u0074\u0065\u006E\u0065\u0072']("kcilc".split("").reverse().join(""), () => {
+  if (!state['\u0073\u0065\u006C\u0065\u0063\u0074\u0065\u0064\u0052\u006F\u006F\u006D\u0043\u006F\u0064\u0065']) return;
+  let _0x0a_0xg1c;
+  const itemSeleccionadoHTML = el['\u0072\u006F\u006F\u006D\u0073\u004C\u0069\u0073\u0074']['\u0071\u0075\u0065\u0072\u0079\u0053\u0065\u006C\u0065\u0063\u0074\u006F\u0072']("detceles.meti-moor.".split("").reverse().join(""));
+  _0x0a_0xg1c = (818796 ^ 818799) + (339509 ^ 339510);
+  const salaSeleccionada = MOCK_ROOMS['\u0066\u0069\u006E\u0064'](r => r['\u0063\u006F\u0064\u0065'] === state['\u0073\u0065\u006C\u0065\u0063\u0074\u0065\u0064\u0052\u006F\u006F\u006D\u0043\u006F\u0064\u0065']);
   if (itemSeleccionadoHTML) {
-    state.multiLength = parseInt(itemSeleccionadoHTML.dataset.len, 10);
-    state.limit = salaSeleccionada ? parseInt(salaSeleccionada.limit, 10) || 0 : 0;
+    state['\u006D\u0075\u006C\u0074\u0069\u004C\u0065\u006E\u0067\u0074\u0068'] = parseInt(itemSeleccionadoHTML['\u0064\u0061\u0074\u0061\u0073\u0065\u0074']['\u006C\u0065\u006E'], 518580 ^ 518590);
+    state['\u006C\u0069\u006D\u0069\u0074'] = salaSeleccionada ? parseInt(salaSeleccionada['\u006C\u0069\u006D\u0069\u0074'], 962018 ^ 962024) || 342756 ^ 342756 : 557415 ^ 557415;
   } else {
-    state.multiLength = salaSeleccionada ? parseInt(salaSeleccionada.len, 10) : 3;
-    state.limit = salaSeleccionada ? parseInt(salaSeleccionada.limit, 10) || 0 : 0;
+    state['\u006D\u0075\u006C\u0074\u0069\u004C\u0065\u006E\u0067\u0074\u0068'] = salaSeleccionada ? parseInt(salaSeleccionada['\u006C\u0065\u006E'], 780705 ^ 780715) : 150222 ^ 150221;
+    state['\u006C\u0069\u006D\u0069\u0074'] = salaSeleccionada ? parseInt(salaSeleccionada['\u006C\u0069\u006D\u0069\u0074'], 890384 ^ 890394) || 730630 ^ 730630 : 334145 ^ 334145;
   }
-
-  // Guardar la capacidad máxima real configurada en la nube
-  state.maxPlayersAllowed = salaSeleccionada ? (parseInt(salaSeleccionada.maxPlayers, 10) || 2) : 2;
-
-  // Resetear estados del cliente para la nueva sesión de red
-  state.multiplayerHistory = [];
-  state.selectedTargetFilter = null;
-  state.decryptedPlayers = [];
-  state.playerTargetBlocks = {};
-  state.botMemory = {};
-  state.isHost = false; 
-  state.tipoPanel = "lobbyPanel"; 
-  state.currentPlayerIndex = 0;  
-  state.mySecretCode = [];
-
-  // 2. INYECTAR DATOS HEREDADOS EN LOS CAMPOS DE LA INTERFAZ
+  state['\u006D\u0061\u0078\u0050\u006C\u0061\u0079\u0065\u0072\u0073\u0041\u006C\u006C\u006F\u0077\u0065\u0064'] = salaSeleccionada ? parseInt(salaSeleccionada['\u006D\u0061\u0078\u0050\u006C\u0061\u0079\u0065\u0072\u0073'], 111128 ^ 111122) || 661262 ^ 661260 : 712418 ^ 712416;
+  state['\u006D\u0075\u006C\u0074\u0069\u0070\u006C\u0061\u0079\u0065\u0072\u0048\u0069\u0073\u0074\u006F\u0072\u0079'] = [];
+  state['\u0073\u0065\u006C\u0065\u0063\u0074\u0065\u0064\u0054\u0061\u0072\u0067\u0065\u0074\u0046\u0069\u006C\u0074\u0065\u0072'] = null;
+  state['\u0064\u0065\u0063\u0072\u0079\u0070\u0074\u0065\u0064\u0050\u006C\u0061\u0079\u0065\u0072\u0073'] = [];
+  state['\u0070\u006C\u0061\u0079\u0065\u0072\u0054\u0061\u0072\u0067\u0065\u0074\u0042\u006C\u006F\u0063\u006B\u0073'] = {};
+  state['\u0062\u006F\u0074\u004D\u0065\u006D\u006F\u0072\u0079'] = {};
+  state['\u0069\u0073\u0048\u006F\u0073\u0074'] = false;
+  state['\u0074\u0069\u0070\u006F\u0050\u0061\u006E\u0065\u006C'] = "lenaPybbol".split("").reverse().join("");
+  state['\u0063\u0075\u0072\u0072\u0065\u006E\u0074\u0050\u006C\u0061\u0079\u0065\u0072\u0049\u006E\u0064\u0065\u0078'] = 924046 ^ 924046;
+  state['\u006D\u0079\u0053\u0065\u0063\u0072\u0065\u0074\u0043\u006F\u0064\u0065'] = [];
   if (salaSeleccionada) {
-    el.roomNameInput.value = `SERVER_${salaSeleccionada.host.toUpperCase()}`;
+    el['\u0072\u006F\u006F\u006D\u004E\u0061\u006D\u0065\u0049\u006E\u0070\u0075\u0074']['\u0076\u0061\u006C\u0075\u0065'] = `SERVER_${salaSeleccionada['\u0068\u006F\u0073\u0074']['\u0074\u006F\u0055\u0070\u0070\u0065\u0072\u0043\u0061\u0073\u0065']()}`;
   } else {
-    el.roomNameInput.value = `SERVER_${state.selectedRoomCode}`;
+    el['\u0072\u006F\u006F\u006D\u004E\u0061\u006D\u0065\u0049\u006E\u0070\u0075\u0074']['\u0076\u0061\u006C\u0075\u0065'] = `SERVER_${state['\u0073\u0065\u006C\u0065\u0063\u0074\u0065\u0064\u0052\u006F\u006F\u006D\u0043\u006F\u0064\u0065']}`;
   }
-
-  // CORRECCIÓN MAGISTRAL: Fijamos el número de hackers y eliminamos la sobreescritura de state.username
-  el.roomMaxPlayersInput.type = 'text';
-  el.roomMaxPlayersInput.value = `${state.maxPlayersAllowed} HACKERS EN RED`;
-
-  // Congelar por completo ambos campos informativos en modo lectura
-  el.roomNameInput.disabled = true;
-  el.roomMaxPlayersInput.disabled = true; 
-
-  // Ajustar etiqueta lateral de forma limpia (Reutilizando la variable del ámbito superior sin duplicar const)
-  let etiquetaMax = document.querySelector('label[for="roomMaxPlayersInput"]');
+  el['\u0072\u006F\u006F\u006D\u004D\u0061\u0078\u0050\u006C\u0061\u0079\u0065\u0072\u0073\u0049\u006E\u0070\u0075\u0074']['\u0074\u0079\u0070\u0065'] = "\u0074\u0065\u0078\u0074";
+  el['\u0072\u006F\u006F\u006D\u004D\u0061\u0078\u0050\u006C\u0061\u0079\u0065\u0072\u0073\u0049\u006E\u0070\u0075\u0074']['\u0076\u0061\u006C\u0075\u0065'] = `${state['\u006D\u0061\u0078\u0050\u006C\u0061\u0079\u0065\u0072\u0073\u0041\u006C\u006C\u006F\u0077\u0065\u0064']} HACKERS EN RED`;
+  el['\u0072\u006F\u006F\u006D\u004E\u0061\u006D\u0065\u0049\u006E\u0070\u0075\u0074']['\u0064\u0069\u0073\u0061\u0062\u006C\u0065\u0064'] = !![];
+  el['\u0072\u006F\u006F\u006D\u004D\u0061\u0078\u0050\u006C\u0061\u0079\u0065\u0072\u0073\u0049\u006E\u0070\u0075\u0074']['\u0064\u0069\u0073\u0061\u0062\u006C\u0065\u0064'] = !![];
+  var _0xgfg8b = (346480 ^ 346484) + (829983 ^ 829979);
+  let etiquetaMax = document['\u0071\u0075\u0065\u0072\u0079\u0053\u0065\u006C\u0065\u0063\u0074\u006F\u0072']("\u006C\u0061\u0062\u0065\u006C\u005B\u0066\u006F\u0072\u003D\u0022\u0072\u006F\u006F\u006D\u004D\u0061\u0078\u0050\u006C\u0061\u0079\u0065\u0072\u0073\u0049\u006E\u0070\u0075\u0074\u0022\u005D");
+  _0xgfg8b = 741274 ^ 741266;
   if (etiquetaMax) {
-    etiquetaMax.textContent = "CAPACIDAD DEL NODO:";
+    etiquetaMax['\u0074\u0065\u0078\u0074\u0043\u006F\u006E\u0074\u0065\u006E\u0074'] = "\u0043\u0041\u0050\u0041\u0043\u0049\u0044\u0041\u0044\u0020\u0044\u0045\u004C\u0020\u004E\u004F\u0044\u004F\u003A";
   }
-
-  // 3. PURIFICACIÓN VISUAL DE DIFICULTADES MULTIJUGADOR PARA EL INVITADO
-  if (el.multiDiffBtns) {
-    el.multiDiffBtns.forEach(b => {
-      const botonLen = parseInt(b.dataset.len, 10);
-      if (botonLen === state.multiLength) {
-        b.style.display = 'block'; 
-        b.classList.add('active');
-        b.disabled = true;
-        b.style.pointerEvents = 'none';
-        b.style.opacity = '1';
-        b.style.border = '1px solid var(--neon)'; 
+  if (el['\u006D\u0075\u006C\u0074\u0069\u0044\u0069\u0066\u0066\u0042\u0074\u006E\u0073']) {
+    el['\u006D\u0075\u006C\u0074\u0069\u0044\u0069\u0066\u0066\u0042\u0074\u006E\u0073']['\u0066\u006F\u0072\u0045\u0061\u0063\u0068'](b => {
+      const botonLen = parseInt(b['\u0064\u0061\u0074\u0061\u0073\u0065\u0074']['\u006C\u0065\u006E'], 674503 ^ 674509);
+      if (botonLen === state['\u006D\u0075\u006C\u0074\u0069\u004C\u0065\u006E\u0067\u0074\u0068']) {
+        b['\u0073\u0074\u0079\u006C\u0065']['\u0064\u0069\u0073\u0070\u006C\u0061\u0079'] = "\u0062\u006C\u006F\u0063\u006B";
+        b['\u0063\u006C\u0061\u0073\u0073\u004C\u0069\u0073\u0074']['\u0061\u0064\u0064']("evitca".split("").reverse().join(""));
+        b['\u0064\u0069\u0073\u0061\u0062\u006C\u0065\u0064'] = !![];
+        b['\u0073\u0074\u0079\u006C\u0065']['\u0070\u006F\u0069\u006E\u0074\u0065\u0072\u0045\u0076\u0065\u006E\u0074\u0073'] = "enon".split("").reverse().join("");
+        b['\u0073\u0074\u0079\u006C\u0065']['\u006F\u0070\u0061\u0063\u0069\u0074\u0079'] = "\u0031";
+        b['\u0073\u0074\u0079\u006C\u0065']['\u0062\u006F\u0072\u0064\u0065\u0072'] = "\u0031\u0070\u0078\u0020\u0073\u006F\u006C\u0069\u0064\u0020\u0076\u0061\u0072\u0028\u002D\u002D\u006E\u0065\u006F\u006E\u0029";
       } else {
-        b.style.display = 'none';
+        b['\u0073\u0074\u0079\u006C\u0065']['\u0064\u0069\u0073\u0070\u006C\u0061\u0079'] = "\u006E\u006F\u006E\u0065";
       }
     });
   }
-  if (el.multiCustomDiffBtn) el.multiCustomDiffBtn.style.display = 'none';
-  if (el.multiCustomLenInput) el.multiCustomLenInput.style.display = 'none';
-
-  // 4. PURIFICACIÓN VISUAL DE LÍMITE DE TIEMPO PARA EL INVITADO
-  if (el.multiLimitBtns) {
-    el.multiLimitBtns.forEach(b => {
-      const botonLimit = parseInt(b.dataset.limit, 10) || 0;
-      if (botonLimit === state.limit) {
-        b.style.display = 'block';
-        b.classList.add('active');
-        b.disabled = true;
-        b.style.pointerEvents = 'none';
-        b.style.opacity = '1';
+  if (el['\u006D\u0075\u006C\u0074\u0069\u0043\u0075\u0073\u0074\u006F\u006D\u0044\u0069\u0066\u0066\u0042\u0074\u006E']) el['\u006D\u0075\u006C\u0074\u0069\u0043\u0075\u0073\u0074\u006F\u006D\u0044\u0069\u0066\u0066\u0042\u0074\u006E']['\u0073\u0074\u0079\u006C\u0065']['\u0064\u0069\u0073\u0070\u006C\u0061\u0079'] = "enon".split("").reverse().join("");
+  if (el['\u006D\u0075\u006C\u0074\u0069\u0043\u0075\u0073\u0074\u006F\u006D\u004C\u0065\u006E\u0049\u006E\u0070\u0075\u0074']) el['\u006D\u0075\u006C\u0074\u0069\u0043\u0075\u0073\u0074\u006F\u006D\u004C\u0065\u006E\u0049\u006E\u0070\u0075\u0074']['\u0073\u0074\u0079\u006C\u0065']['\u0064\u0069\u0073\u0070\u006C\u0061\u0079'] = "\u006E\u006F\u006E\u0065";
+  if (el['\u006D\u0075\u006C\u0074\u0069\u004C\u0069\u006D\u0069\u0074\u0042\u0074\u006E\u0073']) {
+    el['\u006D\u0075\u006C\u0074\u0069\u004C\u0069\u006D\u0069\u0074\u0042\u0074\u006E\u0073']['\u0066\u006F\u0072\u0045\u0061\u0063\u0068'](b => {
+      const botonLimit = parseInt(b['\u0064\u0061\u0074\u0061\u0073\u0065\u0074']['\u006C\u0069\u006D\u0069\u0074'], 314594 ^ 314600) || 800240 ^ 800240;
+      if (botonLimit === state['\u006C\u0069\u006D\u0069\u0074']) {
+        b['\u0073\u0074\u0079\u006C\u0065']['\u0064\u0069\u0073\u0070\u006C\u0061\u0079'] = "\u0062\u006C\u006F\u0063\u006B";
+        b['\u0063\u006C\u0061\u0073\u0073\u004C\u0069\u0073\u0074']['\u0061\u0064\u0064']("evitca".split("").reverse().join(""));
+        b['\u0064\u0069\u0073\u0061\u0062\u006C\u0065\u0064'] = !![];
+        b['\u0073\u0074\u0079\u006C\u0065']['\u0070\u006F\u0069\u006E\u0074\u0065\u0072\u0045\u0076\u0065\u006E\u0074\u0073'] = "enon".split("").reverse().join("");
+        b['\u0073\u0074\u0079\u006C\u0065']['\u006F\u0070\u0061\u0063\u0069\u0074\u0079'] = "\u0031";
       } else {
-        b.style.display = 'none';
+        b['\u0073\u0074\u0079\u006C\u0065']['\u0064\u0069\u0073\u0070\u006C\u0061\u0079'] = "enon".split("").reverse().join("");
       }
     });
   }
-
-  // 5. CONFIGURAR MENSAJES Y DIBUJAR ESTRUCTURA DE RANURAS REACCIONANDO A LA HERENCIA
-  setMultiSetupMessage('Establece tu cifrado de acceso para ingresar a la terminal.', false);
-  
- // CORRECCIÓN MAESTRA: Forzamos al botón del DOM a restaurar su estado nativo de fábrica
-  el.multiLockCodeBtn.disabled = false;                  // <-- Desbloquear el botón
-  el.multiLockCodeBtn.style.pointerEvents = 'auto';      // <-- Devolver interactividad
-  el.multiLockCodeBtn.style.opacity = '1';               // <-- Opacidad brillante original
-  el.multiLockCodeBtn.textContent = "🔒 INGRESO A RED";  // <-- Restaurar la leyenda original
-
-  if (el.forceStartMultiBtn) el.forceStartMultiBtn.classList.add('hidden');
-  
-  el.lobbyPanel.classList.add('hidden');
-  el.createRoomPanel.classList.remove('hidden');
-  
-  crearSlots(); // Dibujará la cantidad exacta heredada
-  buildKeypad(); 
+  setMultiSetupMessage("\u0045\u0073\u0074\u0061\u0062\u006C\u0065\u0063\u0065\u0020\u0074\u0075\u0020\u0063\u0069\u0066\u0072\u0061\u0064\u006F\u0020\u0064\u0065\u0020\u0061\u0063\u0063\u0065\u0073\u006F\u0020\u0070\u0061\u0072\u0061\u0020\u0069\u006E\u0067\u0072\u0065\u0073\u0061\u0072\u0020\u0061\u0020\u006C\u0061\u0020\u0074\u0065\u0072\u006D\u0069\u006E\u0061\u006C\u002E", false);
+  el['\u006D\u0075\u006C\u0074\u0069\u004C\u006F\u0063\u006B\u0043\u006F\u0064\u0065\u0042\u0074\u006E']['\u0064\u0069\u0073\u0061\u0062\u006C\u0065\u0064'] = false;
+  el['\u006D\u0075\u006C\u0074\u0069\u004C\u006F\u0063\u006B\u0043\u006F\u0064\u0065\u0042\u0074\u006E']['\u0073\u0074\u0079\u006C\u0065']['\u0070\u006F\u0069\u006E\u0074\u0065\u0072\u0045\u0076\u0065\u006E\u0074\u0073'] = "otua".split("").reverse().join("");
+  el['\u006D\u0075\u006C\u0074\u0069\u004C\u006F\u0063\u006B\u0043\u006F\u0064\u0065\u0042\u0074\u006E']['\u0073\u0074\u0079\u006C\u0065']['\u006F\u0070\u0061\u0063\u0069\u0074\u0079'] = "\u0031";
+  el['\u006D\u0075\u006C\u0074\u0069\u004C\u006F\u0063\u006B\u0043\u006F\u0064\u0065\u0042\u0074\u006E']['\u0074\u0065\u0078\u0074\u0043\u006F\u006E\u0074\u0065\u006E\u0074'] = "DER A OSERGNI \uDD12\uD83D".split("").reverse().join("");
+  if (el['\u0066\u006F\u0072\u0063\u0065\u0053\u0074\u0061\u0072\u0074\u004D\u0075\u006C\u0074\u0069\u0042\u0074\u006E']) el['\u0066\u006F\u0072\u0063\u0065\u0053\u0074\u0061\u0072\u0074\u004D\u0075\u006C\u0074\u0069\u0042\u0074\u006E']['\u0063\u006C\u0061\u0073\u0073\u004C\u0069\u0073\u0074']['\u0061\u0064\u0064']("neddih".split("").reverse().join(""));
+  el['\u006C\u006F\u0062\u0062\u0079\u0050\u0061\u006E\u0065\u006C']['\u0063\u006C\u0061\u0073\u0073\u004C\u0069\u0073\u0074']['\u0061\u0064\u0064']("neddih".split("").reverse().join(""));
+  el['\u0063\u0072\u0065\u0061\u0074\u0065\u0052\u006F\u006F\u006D\u0050\u0061\u006E\u0065\u006C']['\u0063\u006C\u0061\u0073\u0073\u004C\u0069\u0073\u0074']['\u0072\u0065\u006D\u006F\u0076\u0065']("neddih".split("").reverse().join(""));
+  crearSlots();
+  buildKeypad();
 });
-
-el.vsIaBtn.addEventListener('click', () => {
-  state.username = el.usernameInput.value.trim() || 'Hacker';
-  state.gameMode = 'ia';
-  el.modePanel.classList.add('hidden');
-  el.setupPanel.classList.remove('hidden');
+el['\u0076\u0073\u0049\u0061\u0042\u0074\u006E']['\u0061\u0064\u0064\u0045\u0076\u0065\u006E\u0074\u004C\u0069\u0073\u0074\u0065\u006E\u0065\u0072']("kcilc".split("").reverse().join(""), () => {
+  state['\u0075\u0073\u0065\u0072\u006E\u0061\u006D\u0065'] = el['\u0075\u0073\u0065\u0072\u006E\u0061\u006D\u0065\u0049\u006E\u0070\u0075\u0074']['\u0076\u0061\u006C\u0075\u0065']['\u0074\u0072\u0069\u006D']() || "rekcaH".split("").reverse().join("");
+  state['\u0067\u0061\u006D\u0065\u004D\u006F\u0064\u0065'] = "ai".split("").reverse().join("");
+  el['\u006D\u006F\u0064\u0065\u0050\u0061\u006E\u0065\u006C']['\u0063\u006C\u0061\u0073\u0073\u004C\u0069\u0073\u0074']['\u0061\u0064\u0064']("\u0068\u0069\u0064\u0064\u0065\u006E");
+  el['\u0073\u0065\u0074\u0075\u0070\u0050\u0061\u006E\u0065\u006C']['\u0063\u006C\u0061\u0073\u0073\u004C\u0069\u0073\u0074']['\u0072\u0065\u006D\u006F\u0076\u0065']("neddih".split("").reverse().join(""));
 });
-
-el.vsPlayerBtn.addEventListener('click', () => {
-  const inputName = el.usernameInput.value.trim();
+el['\u0076\u0073\u0050\u006C\u0061\u0079\u0065\u0072\u0042\u0074\u006E']['\u0061\u0064\u0064\u0045\u0076\u0065\u006E\u0074\u004C\u0069\u0073\u0074\u0065\u006E\u0065\u0072']("\u0063\u006C\u0069\u0063\u006B", () => {
+  var _0x7d36a = (885023 ^ 885016) + (296278 ^ 296276);
+  const inputName = el['\u0075\u0073\u0065\u0072\u006E\u0061\u006D\u0065\u0049\u006E\u0070\u0075\u0074']['\u0076\u0061\u006C\u0075\u0065']['\u0074\u0072\u0069\u006D']();
+  _0x7d36a = (723409 ^ 723410) + (876658 ^ 876661);
   if (!inputName) {
-    mostrarAlertaCyber("ACCESO DENEGADO: El seudónimo es obligatorio para el protocolo Multijugador.", true);
-    el.usernameInput.focus();
+    mostrarAlertaCyber("\u0041\u0043\u0043\u0045\u0053\u004F\u0020\u0044\u0045\u004E\u0045\u0047\u0041\u0044\u004F\u003A\u0020\u0045\u006C\u0020\u0073\u0065\u0075\u0064\u00F3\u006E\u0069\u006D\u006F\u0020\u0065\u0073\u0020\u006F\u0062\u006C\u0069\u0067\u0061\u0074\u006F\u0072\u0069\u006F\u0020\u0070\u0061\u0072\u0061\u0020\u0065\u006C\u0020\u0070\u0072\u006F\u0074\u006F\u0063\u006F\u006C\u006F\u0020\u004D\u0075\u006C\u0074\u0069\u006A\u0075\u0067\u0061\u0064\u006F\u0072\u002E", !![]);
+    el['\u0075\u0073\u0065\u0072\u006E\u0061\u006D\u0065\u0049\u006E\u0070\u0075\u0074']['\u0066\u006F\u0063\u0075\u0073']();
     return;
   }
-  state.username = inputName;
-  state.gameMode = 'multi';
-  el.lobbyUserDisplay.textContent = state.username.toUpperCase();
-  el.modePanel.classList.add('hidden');
-  el.lobbyPanel.classList.remove('hidden');
+  state['\u0075\u0073\u0065\u0072\u006E\u0061\u006D\u0065'] = inputName;
+  state['\u0067\u0061\u006D\u0065\u004D\u006F\u0064\u0065'] = "itlum".split("").reverse().join("");
+  el['\u006C\u006F\u0062\u0062\u0079\u0055\u0073\u0065\u0072\u0044\u0069\u0073\u0070\u006C\u0061\u0079']['\u0074\u0065\u0078\u0074\u0043\u006F\u006E\u0074\u0065\u006E\u0074'] = state['\u0075\u0073\u0065\u0072\u006E\u0061\u006D\u0065']['\u0074\u006F\u0055\u0070\u0070\u0065\u0072\u0043\u0061\u0073\u0065']();
+  el['\u006D\u006F\u0064\u0065\u0050\u0061\u006E\u0065\u006C']['\u0063\u006C\u0061\u0073\u0073\u004C\u0069\u0073\u0074']['\u0061\u0064\u0064']("neddih".split("").reverse().join(""));
+  el['\u006C\u006F\u0062\u0062\u0079\u0050\u0061\u006E\u0065\u006C']['\u0063\u006C\u0061\u0073\u0073\u004C\u0069\u0073\u0074']['\u0072\u0065\u006D\u006F\u0076\u0065']("\u0068\u0069\u0064\u0064\u0065\u006E");
   renderRoomsList(MOCK_ROOMS);
-  renderRoomsList([]); // Limpia la lista vieja primero
-  if (socket) socket.emit('solicitar_lista_salas');
+  renderRoomsList([]);
+  if (socket) socket['\u0065\u006D\u0069\u0074']("salas_atsil_raticilos".split("").reverse().join(""));
 });
-
-
-el.createRoomBtn.addEventListener('click', () => {
-  // CORRECCIÓN INTERNA: Forzar limpieza absoluta antes de preparar la reconfiguración
-  if (typeof limpiarEstadoMemoriaCompleto === 'function') {
+el['\u0063\u0072\u0065\u0061\u0074\u0065\u0052\u006F\u006F\u006D\u0042\u0074\u006E']['\u0061\u0064\u0064\u0045\u0076\u0065\u006E\u0074\u004C\u0069\u0073\u0074\u0065\u006E\u0065\u0072']("kcilc".split("").reverse().join(""), () => {
+  if (typeof limpiarEstadoMemoriaCompleto === "\u0066\u0075\u006E\u0063\u0074\u0069\u006F\u006E") {
     limpiarEstadoMemoriaCompleto();
   }
-
-  state.isHost = true;             
-  state.currentPlayerIndex = 0;    
-  state.tipoPanel = "lobbyPanel"; 
-  state.multiLength = 3;
-  state.limit = 0;
-  state.connectedPlayers = [{ name: state.username, isHost: true }];
-  state.maxPlayersAllowed = parseInt(el.roomMaxPlayersInput.value, 10) || 2;
-
-  el.roomNameInput.disabled = false;
-  el.roomMaxPlayersInput.disabled = false;
-  if (el.multiCustomLenInput) el.multiCustomLenInput.disabled = false;
-  
-  el.roomNameInput.value = ''; // Limpiar el cuadro de texto
-  el.roomNameInput.placeholder = `SERVER_${state.username.toUpperCase()}`;
-  el.roomLiveCode.textContent = "SALA: PENDIENTE";
-  
-  if (el.forceStartMultiBtn) {
-    el.forceStartMultiBtn.disabled = true;
-    el.forceStartMultiBtn.classList.add('hidden');
+  state['\u0069\u0073\u0048\u006F\u0073\u0074'] = !![];
+  state['\u0063\u0075\u0072\u0072\u0065\u006E\u0074\u0050\u006C\u0061\u0079\u0065\u0072\u0049\u006E\u0064\u0065\u0078'] = 471211 ^ 471211;
+  state['\u0074\u0069\u0070\u006F\u0050\u0061\u006E\u0065\u006C'] = "\u006C\u006F\u0062\u0062\u0079\u0050\u0061\u006E\u0065\u006C";
+  state['\u006D\u0075\u006C\u0074\u0069\u004C\u0065\u006E\u0067\u0074\u0068'] = 416016 ^ 416019;
+  state['\u006C\u0069\u006D\u0069\u0074'] = 424264 ^ 424264;
+  state['\u0063\u006F\u006E\u006E\u0065\u0063\u0074\u0065\u0064\u0050\u006C\u0061\u0079\u0065\u0072\u0073'] = [{
+    '\u006E\u0061\u006D\u0065': state['\u0075\u0073\u0065\u0072\u006E\u0061\u006D\u0065'],
+    '\u0069\u0073\u0048\u006F\u0073\u0074': !![]
+  }];
+  state['\u006D\u0061\u0078\u0050\u006C\u0061\u0079\u0065\u0072\u0073\u0041\u006C\u006C\u006F\u0077\u0065\u0064'] = parseInt(el['\u0072\u006F\u006F\u006D\u004D\u0061\u0078\u0050\u006C\u0061\u0079\u0065\u0072\u0073\u0049\u006E\u0070\u0075\u0074']['\u0076\u0061\u006C\u0075\u0065'], 645027 ^ 645033) || 960129 ^ 960131;
+  el['\u0072\u006F\u006F\u006D\u004E\u0061\u006D\u0065\u0049\u006E\u0070\u0075\u0074']['\u0064\u0069\u0073\u0061\u0062\u006C\u0065\u0064'] = false;
+  el['\u0072\u006F\u006F\u006D\u004D\u0061\u0078\u0050\u006C\u0061\u0079\u0065\u0072\u0073\u0049\u006E\u0070\u0075\u0074']['\u0064\u0069\u0073\u0061\u0062\u006C\u0065\u0064'] = false;
+  if (el['\u006D\u0075\u006C\u0074\u0069\u0043\u0075\u0073\u0074\u006F\u006D\u004C\u0065\u006E\u0049\u006E\u0070\u0075\u0074']) el['\u006D\u0075\u006C\u0074\u0069\u0043\u0075\u0073\u0074\u006F\u006D\u004C\u0065\u006E\u0049\u006E\u0070\u0075\u0074']['\u0064\u0069\u0073\u0061\u0062\u006C\u0065\u0064'] = false;
+  el['\u0072\u006F\u006F\u006D\u004E\u0061\u006D\u0065\u0049\u006E\u0070\u0075\u0074']['\u0076\u0061\u006C\u0075\u0065'] = '';
+  el['\u0072\u006F\u006F\u006D\u004E\u0061\u006D\u0065\u0049\u006E\u0070\u0075\u0074']['\u0070\u006C\u0061\u0063\u0065\u0068\u006F\u006C\u0064\u0065\u0072'] = `SERVER_${state['\u0075\u0073\u0065\u0072\u006E\u0061\u006D\u0065']['\u0074\u006F\u0055\u0070\u0070\u0065\u0072\u0043\u0061\u0073\u0065']()}`;
+  el['\u0072\u006F\u006F\u006D\u004C\u0069\u0076\u0065\u0043\u006F\u0064\u0065']['\u0074\u0065\u0078\u0074\u0043\u006F\u006E\u0074\u0065\u006E\u0074'] = "ETNEIDNEP :ALAS".split("").reverse().join("");
+  if (el['\u0066\u006F\u0072\u0063\u0065\u0053\u0074\u0061\u0072\u0074\u004D\u0075\u006C\u0074\u0069\u0042\u0074\u006E']) {
+    el['\u0066\u006F\u0072\u0063\u0065\u0053\u0074\u0061\u0072\u0074\u004D\u0075\u006C\u0074\u0069\u0042\u0074\u006E']['\u0064\u0069\u0073\u0061\u0062\u006C\u0065\u0064'] = !![];
+    el['\u0066\u006F\u0072\u0063\u0065\u0053\u0074\u0061\u0072\u0074\u004D\u0075\u006C\u0074\u0069\u0042\u0074\u006E']['\u0063\u006C\u0061\u0073\u0073\u004C\u0069\u0073\u0074']['\u0061\u0064\u0064']("neddih".split("").reverse().join(""));
   }
-
-  setMultiSetupMessage('Establece tu cifrado usando la consola inferior.', false);
-  
-  el.multiDiffBtns.forEach(b => b.classList.remove('active'));
-  if (el.multiCustomDiffBtn) el.multiCustomDiffBtn.classList.remove('active');
-  if (el.multiDiffBtns[0]) el.multiDiffBtns[0].classList.add('active');
-
-  if (el.multiLimitBtns) {
-    el.multiLimitBtns.forEach(b => b.classList.remove('active'));
-    if (el.multiLimitBtns[0]) el.multiLimitBtns[0].classList.add('active');
+  setMultiSetupMessage("\u0045\u0073\u0074\u0061\u0062\u006C\u0065\u0063\u0065\u0020\u0074\u0075\u0020\u0063\u0069\u0066\u0072\u0061\u0064\u006F\u0020\u0075\u0073\u0061\u006E\u0064\u006F\u0020\u006C\u0061\u0020\u0063\u006F\u006E\u0073\u006F\u006C\u0061\u0020\u0069\u006E\u0066\u0065\u0072\u0069\u006F\u0072\u002E", false);
+  el['\u006D\u0075\u006C\u0074\u0069\u0044\u0069\u0066\u0066\u0042\u0074\u006E\u0073']['\u0066\u006F\u0072\u0045\u0061\u0063\u0068'](b => b['\u0063\u006C\u0061\u0073\u0073\u004C\u0069\u0073\u0074']['\u0072\u0065\u006D\u006F\u0076\u0065']("\u0061\u0063\u0074\u0069\u0076\u0065"));
+  if (el['\u006D\u0075\u006C\u0074\u0069\u0043\u0075\u0073\u0074\u006F\u006D\u0044\u0069\u0066\u0066\u0042\u0074\u006E']) el['\u006D\u0075\u006C\u0074\u0069\u0043\u0075\u0073\u0074\u006F\u006D\u0044\u0069\u0066\u0066\u0042\u0074\u006E']['\u0063\u006C\u0061\u0073\u0073\u004C\u0069\u0073\u0074']['\u0072\u0065\u006D\u006F\u0076\u0065']("evitca".split("").reverse().join(""));
+  if (el['\u006D\u0075\u006C\u0074\u0069\u0044\u0069\u0066\u0066\u0042\u0074\u006E\u0073'][374097 ^ 374097]) el['\u006D\u0075\u006C\u0074\u0069\u0044\u0069\u0066\u0066\u0042\u0074\u006E\u0073'][751597 ^ 751597]['\u0063\u006C\u0061\u0073\u0073\u004C\u0069\u0073\u0074']['\u0061\u0064\u0064']("evitca".split("").reverse().join(""));
+  if (el['\u006D\u0075\u006C\u0074\u0069\u004C\u0069\u006D\u0069\u0074\u0042\u0074\u006E\u0073']) {
+    el['\u006D\u0075\u006C\u0074\u0069\u004C\u0069\u006D\u0069\u0074\u0042\u0074\u006E\u0073']['\u0066\u006F\u0072\u0045\u0061\u0063\u0068'](b => b['\u0063\u006C\u0061\u0073\u0073\u004C\u0069\u0073\u0074']['\u0072\u0065\u006D\u006F\u0076\u0065']("\u0061\u0063\u0074\u0069\u0076\u0065"));
+    if (el['\u006D\u0075\u006C\u0074\u0069\u004C\u0069\u006D\u0069\u0074\u0042\u0074\u006E\u0073'][344511 ^ 344511]) el['\u006D\u0075\u006C\u0074\u0069\u004C\u0069\u006D\u0069\u0074\u0042\u0074\u006E\u0073'][305004 ^ 305004]['\u0063\u006C\u0061\u0073\u0073\u004C\u0069\u0073\u0074']['\u0061\u0064\u0064']("\u0061\u0063\u0074\u0069\u0076\u0065");
   }
-  
-  el.lobbyPanel.classList.add('hidden');
-  el.createRoomPanel.classList.remove('hidden');
-
-  crearSlots(); // Ahora sí dibujará con los valores en limpio (🔒🔒🔒)
+  el['\u006C\u006F\u0062\u0062\u0079\u0050\u0061\u006E\u0065\u006C']['\u0063\u006C\u0061\u0073\u0073\u004C\u0069\u0073\u0074']['\u0061\u0064\u0064']("neddih".split("").reverse().join(""));
+  el['\u0063\u0072\u0065\u0061\u0074\u0065\u0052\u006F\u006F\u006D\u0050\u0061\u006E\u0065\u006C']['\u0063\u006C\u0061\u0073\u0073\u004C\u0069\u0073\u0074']['\u0072\u0065\u006D\u006F\u0076\u0065']("\u0068\u0069\u0064\u0064\u0065\u006E");
+  crearSlots();
   renderConnectedPlayers();
-  buildKeypad(); // Re-renderizar teclado limpio sin bloqueos de la partida vieja
+  buildKeypad();
 });
-
-
-/* ---------- BOTONES ADICIONALES DE RETORNO Y CONTROL ---------- */
-el.refreshRoomsBtn.addEventListener('click', () => {
-  if (socket) socket.emit('solicitar_lista_salas');
+el['\u0072\u0065\u0066\u0072\u0065\u0073\u0068\u0052\u006F\u006F\u006D\u0073\u0042\u0074\u006E']['\u0061\u0064\u0064\u0045\u0076\u0065\u006E\u0074\u004C\u0069\u0073\u0074\u0065\u006E\u0065\u0072']("\u0063\u006C\u0069\u0063\u006B", () => {
+  if (socket) socket['\u0065\u006D\u0069\u0074']("salas_atsil_raticilos".split("").reverse().join(""));
 });
-el.backToModeBtn.addEventListener('click', () => { 
-  el.setupPanel.classList.add('hidden'); 
-  el.modePanel.classList.remove('hidden'); 
+el['\u0062\u0061\u0063\u006B\u0054\u006F\u004D\u006F\u0064\u0065\u0042\u0074\u006E']['\u0061\u0064\u0064\u0045\u0076\u0065\u006E\u0074\u004C\u0069\u0073\u0074\u0065\u006E\u0065\u0072']("\u0063\u006C\u0069\u0063\u006B", () => {
+  el['\u0073\u0065\u0074\u0075\u0070\u0050\u0061\u006E\u0065\u006C']['\u0063\u006C\u0061\u0073\u0073\u004C\u0069\u0073\u0074']['\u0061\u0064\u0064']("\u0068\u0069\u0064\u0064\u0065\u006E");
+  el['\u006D\u006F\u0064\u0065\u0050\u0061\u006E\u0065\u006C']['\u0063\u006C\u0061\u0073\u0073\u004C\u0069\u0073\u0074']['\u0072\u0065\u006D\u006F\u0076\u0065']("neddih".split("").reverse().join(""));
 });
-
-el.backToModeFromLobbyBtn.addEventListener('click', () => { 
-  el.lobbyPanel.classList.add('hidden'); 
-  el.modePanel.classList.remove('hidden'); 
+el['\u0062\u0061\u0063\u006B\u0054\u006F\u004D\u006F\u0064\u0065\u0046\u0072\u006F\u006D\u004C\u006F\u0062\u0062\u0079\u0042\u0074\u006E']['\u0061\u0064\u0064\u0045\u0076\u0065\u006E\u0074\u004C\u0069\u0073\u0074\u0065\u006E\u0065\u0072']("\u0063\u006C\u0069\u0063\u006B", () => {
+  el['\u006C\u006F\u0062\u0062\u0079\u0050\u0061\u006E\u0065\u006C']['\u0063\u006C\u0061\u0073\u0073\u004C\u0069\u0073\u0074']['\u0061\u0064\u0064']("\u0068\u0069\u0064\u0064\u0065\u006E");
+  el['\u006D\u006F\u0064\u0065\u0050\u0061\u006E\u0065\u006C']['\u0063\u006C\u0061\u0073\u0073\u004C\u0069\u0073\u0074']['\u0072\u0065\u006D\u006F\u0076\u0065']("\u0068\u0069\u0064\u0064\u0065\u006E");
 });
-
-el.startBtn.addEventListener('click', startGame);
-el.restartBtn.addEventListener('click', resetGame);
-el.MultirestartBtn.addEventListener('click', abandonarPartidaMultijugador);
-
-el.delBtn.addEventListener('click', deleteElement);
-el.multiDelBtn.addEventListener('click', deleteElement);
-el.StatusMultidelBtn.addEventListener('click', deleteElement);
-
-el.sendBtn.addEventListener('click', submitGuess);
-el.StatusMultisendBtn.addEventListener('click', submitGuessMulti);
-
-el.backToLobbyFromCreateBtn.addEventListener('click', () => {
-
-  // 1. NOTIFICAR DESCONEXIÓN A LA RED CENTRAL
+el['\u0073\u0074\u0061\u0072\u0074\u0042\u0074\u006E']['\u0061\u0064\u0064\u0045\u0076\u0065\u006E\u0074\u004C\u0069\u0073\u0074\u0065\u006E\u0065\u0072']("\u0063\u006C\u0069\u0063\u006B", startGame);
+el['\u0072\u0065\u0073\u0074\u0061\u0072\u0074\u0042\u0074\u006E']['\u0061\u0064\u0064\u0045\u0076\u0065\u006E\u0074\u004C\u0069\u0073\u0074\u0065\u006E\u0065\u0072']("kcilc".split("").reverse().join(""), _0xe89c4g);
+el['\u004D\u0075\u006C\u0074\u0069\u0072\u0065\u0073\u0074\u0061\u0072\u0074\u0042\u0074\u006E']['\u0061\u0064\u0064\u0045\u0076\u0065\u006E\u0074\u004C\u0069\u0073\u0074\u0065\u006E\u0065\u0072']("\u0063\u006C\u0069\u0063\u006B", abandonarPartidaMultijugador);
+el['\u0064\u0065\u006C\u0042\u0074\u006E']['\u0061\u0064\u0064\u0045\u0076\u0065\u006E\u0074\u004C\u0069\u0073\u0074\u0065\u006E\u0065\u0072']("\u0063\u006C\u0069\u0063\u006B", deleteElement);
+el['\u006D\u0075\u006C\u0074\u0069\u0044\u0065\u006C\u0042\u0074\u006E']['\u0061\u0064\u0064\u0045\u0076\u0065\u006E\u0074\u004C\u0069\u0073\u0074\u0065\u006E\u0065\u0072']("kcilc".split("").reverse().join(""), deleteElement);
+el['\u0053\u0074\u0061\u0074\u0075\u0073\u004D\u0075\u006C\u0074\u0069\u0064\u0065\u006C\u0042\u0074\u006E']['\u0061\u0064\u0064\u0045\u0076\u0065\u006E\u0074\u004C\u0069\u0073\u0074\u0065\u006E\u0065\u0072']("\u0063\u006C\u0069\u0063\u006B", deleteElement);
+el['\u0073\u0065\u006E\u0064\u0042\u0074\u006E']['\u0061\u0064\u0064\u0045\u0076\u0065\u006E\u0074\u004C\u0069\u0073\u0074\u0065\u006E\u0065\u0072']("\u0063\u006C\u0069\u0063\u006B", submitGuess);
+el['\u0053\u0074\u0061\u0074\u0075\u0073\u004D\u0075\u006C\u0074\u0069\u0073\u0065\u006E\u0064\u0042\u0074\u006E']['\u0061\u0064\u0064\u0045\u0076\u0065\u006E\u0074\u004C\u0069\u0073\u0074\u0065\u006E\u0065\u0072']("kcilc".split("").reverse().join(""), submitGuessMulti);
+el['\u0062\u0061\u0063\u006B\u0054\u006F\u004C\u006F\u0062\u0062\u0079\u0046\u0072\u006F\u006D\u0043\u0072\u0065\u0061\u0074\u0065\u0042\u0074\u006E']['\u0061\u0064\u0064\u0045\u0076\u0065\u006E\u0074\u004C\u0069\u0073\u0074\u0065\u006E\u0065\u0072']("kcilc".split("").reverse().join(""), () => {
   if (socket) {
-    socket.disconnect(); 
-    socket.connect(); // Reconectar para quedar listo en el lobby
+    socket['\u0064\u0069\u0073\u0063\u006F\u006E\u006E\u0065\u0063\u0074']();
+    socket['\u0063\u006F\u006E\u006E\u0065\u0063\u0074']();
   }
-
-  // LIMPIEZA INTERNA ANTES DE RECONFIGURAR
-  if (typeof limpiarEstadoMemoriaCompleto === 'function') {
+  if (typeof limpiarEstadoMemoriaCompleto === "\u0066\u0075\u006E\u0063\u0074\u0069\u006F\u006E") {
     limpiarEstadoMemoriaCompleto();
   }
-
-  el.roomNameInput.disabled = false;
-  el.roomNameInput.value = '';
-  el.roomMaxPlayersInput.type = 'number';
-  el.roomMaxPlayersInput.disabled = false;
-  el.roomMaxPlayersInput.value = '2';
-  
-  let etiquetaMaxLocal = document.querySelector('label[for="roomMaxPlayersInput"]');
+  el['\u0072\u006F\u006F\u006D\u004E\u0061\u006D\u0065\u0049\u006E\u0070\u0075\u0074']['\u0064\u0069\u0073\u0061\u0062\u006C\u0065\u0064'] = false;
+  el['\u0072\u006F\u006F\u006D\u004E\u0061\u006D\u0065\u0049\u006E\u0070\u0075\u0074']['\u0076\u0061\u006C\u0075\u0065'] = '';
+  el['\u0072\u006F\u006F\u006D\u004D\u0061\u0078\u0050\u006C\u0061\u0079\u0065\u0072\u0073\u0049\u006E\u0070\u0075\u0074']['\u0074\u0079\u0070\u0065'] = "\u006E\u0075\u006D\u0062\u0065\u0072";
+  el['\u0072\u006F\u006F\u006D\u004D\u0061\u0078\u0050\u006C\u0061\u0079\u0065\u0072\u0073\u0049\u006E\u0070\u0075\u0074']['\u0064\u0069\u0073\u0061\u0062\u006C\u0065\u0064'] = false;
+  el['\u0072\u006F\u006F\u006D\u004D\u0061\u0078\u0050\u006C\u0061\u0079\u0065\u0072\u0073\u0049\u006E\u0070\u0075\u0074']['\u0076\u0061\u006C\u0075\u0065'] = "\u0032";
+  var _0x9b5ac = (301447 ^ 301441) + (488138 ^ 488141);
+  let etiquetaMaxLocal = document['\u0071\u0075\u0065\u0072\u0079\u0053\u0065\u006C\u0065\u0063\u0074\u006F\u0072']("\u006C\u0061\u0062\u0065\u006C\u005B\u0066\u006F\u0072\u003D\u0022\u0072\u006F\u006F\u006D\u004D\u0061\u0078\u0050\u006C\u0061\u0079\u0065\u0072\u0073\u0049\u006E\u0070\u0075\u0074\u0022\u005D");
+  _0x9b5ac = (122639 ^ 122635) + (707860 ^ 707860);
   if (etiquetaMaxLocal) {
-    etiquetaMaxLocal.textContent = "Límite de Hackers en partida";
+    etiquetaMaxLocal['\u0074\u0065\u0078\u0074\u0043\u006F\u006E\u0074\u0065\u006E\u0074'] = "\u004C\u00ED\u006D\u0069\u0074\u0065\u0020\u0064\u0065\u0020\u0048\u0061\u0063\u006B\u0065\u0072\u0073\u0020\u0065\u006E\u0020\u0070\u0061\u0072\u0074\u0069\u0064\u0061";
   }
-
-  const diffContainer = document.querySelector('.diff-row') || el.multiDiffBtns[0]?.parentElement;
-  if (diffContainer) diffContainer.style.display = 'flex';
-
-  if (el.multiCustomDiffBtn) el.multiCustomDiffBtn.style.display = 'block';
-  
-  el.multiLockCodeBtn.textContent = "🔒 INICIAR PARTIDA";
-
-  if (el.forceStartMultiBtn) el.forceStartMultiBtn.classList.remove('hidden');
-  
-  el.createRoomPanel.classList.add('hidden');
-  el.lobbyPanel.classList.remove('hidden');
-
-    // RESTAURAR BOTONES DE DIFICULTAD PARA EL MODO CREACIÓN
-  if (el.multiDiffBtns) {
-    el.multiDiffBtns.forEach(b => {
-      b.style.display = 'block'; // Volver a mostrarlos todos
-      b.disabled = false;
-      b.style.pointerEvents = 'auto';
-      b.style.opacity = '1';
+  const diffContainer = document['\u0071\u0075\u0065\u0072\u0079\u0053\u0065\u006C\u0065\u0063\u0074\u006F\u0072']("wor-ffid.".split("").reverse().join("")) || el['\u006D\u0075\u006C\u0074\u0069\u0044\u0069\u0066\u0066\u0042\u0074\u006E\u0073'][725181 ^ 725181]?.parentElement;
+  if (diffContainer) diffContainer['\u0073\u0074\u0079\u006C\u0065']['\u0064\u0069\u0073\u0070\u006C\u0061\u0079'] = "\u0066\u006C\u0065\u0078";
+  if (el['\u006D\u0075\u006C\u0074\u0069\u0043\u0075\u0073\u0074\u006F\u006D\u0044\u0069\u0066\u0066\u0042\u0074\u006E']) el['\u006D\u0075\u006C\u0074\u0069\u0043\u0075\u0073\u0074\u006F\u006D\u0044\u0069\u0066\u0066\u0042\u0074\u006E']['\u0073\u0074\u0079\u006C\u0065']['\u0064\u0069\u0073\u0070\u006C\u0061\u0079'] = "\u0062\u006C\u006F\u0063\u006B";
+  el['\u006D\u0075\u006C\u0074\u0069\u004C\u006F\u0063\u006B\u0043\u006F\u0064\u0065\u0042\u0074\u006E']['\u0074\u0065\u0078\u0074\u0043\u006F\u006E\u0074\u0065\u006E\u0074'] = "\uD83D\uDD12\u0020\u0049\u004E\u0049\u0043\u0049\u0041\u0052\u0020\u0050\u0041\u0052\u0054\u0049\u0044\u0041";
+  if (el['\u0066\u006F\u0072\u0063\u0065\u0053\u0074\u0061\u0072\u0074\u004D\u0075\u006C\u0074\u0069\u0042\u0074\u006E']) el['\u0066\u006F\u0072\u0063\u0065\u0053\u0074\u0061\u0072\u0074\u004D\u0075\u006C\u0074\u0069\u0042\u0074\u006E']['\u0063\u006C\u0061\u0073\u0073\u004C\u0069\u0073\u0074']['\u0072\u0065\u006D\u006F\u0076\u0065']("neddih".split("").reverse().join(""));
+  el['\u0063\u0072\u0065\u0061\u0074\u0065\u0052\u006F\u006F\u006D\u0050\u0061\u006E\u0065\u006C']['\u0063\u006C\u0061\u0073\u0073\u004C\u0069\u0073\u0074']['\u0061\u0064\u0064']("neddih".split("").reverse().join(""));
+  el['\u006C\u006F\u0062\u0062\u0079\u0050\u0061\u006E\u0065\u006C']['\u0063\u006C\u0061\u0073\u0073\u004C\u0069\u0073\u0074']['\u0072\u0065\u006D\u006F\u0076\u0065']("neddih".split("").reverse().join(""));
+  if (el['\u006D\u0075\u006C\u0074\u0069\u0044\u0069\u0066\u0066\u0042\u0074\u006E\u0073']) {
+    el['\u006D\u0075\u006C\u0074\u0069\u0044\u0069\u0066\u0066\u0042\u0074\u006E\u0073']['\u0066\u006F\u0072\u0045\u0061\u0063\u0068'](b => {
+      b['\u0073\u0074\u0079\u006C\u0065']['\u0064\u0069\u0073\u0070\u006C\u0061\u0079'] = "kcolb".split("").reverse().join("");
+      b['\u0064\u0069\u0073\u0061\u0062\u006C\u0065\u0064'] = false;
+      b['\u0073\u0074\u0079\u006C\u0065']['\u0070\u006F\u0069\u006E\u0074\u0065\u0072\u0045\u0076\u0065\u006E\u0074\u0073'] = "\u0061\u0075\u0074\u006F";
+      b['\u0073\u0074\u0079\u006C\u0065']['\u006F\u0070\u0061\u0063\u0069\u0074\u0079'] = "\u0031";
     });
   }
-  if (el.multiCustomDiffBtn) el.multiCustomDiffBtn.style.display = 'block';
-  if (el.multiCustomLenInput) el.multiCustomLenInput.style.display = 'block';
-
-  // RESTAURAR BOTONES DE TIEMPO PARA EL MODO CREACIÓN
-  if (el.multiLimitBtns) {
-    el.multiLimitBtns.forEach(b => {
-      b.style.display = 'block'; // Volver a mostrarlos todos
-      b.disabled = false;
-      b.style.pointerEvents = 'auto';
-      b.style.opacity = '1';
+  if (el['\u006D\u0075\u006C\u0074\u0069\u0043\u0075\u0073\u0074\u006F\u006D\u0044\u0069\u0066\u0066\u0042\u0074\u006E']) el['\u006D\u0075\u006C\u0074\u0069\u0043\u0075\u0073\u0074\u006F\u006D\u0044\u0069\u0066\u0066\u0042\u0074\u006E']['\u0073\u0074\u0079\u006C\u0065']['\u0064\u0069\u0073\u0070\u006C\u0061\u0079'] = "\u0062\u006C\u006F\u0063\u006B";
+  if (el['\u006D\u0075\u006C\u0074\u0069\u0043\u0075\u0073\u0074\u006F\u006D\u004C\u0065\u006E\u0049\u006E\u0070\u0075\u0074']) el['\u006D\u0075\u006C\u0074\u0069\u0043\u0075\u0073\u0074\u006F\u006D\u004C\u0065\u006E\u0049\u006E\u0070\u0075\u0074']['\u0073\u0074\u0079\u006C\u0065']['\u0064\u0069\u0073\u0070\u006C\u0061\u0079'] = "kcolb".split("").reverse().join("");
+  if (el['\u006D\u0075\u006C\u0074\u0069\u004C\u0069\u006D\u0069\u0074\u0042\u0074\u006E\u0073']) {
+    el['\u006D\u0075\u006C\u0074\u0069\u004C\u0069\u006D\u0069\u0074\u0042\u0074\u006E\u0073']['\u0066\u006F\u0072\u0045\u0061\u0063\u0068'](b => {
+      b['\u0073\u0074\u0079\u006C\u0065']['\u0064\u0069\u0073\u0070\u006C\u0061\u0079'] = "\u0062\u006C\u006F\u0063\u006B";
+      b['\u0064\u0069\u0073\u0061\u0062\u006C\u0065\u0064'] = false;
+      b['\u0073\u0074\u0079\u006C\u0065']['\u0070\u006F\u0069\u006E\u0074\u0065\u0072\u0045\u0076\u0065\u006E\u0074\u0073'] = "\u0061\u0075\u0074\u006F";
+      b['\u0073\u0074\u0079\u006C\u0065']['\u006F\u0070\u0061\u0063\u0069\u0074\u0079'] = "\u0031";
     });
   }
-
-    // RESTAURAR LA CASILLA DE NÚMERO DE JUGADORES PARA EL MODO CREACIÓN
-  el.roomMaxPlayersInput.type = 'number';
-  el.roomMaxPlayersInput.value = '2'; // Valor por defecto al crear
-  el.roomMaxPlayersInput.disabled = false;
-  
-  const etiquetaMax2 = document.querySelector('label[for="roomMaxPlayersInput"]');
+  el['\u0072\u006F\u006F\u006D\u004D\u0061\u0078\u0050\u006C\u0061\u0079\u0065\u0072\u0073\u0049\u006E\u0070\u0075\u0074']['\u0074\u0079\u0070\u0065'] = "\u006E\u0075\u006D\u0062\u0065\u0072";
+  el['\u0072\u006F\u006F\u006D\u004D\u0061\u0078\u0050\u006C\u0061\u0079\u0065\u0072\u0073\u0049\u006E\u0070\u0075\u0074']['\u0076\u0061\u006C\u0075\u0065'] = "\u0032";
+  el['\u0072\u006F\u006F\u006D\u004D\u0061\u0078\u0050\u006C\u0061\u0079\u0065\u0072\u0073\u0049\u006E\u0070\u0075\u0074']['\u0064\u0069\u0073\u0061\u0062\u006C\u0065\u0064'] = false;
+  const etiquetaMax2 = document['\u0071\u0075\u0065\u0072\u0079\u0053\u0065\u006C\u0065\u0063\u0074\u006F\u0072']("\u006C\u0061\u0062\u0065\u006C\u005B\u0066\u006F\u0072\u003D\u0022\u0072\u006F\u006F\u006D\u004D\u0061\u0078\u0050\u006C\u0061\u0079\u0065\u0072\u0073\u0049\u006E\u0070\u0075\u0074\u0022\u005D");
   if (etiquetaMax2) {
-    etiquetaMax2.textContent = "Límite de Hackers en partida";
+    etiquetaMax2['\u0074\u0065\u0078\u0074\u0043\u006F\u006E\u0074\u0065\u006E\u0074'] = "\u004C\u00ED\u006D\u0069\u0074\u0065\u0020\u0064\u0065\u0020\u0048\u0061\u0063\u006B\u0065\u0072\u0073\u0020\u0065\u006E\u0020\u0070\u0061\u0072\u0074\u0069\u0064\u0061";
   }
 });
-
-  /* ---------- CAPTURA DE TECLADO FÍSICO ---------- */
-document.addEventListener('keydown', (event) => {
-  const key = event.key.toUpperCase();
-
-  // Cierra los teclados flotantes de inmediato
-  if (event.key === 'Escape') {
-    if (el.keypadPanel) el.keypadPanel.classList.add('hidden');
-    if (el.statusMultiKeypadPanel) el.statusMultiKeypadPanel.classList.add('hidden');
-    state.presionado = "";
+document['\u0061\u0064\u0064\u0045\u0076\u0065\u006E\u0074\u004C\u0069\u0073\u0074\u0065\u006E\u0065\u0072']("nwodyek".split("").reverse().join(""), event => {
+  const key = event['\u006B\u0065\u0079']['\u0074\u006F\u0055\u0070\u0070\u0065\u0072\u0043\u0061\u0073\u0065']();
+  if (event['\u006B\u0065\u0079'] === "epacsE".split("").reverse().join("")) {
+    if (el['\u006B\u0065\u0079\u0070\u0061\u0064\u0050\u0061\u006E\u0065\u006C']) el['\u006B\u0065\u0079\u0070\u0061\u0064\u0050\u0061\u006E\u0065\u006C']['\u0063\u006C\u0061\u0073\u0073\u004C\u0069\u0073\u0074']['\u0061\u0064\u0064']("neddih".split("").reverse().join(""));
+    if (el['\u0073\u0074\u0061\u0074\u0075\u0073\u004D\u0075\u006C\u0074\u0069\u004B\u0065\u0079\u0070\u0061\u0064\u0050\u0061\u006E\u0065\u006C']) el['\u0073\u0074\u0061\u0074\u0075\u0073\u004D\u0075\u006C\u0074\u0069\u004B\u0065\u0079\u0070\u0061\u0064\u0050\u0061\u006E\u0065\u006C']['\u0063\u006C\u0061\u0073\u0073\u004C\u0069\u0073\u0074']['\u0061\u0064\u0064']("neddih".split("").reverse().join(""));
+    state['\u0070\u0072\u0065\u0073\u0069\u006F\u006E\u0061\u0064\u006F'] = "";
     return;
   }
-
-  if (!state.playing) return;
-
-  const figureMap = { 'Q': '▲', 'W': '●', 'E': '■', 'R': '♦', 'T': '♥', 'Y': '✖' };
-  if (key === 'ENTER') {
-    if (state.gameMode === 'multi') {
+  if (!state['\u0070\u006C\u0061\u0079\u0069\u006E\u0067']) return;
+  let _0x8a_0xd7c;
+  const figureMap = {
+    "\u0051": "\u25B2",
+    "\u0057": "\u25CF",
+    "\u0045": "\u25A0",
+    "\u0052": "\u2666",
+    "\u0054": "\u2665",
+    "\u0059": "\u2716"
+  };
+  _0x8a_0xd7c = (118896 ^ 118904) + (493931 ^ 493932);
+  if (key === "\u0045\u004E\u0054\u0045\u0052") {
+    if (state['\u0067\u0061\u006D\u0065\u004D\u006F\u0064\u0065'] === "itlum".split("").reverse().join("")) {
       submitGuessMulti();
     } else {
       submitGuess();
     }
-  }
-  else if (key === 'BACKSPACE' || key === 'DELETE') deleteElement();
-  else if (figureMap[key]) addElement(figureMap[key]);
-  else if (BANK.includes(key)) addElement(key);
+  } else if (key === "\u0042\u0041\u0043\u004B\u0053\u0050\u0041\u0043\u0045" || key === "ETELED".split("").reverse().join("")) deleteElement();else if (figureMap[key]) addElement(figureMap[key]);else if (BANK['\u0069\u006E\u0063\u006C\u0075\u0064\u0065\u0073'](key)) addElement(key);
 });
-/**
- * Refresca la interfaz de la lista lateral para reflejar bloqueos globales, 
- * estados e indicadores de transmisión.
- */
-export function actualizarVisualSalaJugadores() {
-    if (!el.jugadorespanel) return;
-
-    const bloqueadosPorHumano = state.playerTargetBlocks[state.username] || [];
-    let htmlGrid = `<div class="players-grid-container">`;
-
-    htmlGrid += state.connectedPlayers.map((p, idx) => {
-        // Evaluación de estados del jugador
-        const esCulpable = state.decryptedPlayers.includes(p.name);
-        const esTurnoActual = state.currentPlayerIndex === idx;
-        const esHistorialActivo = (state.selectedTargetFilter === p.name);
-        const yaAtacadoEnTurno = bloqueadosPorHumano.includes(p.name);
-        const esElMismoHumano = (p.name === state.username);
-
-        // Clases CSS dinámicas
-        const claseBloqueado = (esCulpable || yaAtacadoEnTurno || esElMismoHumano) ? 'bloqueado' : '';
-        const claseSelected = (esHistorialActivo && !claseBloqueado) ? 'selected' : '';
-        const claseHistorial = esHistorialActivo ? 'historial-activo' : '';
-
-        // Determinar rol de Host
-        const determinaHost = p.isHost || (idx === 0 && state.isHost) || p.host;
-        let badge = determinaHost ? 'H' : 'R';
-        if (esCulpable) badge = '✖';
-
-        // Determinar estado de señal (Transmisión)
-        let signalBadge = '';
-        if (!esCulpable) {
-            if (esTurnoActual) {
-                signalBadge = `<span class="signal-badge transmitting">⚡ TRANSMITIENDO</span>`;
-            } else {
-                signalBadge = `<span class="signal-badge listening">💤 EN ESPERA</span>`;
-            }
-        }
-
-        // Estilos en línea condicionales
-        const estiloTurno = esTurnoActual ? 'border: 1px solid #00f5d4; background: rgba(0,245,212,0.1);' : '';
-        let opacidad = (esCulpable || esElMismoHumano) ? 'opacity: 0.4;' : '';
-        if (yaAtacadoEnTurno && !esCulpable) opacidad = 'opacity: 0.5; pointer-events: none;';
-        if (esElMismoHumano) opacidad += ' pointer-events: none;';
-
-        // Plantilla HTML del componente de jugador
-        return `
-            <div class="player-card-item ${claseSelected} ${claseBloqueado}" data-name="${p.name}" data-order="${idx + 1}" style="${estiloTurno} ${opacidad}"> 
+function _0x557gc() {
+  if (!el['\u006A\u0075\u0067\u0061\u0064\u006F\u0072\u0065\u0073\u0070\u0061\u006E\u0065\u006C']) return;
+  var _0x_0x5a4 = (942162 ^ 942163) + (626986 ^ 626990);
+  const _0xdc6c8d = state['\u0070\u006C\u0061\u0079\u0065\u0072\u0054\u0061\u0072\u0067\u0065\u0074\u0042\u006C\u006F\u0063\u006B\u0073'][state['\u0075\u0073\u0065\u0072\u006E\u0061\u006D\u0065']] || [];
+  _0x_0x5a4 = '\u006B\u006C\u0067\u0065\u006F\u006D';
+  let _0x3a_0xd33 = `<div class="players-grid-container">`;
+  _0x3a_0xd33 += state['\u0063\u006F\u006E\u006E\u0065\u0063\u0074\u0065\u0064\u0050\u006C\u0061\u0079\u0065\u0072\u0073']['\u006D\u0061\u0070']((p, idx) => {
+    const _0x049f9b = state['\u0064\u0065\u0063\u0072\u0079\u0070\u0074\u0065\u0064\u0050\u006C\u0061\u0079\u0065\u0072\u0073']['\u0069\u006E\u0063\u006C\u0075\u0064\u0065\u0073'](p['\u006E\u0061\u006D\u0065']);
+    let _0x70c;
+    const _0xd771f = state['\u0063\u0075\u0072\u0072\u0065\u006E\u0074\u0050\u006C\u0061\u0079\u0065\u0072\u0049\u006E\u0064\u0065\u0078'] === idx;
+    _0x70c = 199545 ^ 199545;
+    var _0xg31b = (499425 ^ 499429) + (219634 ^ 219642);
+    const _0xdc13ed = state['\u0073\u0065\u006C\u0065\u0063\u0074\u0065\u0064\u0054\u0061\u0072\u0067\u0065\u0074\u0046\u0069\u006C\u0074\u0065\u0072'] === p['\u006E\u0061\u006D\u0065'];
+    _0xg31b = "dlhbhn".split("").reverse().join("");
+    var _0x19c3g = (161300 ^ 161298) + (870038 ^ 870033);
+    const _0x48cb = _0xdc6c8d['\u0069\u006E\u0063\u006C\u0075\u0064\u0065\u0073'](p['\u006E\u0061\u006D\u0065']);
+    _0x19c3g = (379276 ^ 379276) + (628712 ^ 628705);
+    const _0xa6cb = p['\u006E\u0061\u006D\u0065'] === state['\u0075\u0073\u0065\u0072\u006E\u0061\u006D\u0065'];
+    var _0x40ab = (684869 ^ 684869) + (638749 ^ 638748);
+    const _0x4ecc = _0x049f9b || _0x48cb || _0xa6cb ? "\u0062\u006C\u006F\u0071\u0075\u0065\u0061\u0064\u006F" : '';
+    _0x40ab = (142166 ^ 142162) + (518500 ^ 518503);
+    const _0xd529f = _0xdc13ed && !_0x4ecc ? "\u0073\u0065\u006C\u0065\u0063\u0074\u0065\u0064" : '';
+    const _0x5_0x4a0 = _0xdc13ed ? "ovitca-lairotsih".split("").reverse().join("") : '';
+    const _0x6fc05f = p['\u0069\u0073\u0048\u006F\u0073\u0074'] || idx === (415723 ^ 415723) && state['\u0069\u0073\u0048\u006F\u0073\u0074'] || p['\u0068\u006F\u0073\u0074'];
+    var _0x8cf = (151787 ^ 151779) + (479868 ^ 479867);
+    let _0x4e863a = _0x6fc05f ? "\u0048" : "\u0052";
+    _0x8cf = '\u0062\u006D\u006C\u006B\u006E\u006D';
+    if (_0x049f9b) _0x4e863a = "\u2716";
+    let _0xd68ad = '';
+    if (!_0x049f9b) {
+      if (_0xd771f) {
+        _0xd68ad = `<span class="signal-badge transmitting">⚡ TRANSMITIENDO</span>`;
+      } else {
+        _0xd68ad = `<span class="signal-badge listening">💤 EN ESPERA</span>`;
+      }
+    }
+    let _0xdab6ag;
+    const _0x151cc = _0xd771f ? "\u0062\u006F\u0072\u0064\u0065\u0072\u003A\u0020\u0031\u0070\u0078\u0020\u0073\u006F\u006C\u0069\u0064\u0020\u0023\u0030\u0030\u0066\u0035\u0064\u0034\u003B\u0020\u0062\u0061\u0063\u006B\u0067\u0072\u006F\u0075\u006E\u0064\u003A\u0020\u0072\u0067\u0062\u0061\u0028\u0030\u002C\u0032\u0034\u0035\u002C\u0032\u0031\u0032\u002C\u0030\u002E\u0031\u0029\u003B" : '';
+    _0xdab6ag = (200819 ^ 200827) + (881740 ^ 881739);
+    var _0xgd514a = (334881 ^ 334887) + (426372 ^ 426369);
+    let _0xc84bcc = _0x049f9b || _0xa6cb ? "\u006F\u0070\u0061\u0063\u0069\u0074\u0079\u003A\u0020\u0030\u002E\u0034\u003B" : '';
+    _0xgd514a = (602425 ^ 602417) + (142026 ^ 142027);
+    if (_0x48cb && !_0x049f9b) _0xc84bcc = "\u006F\u0070\u0061\u0063\u0069\u0074\u0079\u003A\u0020\u0030\u002E\u0035\u003B\u0020\u0070\u006F\u0069\u006E\u0074\u0065\u0072\u002D\u0065\u0076\u0065\u006E\u0074\u0073\u003A\u0020\u006E\u006F\u006E\u0065\u003B";
+    if (_0xa6cb) _0xc84bcc += "\u0020\u0070\u006F\u0069\u006E\u0074\u0065\u0072\u002D\u0065\u0076\u0065\u006E\u0074\u0073\u003A\u0020\u006E\u006F\u006E\u0065\u003B";
+    return `
+            <div class="player-card-item ${_0xd529f} ${_0x4ecc}" data-name="${p['\u006E\u0061\u006D\u0065']}" data-order="${idx + (956361 ^ 956360)}" style="${_0x151cc} ${_0xc84bcc}"> 
                 <div class="player-info-inline" style="display: flex; flex-direction: column; align-items: flex-start; gap: 4px;"> 
                     <div style="display: flex; align-items: center; gap: 6px; width: 100%;"> 
-                        <span class="player-name-text" title="${p.name.toUpperCase()}">${esTurnoActual ? '▶️ ' : ''}📡 ${p.name.toUpperCase()}</span> 
-                        ${badge} 
+                        <span class="player-name-text" title="${p['\u006E\u0061\u006D\u0065']['\u0074\u006F\u0055\u0070\u0070\u0065\u0072\u0043\u0061\u0073\u0065']()}">${_0xd771f ? " \uFE0F\u25B6".split("").reverse().join("") : ''}📡 ${p['\u006E\u0061\u006D\u0065']['\u0074\u006F\u0055\u0070\u0070\u0065\u0072\u0043\u0061\u0073\u0065']()}</span> 
+                        ${_0x4e863a} 
                     </div> 
-                    ${signalBadge} 
+                    ${_0xd68ad} 
                 </div> 
                 <div style="display: flex; gap: 4px;"> 
-                    <button class="view-history-btn-compact ${claseHistorial}" data-target-name="${p.name}" style="pointer-events: auto;" title="Ver bitácora de ataques"> ↻ </button> 
-                    <button class="open-notes-btn-compact" data-target-name="${p.name}" style="pointer-events: auto;" ${esCulpable || p.name === state.username ? 'disabled' : ''} title="Abrir Notas Deductivas"> 📝 </button> 
+                    <button class="view-history-btn-compact ${_0x5_0x4a0}" data-target-name="${p['\u006E\u0061\u006D\u0065']}" style="pointer-events: auto;" title="Ver bitácora de ataques"> ↻ </button> 
+                    <button class="open-notes-btn-compact" data-target-name="${p['\u006E\u0061\u006D\u0065']}" style="pointer-events: auto;" ${_0x049f9b || p['\u006E\u0061\u006D\u0065'] === state['\u0075\u0073\u0065\u0072\u006E\u0061\u006D\u0065'] ? "delbasid".split("").reverse().join("") : ''} title="Abrir Notas Deductivas"> 📝 </button> 
                 </div> 
             </div>`;
-    }).join('');
-
-    htmlGrid += `</div>`;
-    el.jugadorespanel.innerHTML = htmlGrid;
+  })['\u006A\u006F\u0069\u006E']('');
+  _0x3a_0xd33 += `</div>`;
+  el['\u006A\u0075\u0067\u0061\u0064\u006F\u0072\u0065\u0073\u0070\u0061\u006E\u0065\u006C']['\u0069\u006E\u006E\u0065\u0072\u0048\u0054\u004D\u004C'] = _0x3a_0xd33;
 }
-
-// ESCUCHAR TECLA ENTER EN EL CUADRO DE LOGEO DE NOMBRE (ACTUALIZADO INTELIGENTE)
-if (el.usernameInput) {
-  el.usernameInput.addEventListener('keydown', (event) => {
-    if (event.key === 'ENTER') {
-      // Simulamos automáticamente un clic real en el botón Multijugador que ya programaste
-      if (el.vsPlayerBtn) {
-        el.vsPlayerBtn.click();
+export { _0x557gc as actualizarVisualSalaJugadores };
+if (el['\u0075\u0073\u0065\u0072\u006E\u0061\u006D\u0065\u0049\u006E\u0070\u0075\u0074']) {
+  el['\u0075\u0073\u0065\u0072\u006E\u0061\u006D\u0065\u0049\u006E\u0070\u0075\u0074']['\u0061\u0064\u0064\u0045\u0076\u0065\u006E\u0074\u004C\u0069\u0073\u0074\u0065\u006E\u0065\u0072']("\u006B\u0065\u0079\u0064\u006F\u0077\u006E", event => {
+    if (event['\u006B\u0065\u0079'] === "\u0045\u004E\u0054\u0045\u0052") {
+      if (el['\u0076\u0073\u0050\u006C\u0061\u0079\u0065\u0072\u0042\u0074\u006E']) {
+        el['\u0076\u0073\u0050\u006C\u0061\u0079\u0065\u0072\u0042\u0074\u006E']['\u0063\u006C\u0069\u0063\u006B']();
       }
     }
   });
 }
-
-if (el.jugadorespanel) {
-  el.jugadorespanel.addEventListener('click', (event) => {
-    const viewBtn = event.target.closest('.view-history-btn-compact');
+if (el['\u006A\u0075\u0067\u0061\u0064\u006F\u0072\u0065\u0073\u0070\u0061\u006E\u0065\u006C']) {
+  el['\u006A\u0075\u0067\u0061\u0064\u006F\u0072\u0065\u0073\u0070\u0061\u006E\u0065\u006C']['\u0061\u0064\u0064\u0045\u0076\u0065\u006E\u0074\u004C\u0069\u0073\u0074\u0065\u006E\u0065\u0072']("\u0063\u006C\u0069\u0063\u006B", event => {
+    let _0x69efe;
+    const viewBtn = event['\u0074\u0061\u0072\u0067\u0065\u0074']['\u0063\u006C\u006F\u0073\u0065\u0073\u0074']("tcapmoc-ntb-yrotsih-weiv.".split("").reverse().join(""));
+    _0x69efe = (580980 ^ 580983) + (748876 ^ 748873);
     if (viewBtn) {
-      event.stopPropagation();
-      const targetName = viewBtn.dataset.targetName;
-      el.jugadorespanel.querySelectorAll('.view-history-btn-compact')
-      .forEach(btn => btn.classList.remove('historial-activo'));
-      viewBtn.classList.add('historial-activo');
-      state.selectedTargetFilter = targetName;
+      event['\u0073\u0074\u006F\u0070\u0050\u0072\u006F\u0070\u0061\u0067\u0061\u0074\u0069\u006F\u006E']();
+      let _0x3f680g;
+      const targetName = viewBtn['\u0064\u0061\u0074\u0061\u0073\u0065\u0074']['\u0074\u0061\u0072\u0067\u0065\u0074\u004E\u0061\u006D\u0065'];
+      _0x3f680g = 354597 ^ 354597;
+      el['\u006A\u0075\u0067\u0061\u0064\u006F\u0072\u0065\u0073\u0070\u0061\u006E\u0065\u006C']['\u0071\u0075\u0065\u0072\u0079\u0053\u0065\u006C\u0065\u0063\u0074\u006F\u0072\u0041\u006C\u006C']("tcapmoc-ntb-yrotsih-weiv.".split("").reverse().join(""))['\u0066\u006F\u0072\u0045\u0061\u0063\u0068'](btn => btn['\u0063\u006C\u0061\u0073\u0073\u004C\u0069\u0073\u0074']['\u0072\u0065\u006D\u006F\u0076\u0065']("\u0068\u0069\u0073\u0074\u006F\u0072\u0069\u0061\u006C\u002D\u0061\u0063\u0074\u0069\u0076\u006F"));
+      viewBtn['\u0063\u006C\u0061\u0073\u0073\u004C\u0069\u0073\u0074']['\u0061\u0064\u0064']("\u0068\u0069\u0073\u0074\u006F\u0072\u0069\u0061\u006C\u002D\u0061\u0063\u0074\u0069\u0076\u006F");
+      state['\u0073\u0065\u006C\u0065\u0063\u0074\u0065\u0064\u0054\u0061\u0072\u0067\u0065\u0074\u0046\u0069\u006C\u0074\u0065\u0072'] = targetName;
       renderizarBitacoraFiltrada();
       return;
     }
-    const notesBtn = event.target.closest('.open-notes-btn-compact');
+    const notesBtn = event['\u0074\u0061\u0072\u0067\u0065\u0074']['\u0063\u006C\u006F\u0073\u0065\u0073\u0074']("\u002E\u006F\u0070\u0065\u006E\u002D\u006E\u006F\u0074\u0065\u0073\u002D\u0062\u0074\u006E\u002D\u0063\u006F\u006D\u0070\u0061\u0063\u0074");
     if (notesBtn) {
-      event.stopPropagation();
-      const targetName = notesBtn.dataset.targetName;
-      state.selectedTargetFilter = targetName;
+      event['\u0073\u0074\u006F\u0070\u0050\u0072\u006F\u0070\u0061\u0067\u0061\u0074\u0069\u006F\u006E']();
+      const targetName = notesBtn['\u0064\u0061\u0074\u0061\u0073\u0065\u0074']['\u0074\u0061\u0072\u0067\u0065\u0074\u004E\u0061\u006D\u0065'];
+      state['\u0073\u0065\u006C\u0065\u0063\u0074\u0065\u0064\u0054\u0061\u0072\u0067\u0065\u0074\u0046\u0069\u006C\u0074\u0065\u0072'] = targetName;
       abrirModalNotas();
       return;
     }
-    const playerCard = event.target.closest('.player-card-item');
+    var _0xc76e = (314486 ^ 314494) + (952452 ^ 952461);
+    const playerCard = event['\u0074\u0061\u0072\u0067\u0065\u0074']['\u0063\u006C\u006F\u0073\u0065\u0073\u0074']("meti-drac-reyalp.".split("").reverse().join(""));
+    _0xc76e = '\u0064\u0063\u006F\u0069\u006D\u0067';
     if (!playerCard) return;
-    const chosenPlayerName = playerCard.dataset.name;
-    if (chosenPlayerName === state.username || playerCard.classList.contains('bloqueado')) {
+    let _0xdf_0xf3b;
+    const chosenPlayerName = playerCard['\u0064\u0061\u0074\u0061\u0073\u0065\u0074']['\u006E\u0061\u006D\u0065'];
+    _0xdf_0xf3b = 881150 ^ 881142;
+    if (chosenPlayerName === state['\u0075\u0073\u0065\u0072\u006E\u0061\u006D\u0065'] || playerCard['\u0063\u006C\u0061\u0073\u0073\u004C\u0069\u0073\u0074']['\u0063\u006F\u006E\u0074\u0061\u0069\u006E\u0073']("\u0062\u006C\u006F\u0071\u0075\u0065\u0061\u0064\u006F")) {
       return;
     }
-    const currentActive = el.jugadorespanel.querySelector('.player-card-item.selected');
-    if (currentActive) currentActive.classList.remove('selected');
-    playerCard.classList.add('selected');
-    state.selectedTargetFilter = chosenPlayerName;
+    const currentActive = el['\u006A\u0075\u0067\u0061\u0064\u006F\u0072\u0065\u0073\u0070\u0061\u006E\u0065\u006C']['\u0071\u0075\u0065\u0072\u0079\u0053\u0065\u006C\u0065\u0063\u0074\u006F\u0072']("\u002E\u0070\u006C\u0061\u0079\u0065\u0072\u002D\u0063\u0061\u0072\u0064\u002D\u0069\u0074\u0065\u006D\u002E\u0073\u0065\u006C\u0065\u0063\u0074\u0065\u0064");
+    if (currentActive) currentActive['\u0063\u006C\u0061\u0073\u0073\u004C\u0069\u0073\u0074']['\u0072\u0065\u006D\u006F\u0076\u0065']("detceles".split("").reverse().join(""));
+    playerCard['\u0063\u006C\u0061\u0073\u0073\u004C\u0069\u0073\u0074']['\u0061\u0064\u0064']("detceles".split("").reverse().join(""));
+    state['\u0073\u0065\u006C\u0065\u0063\u0074\u0065\u0064\u0054\u0061\u0072\u0067\u0065\u0074\u0046\u0069\u006C\u0074\u0065\u0072'] = chosenPlayerName;
     renderizarBitacoraFiltrada();
   });
 }
-
 function abrirModalNotas() {
-  const viejoModal = document.getElementById('modalNotasDeduccion');
-  if (viejoModal) viejoModal.remove();
-  const modal = document.createElement('div');
-  modal.id = 'modalNotasDeduccion';
-  modal.className = 'overlay-notes';
-  modal.innerHTML = `
+  const _0x1ab = document['\u0067\u0065\u0074\u0045\u006C\u0065\u006D\u0065\u006E\u0074\u0042\u0079\u0049\u0064']("noiccudeDsatoNladom".split("").reverse().join(""));
+  if (_0x1ab) _0x1ab['\u0072\u0065\u006D\u006F\u0076\u0065']();
+  const _0xb616b = document['\u0063\u0072\u0065\u0061\u0074\u0065\u0045\u006C\u0065\u006D\u0065\u006E\u0074']("\u0064\u0069\u0076");
+  _0xb616b['\u0069\u0064'] = "\u006D\u006F\u0064\u0061\u006C\u004E\u006F\u0074\u0061\u0073\u0044\u0065\u0064\u0075\u0063\u0063\u0069\u006F\u006E";
+  _0xb616b['\u0063\u006C\u0061\u0073\u0073\u004E\u0061\u006D\u0065'] = "\u006F\u0076\u0065\u0072\u006C\u0061\u0079\u002D\u006E\u006F\u0074\u0065\u0073";
+  _0xb616b['\u0069\u006E\u006E\u0065\u0072\u0048\u0054\u004D\u004C'] = `
     <div class="notes-modal-card"> 
       <div class="notes-modal-close" id="closeNotesModalBtn">✕</div> 
       <div id="cuadernoNotasContenedor"></div> 
     </div>
   `;
-  document.body.appendChild(modal);
-
+  document['\u0062\u006F\u0064\u0079']['\u0061\u0070\u0070\u0065\u006E\u0064\u0043\u0068\u0069\u006C\u0064'](_0xb616b);
   renderizarCuadernoNotas();
-
-  document.getElementById('closeNotesModalBtn').addEventListener('click', () => {
-    modal.remove();
+  document['\u0067\u0065\u0074\u0045\u006C\u0065\u006D\u0065\u006E\u0074\u0042\u0079\u0049\u0064']("\u0063\u006C\u006F\u0073\u0065\u004E\u006F\u0074\u0065\u0073\u004D\u006F\u0064\u0061\u006C\u0042\u0074\u006E")['\u0061\u0064\u0064\u0045\u0076\u0065\u006E\u0074\u004C\u0069\u0073\u0074\u0065\u006E\u0065\u0072']("kcilc".split("").reverse().join(""), () => {
+    _0xb616b['\u0072\u0065\u006D\u006F\u0076\u0065']();
   });
-  modal.addEventListener('click', (e) => {
-    if (e.target === modal) modal.remove();
+  _0xb616b['\u0061\u0064\u0064\u0045\u0076\u0065\u006E\u0074\u004C\u0069\u0073\u0074\u0065\u006E\u0065\u0072']("kcilc".split("").reverse().join(""), e => {
+    if (e['\u0074\u0061\u0072\u0067\u0065\u0074'] === _0xb616b) _0xb616b['\u0072\u0065\u006D\u006F\u0076\u0065']();
   });
 }
-export function lanzarFuegosArtificialesCiberpunk() {
-  const colores = ['#00f5d4', '#f637ec', '#ffb703', '#ff4d6d', '#ffffff'];
-  const intervaloPirotecnia = setInterval(() => {
-    if (!document.getElementById('winOverlay')) {
-      clearInterval(intervaloPirotecnia);
+function _0x2bg1d(_0x75d6e) {
+  const _0xd64eaf = ["4d5f00#".split("").reverse().join(""), "\u0023\u0066\u0036\u0033\u0037\u0065\u0063", "\u0023\u0066\u0066\u0062\u0037\u0030\u0033", "d6d4ff#".split("").reverse().join(""), "ffffff#".split("").reverse().join("")];
+  const _0x72d = setInterval(() => {
+    if (!document['\u0067\u0065\u0074\u0045\u006C\u0065\u006D\u0065\u006E\u0074\u0042\u0079\u0049\u0064']("\u0077\u0069\u006E\u004F\u0076\u0065\u0072\u006C\u0061\u0079")) {
+      clearInterval(_0x72d);
       return;
     }
-    const centroX = Math.random() * 100;
-    const centroY = 20 + Math.random() * 50;
-    const colorExplosion = colores[Math.floor(Math.random() * colores.length)];
-    for (let i = 0; i < 24; i++) {
-      const particula = document.createElement('div');
-      particula.className = 'confetti';
-      particula.style.left = centroX + 'vw';
-      particula.style.top = centroY + 'vh';
-      particula.style.background = colorExplosion;
-      particula.style.width = '6px';
-      particula.style.height = '6px';
-      particula.style.borderRadius = '50%';
-      particula.style.boxShadow = `0 0 8px ${colorExplosion}`;
-
-      const angulo = (i * 15) * (Math.PI / 180);
-      const velocidad = 40 + Math.random() * 60;
-      const desvX = Math.cos(angulo) * velocidad;
-      const desvY = Math.sin(angulo) * velocidad;
-
-      particula.style.setProperty('--x', `${desvX}px`);
-      particula.style.setProperty('--y', `${desvY}px`);
-      particula.style.animation = 'fuegosArtificialesAnim 1.8s cubic-bezier(0.1, 0.8, 0.3, 1) forwards';
-      document.body.appendChild(particula);
-      setTimeout(() => particula.remove(), 1800);
+    var _0xccfd = (857685 ^ 857693) + (373591 ^ 373589);
+    const _0xbd937f = Math['\u0072\u0061\u006E\u0064\u006F\u006D']() * (774035 ^ 774135);
+    _0xccfd = 154328 ^ 154320;
+    var _0xfd81e = (959462 ^ 959459) + (229728 ^ 229736);
+    const _0xfa0b = (124126 ^ 124106) + Math['\u0072\u0061\u006E\u0064\u006F\u006D']() * (790406 ^ 790452);
+    _0xfd81e = "knbngn".split("").reverse().join("");
+    const _0x27g = _0xd64eaf[Math['\u0066\u006C\u006F\u006F\u0072'](Math['\u0072\u0061\u006E\u0064\u006F\u006D']() * _0xd64eaf['\u006C\u0065\u006E\u0067\u0074\u0068'])];
+    for (let i = 709800 ^ 709800; i < (472385 ^ 472409); i++) {
+      const _0xf5c96a = document['\u0063\u0072\u0065\u0061\u0074\u0065\u0045\u006C\u0065\u006D\u0065\u006E\u0074']("\u0064\u0069\u0076");
+      _0xf5c96a['\u0063\u006C\u0061\u0073\u0073\u004E\u0061\u006D\u0065'] = "\u0063\u006F\u006E\u0066\u0065\u0074\u0074\u0069";
+      _0xf5c96a['\u0073\u0074\u0079\u006C\u0065']['\u006C\u0065\u0066\u0074'] = _0xbd937f + "\u0076\u0077";
+      _0xf5c96a['\u0073\u0074\u0079\u006C\u0065']['\u0074\u006F\u0070'] = _0xfa0b + "\u0076\u0068";
+      _0xf5c96a['\u0073\u0074\u0079\u006C\u0065']['\u0062\u0061\u0063\u006B\u0067\u0072\u006F\u0075\u006E\u0064'] = _0x27g;
+      _0xf5c96a['\u0073\u0074\u0079\u006C\u0065']['\u0077\u0069\u0064\u0074\u0068'] = "\u0036\u0070\u0078";
+      _0xf5c96a['\u0073\u0074\u0079\u006C\u0065']['\u0068\u0065\u0069\u0067\u0068\u0074'] = "\u0036\u0070\u0078";
+      _0xf5c96a['\u0073\u0074\u0079\u006C\u0065']['\u0062\u006F\u0072\u0064\u0065\u0072\u0052\u0061\u0064\u0069\u0075\u0073'] = "\u0035\u0030\u0025";
+      _0xf5c96a['\u0073\u0074\u0079\u006C\u0065']['\u0062\u006F\u0078\u0053\u0068\u0061\u0064\u006F\u0077'] = `0 0 8px ${_0x27g}`;
+      var _0x2_0x7g3 = (584609 ^ 584609) + (971988 ^ 971990);
+      const _0xce_0x783 = i * (928209 ^ 928222) * (Math['\u0050\u0049'] / (449953 ^ 449813));
+      _0x2_0x7g3 = 165262 ^ 165260;
+      var _0xdf2 = (276578 ^ 276587) + (487339 ^ 487341);
+      const _0xe8a7g = (612604 ^ 612564) + Math['\u0072\u0061\u006E\u0064\u006F\u006D']() * (430263 ^ 430219);
+      _0xdf2 = (925310 ^ 925308) + (980287 ^ 980287);
+      const _0xc0g = Math['\u0063\u006F\u0073'](_0xce_0x783) * _0xe8a7g;
+      const _0x5d48gd = Math['\u0073\u0069\u006E'](_0xce_0x783) * _0xe8a7g;
+      _0xf5c96a['\u0073\u0074\u0079\u006C\u0065']['\u0073\u0065\u0074\u0050\u0072\u006F\u0070\u0065\u0072\u0074\u0079']("\u002D\u002D\u0078", `${_0xc0g}px`);
+      _0xf5c96a['\u0073\u0074\u0079\u006C\u0065']['\u0073\u0065\u0074\u0050\u0072\u006F\u0070\u0065\u0072\u0074\u0079']("\u002D\u002D\u0079", `${_0x5d48gd}px`);
+      _0xf5c96a['\u0073\u0074\u0079\u006C\u0065']['\u0061\u006E\u0069\u006D\u0061\u0074\u0069\u006F\u006E'] = "\u0066\u0075\u0065\u0067\u006F\u0073\u0041\u0072\u0074\u0069\u0066\u0069\u0063\u0069\u0061\u006C\u0065\u0073\u0041\u006E\u0069\u006D\u0020\u0031\u002E\u0038\u0073\u0020\u0063\u0075\u0062\u0069\u0063\u002D\u0062\u0065\u007A\u0069\u0065\u0072\u0028\u0030\u002E\u0031\u002C\u0020\u0030\u002E\u0038\u002C\u0020\u0030\u002E\u0033\u002C\u0020\u0031\u0029\u0020\u0066\u006F\u0072\u0077\u0061\u0072\u0064\u0073";
+      document['\u0062\u006F\u0064\u0079']['\u0061\u0070\u0070\u0065\u006E\u0064\u0043\u0068\u0069\u006C\u0064'](_0xf5c96a);
+      setTimeout(() => _0xf5c96a['\u0072\u0065\u006D\u006F\u0076\u0065'](), 766528 ^ 767304);
     }
-  }, 450);
+  }, 316719 ^ 316653);
+  _0x75d6e = "djhcjk".split("").reverse().join("");
 }
+export { _0x2bg1d as lanzarFuegosArtificialesCiberpunk };
 renderRecords();
-// Añadir al final absoluto de main.js para encender la red en tiempo real
-import { inicializarConexionSocket } from './mode-multi.js';
-
-// Conectarse de forma local al puerto 3000 de Node.js
-// Nota: Cuando subamos el servidor a Render.com, solo cambiaremos esta URL por la pública gratuita.
-const urlServidorPruebas = "https://codigooculto-v1kw.onrender.com";
+import { inicializarConexionSocket } from "\u002E\u002F\u006D\u006F\u0064\u0065\u002D\u006D\u0075\u006C\u0074\u0069\u002E\u006A\u0073";
+let _0xb2bbec;
+const urlServidorPruebas = "\u0068\u0074\u0074\u0070\u0073\u003A\u002F\u002F\u0063\u006F\u0064\u0069\u0067\u006F\u006F\u0063\u0075\u006C\u0074\u006F\u002D\u0076\u0031\u006B\u0077\u002E\u006F\u006E\u0072\u0065\u006E\u0064\u0065\u0072\u002E\u0063\u006F\u006D";
+_0xb2bbec = (795650 ^ 795655) + (627833 ^ 627839);
+let _0x522ee;
 const instanciaSocket = io(urlServidorPruebas);
-
-// Compartir el canal activo e inicializar los escuchadores gráficos que acabamos de configurar
+_0x522ee = (478045 ^ 478044) + (652788 ^ 652797);
 inicializarConexionSocket(instanciaSocket);
-vincularEventosGraficosDeRed();
-
-/* ---------- CONTROL PROTOCOLO BOTÓN ATRÁS EN CELULARES ---------- 
-window.addEventListener('popstate', (event) => {
-  // Verificamos si los teclados flotantes están visibles en pantalla
-  const tecladoIaVisible = el.keypadPanel && !el.keypadPanel.classList.contains('hidden');
-  const tecladoMultiVisible = el.statusMultiKeypadPanel && !el.statusMultiKeypadPanel.classList.contains('hidden');
-
-  if (tecladoIaVisible || tecladoMultiVisible) {
-    // Si alguno estaba abierto, mitigamos la salida ocultando las consolas
-    if (el.keypadPanel) el.keypadPanel.classList.add('hidden');
-    if (el.statusMultiKeypadPanel) el.statusMultiKeypadPanel.classList.add('hidden');
-    state.presionado = "";
-    
-    console.log("📡 GESTO MÓVIL DETECTADO: Consola replegada con éxito.");
-  }
-});*/
-/* =============================================================================
-   🎮 PROTOCOLO DE SEGURIDAD: INTERCEPCIÓN DEL BOTÓN ATRÁS DEL CELULAR
-   ============================================================================= */
-
-// Forzamos al navegador a mantener un estado activo en el historial constantemente
-history.pushState(null, null, window.location.href);
-
-window.addEventListener('popstate', () => {
-    // 1. EVALUACIÓN A: Si el cuaderno de notas deductivas está abierto, lo cerramos de inmediato
-  const modalNotas = document.getElementById('modalNotasDeduccion');
+_0x0d44g();
+history['\u0070\u0075\u0073\u0068\u0053\u0074\u0061\u0074\u0065'](null, null, window['\u006C\u006F\u0063\u0061\u0074\u0069\u006F\u006E']['\u0068\u0072\u0065\u0066']);
+window['\u0061\u0064\u0064\u0045\u0076\u0065\u006E\u0074\u004C\u0069\u0073\u0074\u0065\u006E\u0065\u0072']("\u0070\u006F\u0070\u0073\u0074\u0061\u0074\u0065", () => {
+  let _0x38b;
+  const modalNotas = document['\u0067\u0065\u0074\u0045\u006C\u0065\u006D\u0065\u006E\u0074\u0042\u0079\u0049\u0064']("\u006D\u006F\u0064\u0061\u006C\u004E\u006F\u0074\u0061\u0073\u0044\u0065\u0064\u0075\u0063\u0063\u0069\u006F\u006E");
+  _0x38b = (620422 ^ 620423) + (213108 ^ 213104);
   if (modalNotas) {
-    modalNotas.remove(); // Elimina el modal de la pantalla al presionar Atrás en el celular
-    console.log("📝 Protocolo de notas: Ventana deductiva replegada mediante botón atrás físico.");
-    
-    // Volvemos a inyectar el escudo protector y salimos de la función
-    history.pushState(null, null, window.location.href);
+    modalNotas['\u0072\u0065\u006D\u006F\u0076\u0065']();
+    console['\u006C\u006F\u0067'](".ocis\xEDf s\xE1rta n\xF3tob etnaidem adagelper avitcuded anatneV :saton ed olocotorP \uDCDD\uD83D".split("").reverse().join(""));
+    history['\u0070\u0075\u0073\u0068\u0053\u0074\u0061\u0074\u0065'](null, null, window['\u006C\u006F\u0063\u0061\u0074\u0069\u006F\u006E']['\u0068\u0072\u0065\u0066']);
     return;
   }
-
-  // 1. Si los teclados flotantes están abiertos, los cerramos primero de forma segura
-  const tecladoIaVisible = el.keypadPanel && !el.keypadPanel.classList.contains('hidden');
-  const tecladoMultiVisible = el.statusMultiKeypadPanel && !el.statusMultiKeypadPanel.classList.contains('hidden');
-
+  const tecladoIaVisible = el['\u006B\u0065\u0079\u0070\u0061\u0064\u0050\u0061\u006E\u0065\u006C'] && !el['\u006B\u0065\u0079\u0070\u0061\u0064\u0050\u0061\u006E\u0065\u006C']['\u0063\u006C\u0061\u0073\u0073\u004C\u0069\u0073\u0074']['\u0063\u006F\u006E\u0074\u0061\u0069\u006E\u0073']("\u0068\u0069\u0064\u0064\u0065\u006E");
+  const tecladoMultiVisible = el['\u0073\u0074\u0061\u0074\u0075\u0073\u004D\u0075\u006C\u0074\u0069\u004B\u0065\u0079\u0070\u0061\u0064\u0050\u0061\u006E\u0065\u006C'] && !el['\u0073\u0074\u0061\u0074\u0075\u0073\u004D\u0075\u006C\u0074\u0069\u004B\u0065\u0079\u0070\u0061\u0064\u0050\u0061\u006E\u0065\u006C']['\u0063\u006C\u0061\u0073\u0073\u004C\u0069\u0073\u0074']['\u0063\u006F\u006E\u0074\u0061\u0069\u006E\u0073']("\u0068\u0069\u0064\u0064\u0065\u006E");
   if (tecladoIaVisible || tecladoMultiVisible) {
-    if (el.keypadPanel) el.keypadPanel.classList.add('hidden');
-    if (el.statusMultiKeypadPanel) el.statusMultiKeypadPanel.classList.add('hidden');
-    state.presionado = "";
+    if (el['\u006B\u0065\u0079\u0070\u0061\u0064\u0050\u0061\u006E\u0065\u006C']) el['\u006B\u0065\u0079\u0070\u0061\u0064\u0050\u0061\u006E\u0065\u006C']['\u0063\u006C\u0061\u0073\u0073\u004C\u0069\u0073\u0074']['\u0061\u0064\u0064']("neddih".split("").reverse().join(""));
+    if (el['\u0073\u0074\u0061\u0074\u0075\u0073\u004D\u0075\u006C\u0074\u0069\u004B\u0065\u0079\u0070\u0061\u0064\u0050\u0061\u006E\u0065\u006C']) el['\u0073\u0074\u0061\u0074\u0075\u0073\u004D\u0075\u006C\u0074\u0069\u004B\u0065\u0079\u0070\u0061\u0064\u0050\u0061\u006E\u0065\u006C']['\u0063\u006C\u0061\u0073\u0073\u004C\u0069\u0073\u0074']['\u0061\u0064\u0064']("\u0068\u0069\u0064\u0064\u0065\u006E");
+    state['\u0070\u0072\u0065\u0073\u0069\u006F\u006E\u0061\u0064\u006F'] = "";
   } else {
-    // 2. Si presiona atrás en cualquier otro menú, bloqueamos la salida y le avisamos visualmente
-    mostrarAlertaCyber("PROTOCOLO ACTIVO: Utiliza los botones de la interfaz gráfica para navegar por el Mainframe.", true);
+    mostrarAlertaCyber(".emarfniaM le rop ragevan arap acif\xE1rg zafretni al ed senotob sol azilitU :OVITCA OLOCOTORP".split("").reverse().join(""), !![]);
   }
-
-  // 3. Volvemos a inyectar el escudo protector inmediatamente para el próximo intento
-  history.pushState(null, null, window.location.href);
+  history['\u0070\u0075\u0073\u0068\u0053\u0074\u0061\u0074\u0065'](null, null, window['\u006C\u006F\u0063\u0061\u0074\u0069\u006F\u006E']['\u0068\u0072\u0065\u0066']);
 });
