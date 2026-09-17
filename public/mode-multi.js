@@ -1,250 +1,190 @@
-/* =========================================================
-   CÓDIGO OCULTO - Controlador de Partida Modo Multijugador (En Línea)
-   ========================================================= */
-import { state, BANK } from './config.js';
-import { el } from './dom.js';
-import { buildKeypad, crearSlots, refreshKeypad, setMultiSetupMessage, mostrarAlertaCyber } from './ui.js';
-import { renderConnectedPlayers } from './rooms.js';
-import { lanzarPartidaMultijugador } from './match.js';
-import { resetGame, actualizarVisualSalaJugadores } from './main.js';
-
-// Variable de conexión global que inicializaremos en el punto de entrada
+import { state, BANK } from "\u002E\u002F\u0063\u006F\u006E\u0066\u0069\u0067\u002E\u006A\u0073";
+import { el } from "\u002E\u002F\u0064\u006F\u006D\u002E\u006A\u0073";
+import { buildKeypad, crearSlots, refreshKeypad, setMultiSetupMessage, mostrarAlertaCyber } from "\u002E\u002F\u0075\u0069\u002E\u006A\u0073";
+import { renderConnectedPlayers } from "\u002E\u002F\u0072\u006F\u006F\u006D\u0073\u002E\u006A\u0073";
+import { lanzarPartidaMultijugador } from "\u002E\u002F\u006D\u0061\u0074\u0063\u0068\u002E\u006A\u0073";
+import { resetGame, actualizarVisualSalaJugadores } from "\u002E\u002F\u006D\u0061\u0069\u006E\u002E\u006A\u0073";
+let _0x52e58c;
 export let socket = null;
-
-/**
- * Asigna la instancia activa de la conexión de red compartida por el orquestador
- */
-export function inicializarConexionSocket(instanciaSocket) {
+_0x52e58c = 849641 ^ 849647;
+function _0xad697a(instanciaSocket) {
   socket = instanciaSocket;
   configurarEscuchadoresRed();
 }
-
-// Validar longitud personalizada modo multijugador
-export function validarLongitudPersonalizadaMulti() {
-  let val = parseInt(el.multiCustomLenInput.value, 10);
-  const maxElements = BANK.length;
-
-  if (isNaN(val) || val < 3) val = 3;
-  if (val > maxElements) val = maxElements;
-  
-  el.multiCustomLenInput.value = val;
-  state.multiLength = val;
-  state.mySecretCode = [];
-  
+export { _0xad697a as inicializarConexionSocket };
+function _0x745e2g() {
+  var _0xg83a = (672723 ^ 672720) + (622544 ^ 622544);
+  let _0x57f3ac = parseInt(el['\u006D\u0075\u006C\u0074\u0069\u0043\u0075\u0073\u0074\u006F\u006D\u004C\u0065\u006E\u0049\u006E\u0070\u0075\u0074']['\u0076\u0061\u006C\u0075\u0065'], 881622 ^ 881628);
+  _0xg83a = 775327 ^ 775321;
+  var _0x5b_0x14d = (433689 ^ 433693) + (864824 ^ 864817);
+  const _0x1bd71f = BANK['\u006C\u0065\u006E\u0067\u0074\u0068'];
+  _0x5b_0x14d = "bikqfh".split("").reverse().join("");
+  if (isNaN(_0x57f3ac) || _0x57f3ac < (546960 ^ 546963)) _0x57f3ac = 110388 ^ 110391;
+  if (_0x57f3ac > _0x1bd71f) _0x57f3ac = _0x1bd71f;
+  el['\u006D\u0075\u006C\u0074\u0069\u0043\u0075\u0073\u0074\u006F\u006D\u004C\u0065\u006E\u0049\u006E\u0070\u0075\u0074']['\u0076\u0061\u006C\u0075\u0065'] = _0x57f3ac;
+  state['\u006D\u0075\u006C\u0074\u0069\u004C\u0065\u006E\u0067\u0074\u0068'] = _0x57f3ac;
+  state['\u006D\u0079\u0053\u0065\u0063\u0072\u0065\u0074\u0043\u006F\u0064\u0065'] = [];
   crearSlots();
   refreshKeypad();
 }
-
-// Eventos de los botones de dificultad del menú multiplayer
-el.multiDiffBtns.forEach(btn => {
-  btn.addEventListener('click', () => {
-    if (state.isCodeLocked) return;
-    el.multiDiffBtns.forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    state.multiLength = parseInt(btn.dataset.len, 10);
-    state.mySecretCode = [];
+export { _0x745e2g as validarLongitudPersonalizadaMulti };
+el['\u006D\u0075\u006C\u0074\u0069\u0044\u0069\u0066\u0066\u0042\u0074\u006E\u0073']['\u0066\u006F\u0072\u0045\u0061\u0063\u0068'](btn => {
+  btn['\u0061\u0064\u0064\u0045\u0076\u0065\u006E\u0074\u004C\u0069\u0073\u0074\u0065\u006E\u0065\u0072']("kcilc".split("").reverse().join(""), () => {
+    if (state['\u0069\u0073\u0043\u006F\u0064\u0065\u004C\u006F\u0063\u006B\u0065\u0064']) return;
+    el['\u006D\u0075\u006C\u0074\u0069\u0044\u0069\u0066\u0066\u0042\u0074\u006E\u0073']['\u0066\u006F\u0072\u0045\u0061\u0063\u0068'](b => b['\u0063\u006C\u0061\u0073\u0073\u004C\u0069\u0073\u0074']['\u0072\u0065\u006D\u006F\u0076\u0065']("\u0061\u0063\u0074\u0069\u0076\u0065"));
+    btn['\u0063\u006C\u0061\u0073\u0073\u004C\u0069\u0073\u0074']['\u0061\u0064\u0064']("\u0061\u0063\u0074\u0069\u0076\u0065");
+    state['\u006D\u0075\u006C\u0074\u0069\u004C\u0065\u006E\u0067\u0074\u0068'] = parseInt(btn['\u0064\u0061\u0074\u0061\u0073\u0065\u0074']['\u006C\u0065\u006E'], 180451 ^ 180457);
+    state['\u006D\u0079\u0053\u0065\u0063\u0072\u0065\u0074\u0043\u006F\u0064\u0065'] = [];
     crearSlots();
     refreshKeypad();
   });
 });
-
-el.multiCustomDiffBtn.addEventListener('click', () => {
-  if (!state.isCodeLocked) {
-    el.multiDiffBtns.forEach(b => b.classList.remove('active'));
-    el.multiCustomDiffBtn.classList.add('active');
-    validarLongitudPersonalizadaMulti();
+el['\u006D\u0075\u006C\u0074\u0069\u0043\u0075\u0073\u0074\u006F\u006D\u0044\u0069\u0066\u0066\u0042\u0074\u006E']['\u0061\u0064\u0064\u0045\u0076\u0065\u006E\u0074\u004C\u0069\u0073\u0074\u0065\u006E\u0065\u0072']("kcilc".split("").reverse().join(""), () => {
+  if (!state['\u0069\u0073\u0043\u006F\u0064\u0065\u004C\u006F\u0063\u006B\u0065\u0064']) {
+    el['\u006D\u0075\u006C\u0074\u0069\u0044\u0069\u0066\u0066\u0042\u0074\u006E\u0073']['\u0066\u006F\u0072\u0045\u0061\u0063\u0068'](b => b['\u0063\u006C\u0061\u0073\u0073\u004C\u0069\u0073\u0074']['\u0072\u0065\u006D\u006F\u0076\u0065']("evitca".split("").reverse().join("")));
+    el['\u006D\u0075\u006C\u0074\u0069\u0043\u0075\u0073\u0074\u006F\u006D\u0044\u0069\u0066\u0066\u0042\u0074\u006E']['\u0063\u006C\u0061\u0073\u0073\u004C\u0069\u0073\u0074']['\u0061\u0064\u0064']("\u0061\u0063\u0074\u0069\u0076\u0065");
+    _0x745e2g();
   }
 });
-
-el.multiCustomLenInput.addEventListener('input', () => {
-  if (el.multiCustomDiffBtn.classList.contains('active') && !state.isCodeLocked) {
-    validarLongitudPersonalizadaMulti();
+el['\u006D\u0075\u006C\u0074\u0069\u0043\u0075\u0073\u0074\u006F\u006D\u004C\u0065\u006E\u0049\u006E\u0070\u0075\u0074']['\u0061\u0064\u0064\u0045\u0076\u0065\u006E\u0074\u004C\u0069\u0073\u0074\u0065\u006E\u0065\u0072']("\u0069\u006E\u0070\u0075\u0074", () => {
+  if (el['\u006D\u0075\u006C\u0074\u0069\u0043\u0075\u0073\u0074\u006F\u006D\u0044\u0069\u0066\u0066\u0042\u0074\u006E']['\u0063\u006C\u0061\u0073\u0073\u004C\u0069\u0073\u0074']['\u0063\u006F\u006E\u0074\u0061\u0069\u006E\u0073']("\u0061\u0063\u0074\u0069\u0076\u0065") && !state['\u0069\u0073\u0043\u006F\u0064\u0065\u004C\u006F\u0063\u006B\u0065\u0064']) {
+    _0x745e2g();
   }
 });
-
-// Confirmación y bloqueo del código de acceso a la red (ACTUALIZADO PARA INVITADO)
-el.multiLockCodeBtn.addEventListener('click', () => {
-  if (state.mySecretCode.length < state.multiLength) {
-    setMultiSetupMessage(`⚠ ERROR: Cifrado incompleto. Requiere ${state.multiLength} elementos.`, true);
+el['\u006D\u0075\u006C\u0074\u0069\u004C\u006F\u0063\u006B\u0043\u006F\u0064\u0065\u0042\u0074\u006E']['\u0061\u0064\u0064\u0045\u0076\u0065\u006E\u0074\u004C\u0069\u0073\u0074\u0065\u006E\u0065\u0072']("\u0063\u006C\u0069\u0063\u006B", () => {
+  if (state['\u006D\u0079\u0053\u0065\u0063\u0072\u0065\u0074\u0043\u006F\u0064\u0065']['\u006C\u0065\u006E\u0067\u0074\u0068'] < state['\u006D\u0075\u006C\u0074\u0069\u004C\u0065\u006E\u0067\u0074\u0068']) {
+    setMultiSetupMessage(`⚠ ERROR: Cifrado incompleto. Requiere ${state['\u006D\u0075\u006C\u0074\u0069\u004C\u0065\u006E\u0067\u0074\u0068']} elementos.`, !![]);
     return;
   }
-
-  state.isCodeLocked = true;
-
-  // 1. TRANSMISIÓN EN CALIENTE: Si es HOST, publica la sala en internet
-  if (state.isHost) {
-    let roomName = el.roomNameInput.value.trim().toUpperCase() || `SERVER_${state.username.toUpperCase()}`;
-    state.maxPlayersAllowed = parseInt(el.roomMaxPlayersInput.value, 10) || 2;
-    
-    el.roomNameInput.disabled = true;
-    el.roomMaxPlayersInput.disabled = true;
-    el.encabezado.textContent = roomName;
-
-    setMultiSetupMessage("✔ PUBLICANDO SALA EN LA RED CENTRAL...", false);
-    
-    // NOTIFICACIÓN AL SERVIDOR: Registrar la nueva sala en internet
-    socket.emit('crear_sala', {
-      roomCode: roomName,
-      username: state.username,
-      maxPlayers: state.maxPlayersAllowed,
-      multiLength: state.multiLength,
-      limit: state.limit
+  state['\u0069\u0073\u0043\u006F\u0064\u0065\u004C\u006F\u0063\u006B\u0065\u0064'] = !![];
+  if (state['\u0069\u0073\u0048\u006F\u0073\u0074']) {
+    let roomName = el['\u0072\u006F\u006F\u006D\u004E\u0061\u006D\u0065\u0049\u006E\u0070\u0075\u0074']['\u0076\u0061\u006C\u0075\u0065']['\u0074\u0072\u0069\u006D']()['\u0074\u006F\u0055\u0070\u0070\u0065\u0072\u0043\u0061\u0073\u0065']() || `SERVER_${state['\u0075\u0073\u0065\u0072\u006E\u0061\u006D\u0065']['\u0074\u006F\u0055\u0070\u0070\u0065\u0072\u0043\u0061\u0073\u0065']()}`;
+    state['\u006D\u0061\u0078\u0050\u006C\u0061\u0079\u0065\u0072\u0073\u0041\u006C\u006C\u006F\u0077\u0065\u0064'] = parseInt(el['\u0072\u006F\u006F\u006D\u004D\u0061\u0078\u0050\u006C\u0061\u0079\u0065\u0072\u0073\u0049\u006E\u0070\u0075\u0074']['\u0076\u0061\u006C\u0075\u0065'], 825993 ^ 825987) || 605258 ^ 605256;
+    el['\u0072\u006F\u006F\u006D\u004E\u0061\u006D\u0065\u0049\u006E\u0070\u0075\u0074']['\u0064\u0069\u0073\u0061\u0062\u006C\u0065\u0064'] = !![];
+    el['\u0072\u006F\u006F\u006D\u004D\u0061\u0078\u0050\u006C\u0061\u0079\u0065\u0072\u0073\u0049\u006E\u0070\u0075\u0074']['\u0064\u0069\u0073\u0061\u0062\u006C\u0065\u0064'] = !![];
+    el['\u0065\u006E\u0063\u0061\u0062\u0065\u007A\u0061\u0064\u006F']['\u0074\u0065\u0078\u0074\u0043\u006F\u006E\u0074\u0065\u006E\u0074'] = roomName;
+    setMultiSetupMessage("\u2714\u0020\u0050\u0055\u0042\u004C\u0049\u0043\u0041\u004E\u0044\u004F\u0020\u0053\u0041\u004C\u0041\u0020\u0045\u004E\u0020\u004C\u0041\u0020\u0052\u0045\u0044\u0020\u0043\u0045\u004E\u0054\u0052\u0041\u004C\u002E\u002E\u002E", false);
+    socket['\u0065\u006D\u0069\u0074']("alas_raerc".split("").reverse().join(""), {
+      '\u0072\u006F\u006F\u006D\u0043\u006F\u0064\u0065': roomName,
+      '\u0075\u0073\u0065\u0072\u006E\u0061\u006D\u0065': state['\u0075\u0073\u0065\u0072\u006E\u0061\u006D\u0065'],
+      '\u006D\u0061\u0078\u0050\u006C\u0061\u0079\u0065\u0072\u0073': state['\u006D\u0061\u0078\u0050\u006C\u0061\u0079\u0065\u0072\u0073\u0041\u006C\u006C\u006F\u0077\u0065\u0064'],
+      '\u006D\u0075\u006C\u0074\u0069\u004C\u0065\u006E\u0067\u0074\u0068': state['\u006D\u0075\u006C\u0074\u0069\u004C\u0065\u006E\u0067\u0074\u0068'],
+      "limit": state['\u006C\u0069\u006D\u0069\u0074']
     });
-  } 
-  // 2. TRANSMISIÓN EN CALIENTE: Si es INVITADO, solicita unirse al nodo remoto
-  else {
-    setMultiSetupMessage("✔ ENVIANDO PETICIÓN DE ACCESO AL NODO...", false);
-    
-    // REQUERIMIENTO COMPLETO: Bloquear el botón e indicar estado de espera ciberpunk
-    el.multiLockCodeBtn.disabled = true;
-    el.multiLockCodeBtn.style.pointerEvents = 'none';
-    el.multiLockCodeBtn.style.opacity = '0.6';
-    el.multiLockCodeBtn.textContent = "⏳ ESPERANDO CONEXIONES...";
-
-    socket.emit('unirse_sala', {
-      roomCode: state.selectedRoomCode,
-      username: state.username
+  } else {
+    setMultiSetupMessage("\u2714\u0020\u0045\u004E\u0056\u0049\u0041\u004E\u0044\u004F\u0020\u0050\u0045\u0054\u0049\u0043\u0049\u00D3\u004E\u0020\u0044\u0045\u0020\u0041\u0043\u0043\u0045\u0053\u004F\u0020\u0041\u004C\u0020\u004E\u004F\u0044\u004F\u002E\u002E\u002E", false);
+    el['\u006D\u0075\u006C\u0074\u0069\u004C\u006F\u0063\u006B\u0043\u006F\u0064\u0065\u0042\u0074\u006E']['\u0064\u0069\u0073\u0061\u0062\u006C\u0065\u0064'] = !![];
+    el['\u006D\u0075\u006C\u0074\u0069\u004C\u006F\u0063\u006B\u0043\u006F\u0064\u0065\u0042\u0074\u006E']['\u0073\u0074\u0079\u006C\u0065']['\u0070\u006F\u0069\u006E\u0074\u0065\u0072\u0045\u0076\u0065\u006E\u0074\u0073'] = "\u006E\u006F\u006E\u0065";
+    el['\u006D\u0075\u006C\u0074\u0069\u004C\u006F\u0063\u006B\u0043\u006F\u0064\u0065\u0042\u0074\u006E']['\u0073\u0074\u0079\u006C\u0065']['\u006F\u0070\u0061\u0063\u0069\u0074\u0079'] = "\u0030\u002E\u0036";
+    el['\u006D\u0075\u006C\u0074\u0069\u004C\u006F\u0063\u006B\u0043\u006F\u0064\u0065\u0042\u0074\u006E']['\u0074\u0065\u0078\u0074\u0043\u006F\u006E\u0074\u0065\u006E\u0074'] = "\u23F3\u0020\u0045\u0053\u0050\u0045\u0052\u0041\u004E\u0044\u004F\u0020\u0043\u004F\u004E\u0045\u0058\u0049\u004F\u004E\u0045\u0053\u002E\u002E\u002E";
+    socket['\u0065\u006D\u0069\u0074']("\u0075\u006E\u0069\u0072\u0073\u0065\u005F\u0073\u0061\u006C\u0061", {
+      "roomCode": state['\u0073\u0065\u006C\u0065\u0063\u0074\u0065\u0064\u0052\u006F\u006F\u006D\u0043\u006F\u0064\u0065'],
+      '\u0075\u0073\u0065\u0072\u006E\u0061\u006D\u0065': state['\u0075\u0073\u0065\u0072\u006E\u0061\u006D\u0065']
     });
   }
 });
-
-/**
- * Escucha los eventos globales provenientes de la nube para reaccionar en tiempo real
- */
 function configurarEscuchadoresRed() {
   if (!socket) return;
-
-  // A. Sincronizar listado de salas
-  socket.on('lista_salas_actualizada', (salasReales) => {
-    import('./config.js').then(config => {
-      config.MOCK_ROOMS.length = 0;
-      salasReales.forEach(sala => config.MOCK_ROOMS.push(sala));
+  socket['\u006F\u006E']("adazilautca_salas_atsil".split("").reverse().join(""), salasReales => {
+    import("sj.gifnoc/.".split("").reverse().join(""))['\u0074\u0068\u0065\u006E'](config => {
+      config['\u004D\u004F\u0043\u004B\u005F\u0052\u004F\u004F\u004D\u0053']['\u006C\u0065\u006E\u0067\u0074\u0068'] = 564108 ^ 564108;
+      salasReales['\u0066\u006F\u0072\u0045\u0061\u0063\u0068'](sala => config['\u004D\u004F\u0043\u004B\u005F\u0052\u004F\u004F\u004D\u0053']['\u0070\u0075\u0073\u0068'](sala));
     });
-    import('./rooms.js').then(modulo => modulo.renderRoomsList(salasReales));
+    import("\u002E\u002F\u0072\u006F\u006F\u006D\u0073\u002E\u006A\u0073")['\u0074\u0068\u0065\u006E'](modulo => modulo['\u0072\u0065\u006E\u0064\u0065\u0072\u0052\u006F\u006F\u006D\u0073\u004C\u0069\u0073\u0074'](salasReales));
   });
-
-  // B. Confirmación de creación para el Host
-  socket.on('sala_creada_ok', (sala) => {
-    state.connectedPlayers = sala.connectedPlayers;
-    el.roomLiveCode.textContent = `SALA: ${sala.code}`;
-    setMultiSetupMessage("✔ SALA PUBLICADA. Esperando cifrados adversarios...", false);
-    
+  socket['\u006F\u006E']("ko_adaerc_alas".split("").reverse().join(""), sala => {
+    state['\u0063\u006F\u006E\u006E\u0065\u0063\u0074\u0065\u0064\u0050\u006C\u0061\u0079\u0065\u0072\u0073'] = sala['\u0063\u006F\u006E\u006E\u0065\u0063\u0074\u0065\u0064\u0050\u006C\u0061\u0079\u0065\u0072\u0073'];
+    el['\u0072\u006F\u006F\u006D\u004C\u0069\u0076\u0065\u0043\u006F\u0064\u0065']['\u0074\u0065\u0078\u0074\u0043\u006F\u006E\u0074\u0065\u006E\u0074'] = `SALA: ${sala['\u0063\u006F\u0064\u0065']}`;
+    setMultiSetupMessage("\u2714\u0020\u0053\u0041\u004C\u0041\u0020\u0050\u0055\u0042\u004C\u0049\u0043\u0041\u0044\u0041\u002E\u0020\u0045\u0073\u0070\u0065\u0072\u0061\u006E\u0064\u006F\u0020\u0063\u0069\u0066\u0072\u0061\u0064\u006F\u0073\u0020\u0061\u0064\u0076\u0065\u0072\u0073\u0061\u0072\u0069\u006F\u0073\u002E\u002E\u002E", false);
     buildKeypad();
     crearSlots();
     refreshKeypad();
     renderConnectedPlayers();
-
-    socket.emit('confirmar_codigo_secreto', {
-      roomCode: sala.code,
-      username: state.username,
-      secretCode: [...state.mySecretCode]
+    socket['\u0065\u006D\u0069\u0074']("oterces_ogidoc_ramrifnoc".split("").reverse().join(""), {
+      '\u0072\u006F\u006F\u006D\u0043\u006F\u0064\u0065': sala['\u0063\u006F\u0064\u0065'],
+      '\u0075\u0073\u0065\u0072\u006E\u0061\u006D\u0065': state['\u0075\u0073\u0065\u0072\u006E\u0061\u006D\u0065'],
+      '\u0073\u0065\u0063\u0072\u0065\u0074\u0043\u006F\u0064\u0065': [...state['\u006D\u0079\u0053\u0065\u0063\u0072\u0065\u0074\u0043\u006F\u0064\u0065']]
     });
   });
-
-  // C. Confirmación de acceso concedido para el Invitado
-  socket.on('union_exitosa', (datos) => {
-    state.multiLength = datos.multiLength;
-    state.limit = datos.limit;
-    setMultiSetupMessage("✔ ENLAZADO. Transmitiendo clave de acceso...", false);
-
-    // Al recibir esta señal, el invitado envía inmediatamente su contraseña elegida
-    socket.emit('confirmar_codigo_secreto', {
-      roomCode: state.selectedRoomCode,
-      username: state.username,
-      secretCode: [...state.mySecretCode]
+  socket['\u006F\u006E']("asotixe_noinu".split("").reverse().join(""), datos => {
+    state['\u006D\u0075\u006C\u0074\u0069\u004C\u0065\u006E\u0067\u0074\u0068'] = datos['\u006D\u0075\u006C\u0074\u0069\u004C\u0065\u006E\u0067\u0074\u0068'];
+    state['\u006C\u0069\u006D\u0069\u0074'] = datos['\u006C\u0069\u006D\u0069\u0074'];
+    setMultiSetupMessage("\u2714\u0020\u0045\u004E\u004C\u0041\u005A\u0041\u0044\u004F\u002E\u0020\u0054\u0072\u0061\u006E\u0073\u006D\u0069\u0074\u0069\u0065\u006E\u0064\u006F\u0020\u0063\u006C\u0061\u0076\u0065\u0020\u0064\u0065\u0020\u0061\u0063\u0063\u0065\u0073\u006F\u002E\u002E\u002E", false);
+    socket['\u0065\u006D\u0069\u0074']("\u0063\u006F\u006E\u0066\u0069\u0072\u006D\u0061\u0072\u005F\u0063\u006F\u0064\u0069\u0067\u006F\u005F\u0073\u0065\u0063\u0072\u0065\u0074\u006F", {
+      '\u0072\u006F\u006F\u006D\u0043\u006F\u0064\u0065': state['\u0073\u0065\u006C\u0065\u0063\u0074\u0065\u0064\u0052\u006F\u006F\u006D\u0043\u006F\u0064\u0065'],
+      '\u0075\u0073\u0065\u0072\u006E\u0061\u006D\u0065': state['\u0075\u0073\u0065\u0072\u006E\u0061\u006D\u0065'],
+      '\u0073\u0065\u0063\u0072\u0065\u0074\u0043\u006F\u0064\u0065': [...state['\u006D\u0079\u0053\u0065\u0063\u0072\u0065\u0074\u0043\u006F\u0064\u0065']]
     });
   });
-
-  // D. Sincronizar hackers conectados
-  socket.on('actualizar_sala_jugadores', (jugadores) => {
-    state.connectedPlayers = jugadores;
+  socket['\u006F\u006E']("\u0061\u0063\u0074\u0075\u0061\u006C\u0069\u007A\u0061\u0072\u005F\u0073\u0061\u006C\u0061\u005F\u006A\u0075\u0067\u0061\u0064\u006F\u0072\u0065\u0073", jugadores => {
+    state['\u0063\u006F\u006E\u006E\u0065\u0063\u0074\u0065\u0064\u0050\u006C\u0061\u0079\u0065\u0072\u0073'] = jugadores;
     renderConnectedPlayers();
     actualizarVisualSalaJugadores();
   });
-
-  socket.on('error_red', (mensaje) => {
-    mostrarAlertaCyber(mensaje, true); // Reemplaza el alert(mensaje) nativo
-    state.isCodeLocked = false;
-    setMultiSetupMessage(mensaje, true);
+  socket['\u006F\u006E']("\u0065\u0072\u0072\u006F\u0072\u005F\u0072\u0065\u0064", mensaje => {
+    mostrarAlertaCyber(mensaje, !![]);
+    state['\u0069\u0073\u0043\u006F\u0064\u0065\u004C\u006F\u0063\u006B\u0065\u0064'] = false;
+    setMultiSetupMessage(mensaje, !![]);
   });
-
-  // E. ACTIVACIÓN GLOBAL DE LA PARTIDA (Automático o Forzado)
-  socket.on('partida_lista_para_lanzar', (datos) => {
-    state.connectedPlayers = datos.connectedPlayers;
-    state.currentPlayerIndex = datos.currentPlayerIndex;
-    lanzarPartidaMultijugador("Conexión establecida.");
+  socket['\u006F\u006E']("\u0070\u0061\u0072\u0074\u0069\u0064\u0061\u005F\u006C\u0069\u0073\u0074\u0061\u005F\u0070\u0061\u0072\u0061\u005F\u006C\u0061\u006E\u007A\u0061\u0072", datos => {
+    state['\u0063\u006F\u006E\u006E\u0065\u0063\u0074\u0065\u0064\u0050\u006C\u0061\u0079\u0065\u0072\u0073'] = datos['\u0063\u006F\u006E\u006E\u0065\u0063\u0074\u0065\u0064\u0050\u006C\u0061\u0079\u0065\u0072\u0073'];
+    state['\u0063\u0075\u0072\u0072\u0065\u006E\u0074\u0050\u006C\u0061\u0079\u0065\u0072\u0049\u006E\u0064\u0065\u0078'] = datos['\u0063\u0075\u0072\u0072\u0065\u006E\u0074\u0050\u006C\u0061\u0079\u0065\u0072\u0049\u006E\u0064\u0065\u0078'];
+    lanzarPartidaMultijugador("\u0043\u006F\u006E\u0065\u0078\u0069\u00F3\u006E\u0020\u0065\u0073\u0074\u0061\u0062\u006C\u0065\u0063\u0069\u0064\u0061\u002E");
   });
-   
-  // F. Permitir al Host forzar el inicio
-  socket.on('habilitar_inicio_forzado', () => {
-    if (state.isHost && el.forceStartMultiBtn) {
-      el.forceStartMultiBtn.disabled = false;
-      el.forceStartMultiBtn.classList.remove('hidden');
+  socket['\u006F\u006E']("\u0068\u0061\u0062\u0069\u006C\u0069\u0074\u0061\u0072\u005F\u0069\u006E\u0069\u0063\u0069\u006F\u005F\u0066\u006F\u0072\u007A\u0061\u0064\u006F", () => {
+    if (state['\u0069\u0073\u0048\u006F\u0073\u0074'] && el['\u0066\u006F\u0072\u0063\u0065\u0053\u0074\u0061\u0072\u0074\u004D\u0075\u006C\u0074\u0069\u0042\u0074\u006E']) {
+      el['\u0066\u006F\u0072\u0063\u0065\u0053\u0074\u0061\u0072\u0074\u004D\u0075\u006C\u0074\u0069\u0042\u0074\u006E']['\u0064\u0069\u0073\u0061\u0062\u006C\u0065\u0064'] = false;
+      el['\u0066\u006F\u0072\u0063\u0065\u0053\u0074\u0061\u0072\u0074\u004D\u0075\u006C\u0074\u0069\u0042\u0074\u006E']['\u0063\u006C\u0061\u0073\u0073\u004C\u0069\u0073\u0074']['\u0072\u0065\u006D\u006F\u0076\u0065']("\u0068\u0069\u0064\u0064\u0065\u006E");
     }
   });
-
-  // ASOCIACIÓN GARANTIZADA DEL BOTÓN DE INICIO FORZADO
-  if (el.forceStartMultiBtn) {
-    // Limpiar cualquier escuchador antiguo clonando el botón para evitar doble envío
-    const clonBoton = el.forceStartMultiBtn.cloneNode(true);
-    el.forceStartMultiBtn.parentNode.replaceChild(clonBoton, el.forceStartMultiBtn);
-    el.forceStartMultiBtn = clonBoton;
-
-    el.forceStartMultiBtn.disabled = !state.isHost; 
-    
-    el.forceStartMultiBtn.addEventListener('click', () => {
-      if (!state.isHost || !socket) return;
-      // Extraer el código activo de la sala directamente del elemento de interfaz
-      let roomName = el.roomLiveCode.textContent.replace('SALA:', '').trim();
-      if (!roomName || roomName === "PENDIENTE") {
-         roomName = el.roomNameInput.value.trim().toUpperCase() || `SERVER_${state.username.toUpperCase()}`;
+  if (el['\u0066\u006F\u0072\u0063\u0065\u0053\u0074\u0061\u0072\u0074\u004D\u0075\u006C\u0074\u0069\u0042\u0074\u006E']) {
+    var _0x9ce03f = (719817 ^ 719819) + (622427 ^ 622419);
+    const _0x9aa7cf = el['\u0066\u006F\u0072\u0063\u0065\u0053\u0074\u0061\u0072\u0074\u004D\u0075\u006C\u0074\u0069\u0042\u0074\u006E']['\u0063\u006C\u006F\u006E\u0065\u004E\u006F\u0064\u0065'](!![]);
+    _0x9ce03f = 238385 ^ 238390;
+    el['\u0066\u006F\u0072\u0063\u0065\u0053\u0074\u0061\u0072\u0074\u004D\u0075\u006C\u0074\u0069\u0042\u0074\u006E']['\u0070\u0061\u0072\u0065\u006E\u0074\u004E\u006F\u0064\u0065']['\u0072\u0065\u0070\u006C\u0061\u0063\u0065\u0043\u0068\u0069\u006C\u0064'](_0x9aa7cf, el['\u0066\u006F\u0072\u0063\u0065\u0053\u0074\u0061\u0072\u0074\u004D\u0075\u006C\u0074\u0069\u0042\u0074\u006E']);
+    el['\u0066\u006F\u0072\u0063\u0065\u0053\u0074\u0061\u0072\u0074\u004D\u0075\u006C\u0074\u0069\u0042\u0074\u006E'] = _0x9aa7cf;
+    el['\u0066\u006F\u0072\u0063\u0065\u0053\u0074\u0061\u0072\u0074\u004D\u0075\u006C\u0074\u0069\u0042\u0074\u006E']['\u0064\u0069\u0073\u0061\u0062\u006C\u0065\u0064'] = !state['\u0069\u0073\u0048\u006F\u0073\u0074'];
+    el['\u0066\u006F\u0072\u0063\u0065\u0053\u0074\u0061\u0072\u0074\u004D\u0075\u006C\u0074\u0069\u0042\u0074\u006E']['\u0061\u0064\u0064\u0045\u0076\u0065\u006E\u0074\u004C\u0069\u0073\u0074\u0065\u006E\u0065\u0072']("kcilc".split("").reverse().join(""), () => {
+      if (!state['\u0069\u0073\u0048\u006F\u0073\u0074'] || !socket) return;
+      var _0xg42dd = (755205 ^ 755213) + (317173 ^ 317180);
+      let _0xe43d4f = el['\u0072\u006F\u006F\u006D\u004C\u0069\u0076\u0065\u0043\u006F\u0064\u0065']['\u0074\u0065\u0078\u0074\u0043\u006F\u006E\u0074\u0065\u006E\u0074']['\u0072\u0065\u0070\u006C\u0061\u0063\u0065']("\u0053\u0041\u004C\u0041\u003A", '')['\u0074\u0072\u0069\u006D']();
+      _0xg42dd = '\u0069\u0070\u0063\u0067\u0070\u006B';
+      if (!_0xe43d4f || _0xe43d4f === "\u0050\u0045\u004E\u0044\u0049\u0045\u004E\u0054\u0045") {
+        _0xe43d4f = el['\u0072\u006F\u006F\u006D\u004E\u0061\u006D\u0065\u0049\u006E\u0070\u0075\u0074']['\u0076\u0061\u006C\u0075\u0065']['\u0074\u0072\u0069\u006D']()['\u0074\u006F\u0055\u0070\u0070\u0065\u0072\u0043\u0061\u0073\u0065']() || `SERVER_${state['\u0075\u0073\u0065\u0072\u006E\u0061\u006D\u0065']['\u0074\u006F\u0055\u0070\u0070\u0065\u0072\u0043\u0061\u0073\u0065']()}`;
       }
-      socket.emit('forzar_inicio_partida', { roomCode: roomName });
+      socket['\u0065\u006D\u0069\u0074']("\u0066\u006F\u0072\u007A\u0061\u0072\u005F\u0069\u006E\u0069\u0063\u0069\u006F\u005F\u0070\u0061\u0072\u0074\u0069\u0064\u0061", {
+        '\u0072\u006F\u006F\u006D\u0043\u006F\u0064\u0065': _0xe43d4f
+      });
     });
   }
 }
-
-/**
- * Remueve al jugador de la transmisión y cierra la conexión del terminal de forma limpia
- */
-export function abandonarPartidaMultijugador() {
+function _0x6259e() {
   if (socket) {
-    socket.disconnect(); // Romper la sala vieja de forma estricta en el backend
-    socket.connect();    // Reencender la antena de inmediato para futuras partidas online
+    socket['\u0064\u0069\u0073\u0063\u006F\u006E\u006E\u0065\u0063\u0074']();
+    socket['\u0063\u006F\u006E\u006E\u0065\u0063\u0074']();
   }
-
-  // 💡 ¡ORDEN DE LIMPIEZA REPARADO!: 'resetGame' ya se encarga de vaciar y ocultar 
-  // de forma centralizada todos los subpaneles multijugador activos.
   resetGame();
-  
-  if (el.multiStatusPanel) el.multiStatusPanel.classList.add('hidden');
-  if (el.statusMultiLogPanel) el.statusMultiLogPanel.classList.add('hidden');
-  
-  // Elminamos la llamada a actualizarVisualSalaJugadores() aquí, ya que el panel 
-  // fue purgado y puesto en 'display: none' de forma segura por resetGame().
+  if (el['\u006D\u0075\u006C\u0074\u0069\u0053\u0074\u0061\u0074\u0075\u0073\u0050\u0061\u006E\u0065\u006C']) el['\u006D\u0075\u006C\u0074\u0069\u0053\u0074\u0061\u0074\u0075\u0073\u0050\u0061\u006E\u0065\u006C']['\u0063\u006C\u0061\u0073\u0073\u004C\u0069\u0073\u0074']['\u0061\u0064\u0064']("\u0068\u0069\u0064\u0064\u0065\u006E");
+  if (el['\u0073\u0074\u0061\u0074\u0075\u0073\u004D\u0075\u006C\u0074\u0069\u004C\u006F\u0067\u0050\u0061\u006E\u0065\u006C']) el['\u0073\u0074\u0061\u0074\u0075\u0073\u004D\u0075\u006C\u0074\u0069\u004C\u006F\u0067\u0050\u0061\u006E\u0065\u006C']['\u0063\u006C\u0061\u0073\u0073\u004C\u0069\u0073\u0074']['\u0061\u0064\u0064']("\u0068\u0069\u0064\u0064\u0065\u006E");
 }
-
-
-
-// Vincular los selectores de límite de tiempo para el modo multijugador (ACTUALIZADO)
-if (el.multiLimitBtns) {
-  el.multiLimitBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      // MEDIDA DE SEGURIDAD ESTRICTA: Si la clave ya está bloqueada o NO eres el creador, abortar
-      if (state.isCodeLocked || !state.isHost) return;
-      
-      el.multiLimitBtns.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      
-      state.limit = parseInt(btn.dataset.limit, 10) || 0;
-      console.log(`⏱ LÍMITE DE TRANSMISIÓN AJUSTADO: ${state.limit} segundos.`);
-
-      if (el.timerText) {
-        const m = Math.floor(state.limit / 60);
-        const s = state.limit % 60;
-        el.timerText.textContent = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+export { _0x6259e as abandonarPartidaMultijugador };
+if (el['\u006D\u0075\u006C\u0074\u0069\u004C\u0069\u006D\u0069\u0074\u0042\u0074\u006E\u0073']) {
+  el['\u006D\u0075\u006C\u0074\u0069\u004C\u0069\u006D\u0069\u0074\u0042\u0074\u006E\u0073']['\u0066\u006F\u0072\u0045\u0061\u0063\u0068'](btn => {
+    btn['\u0061\u0064\u0064\u0045\u0076\u0065\u006E\u0074\u004C\u0069\u0073\u0074\u0065\u006E\u0065\u0072']("kcilc".split("").reverse().join(""), () => {
+      if (state['\u0069\u0073\u0043\u006F\u0064\u0065\u004C\u006F\u0063\u006B\u0065\u0064'] || !state['\u0069\u0073\u0048\u006F\u0073\u0074']) return;
+      el['\u006D\u0075\u006C\u0074\u0069\u004C\u0069\u006D\u0069\u0074\u0042\u0074\u006E\u0073']['\u0066\u006F\u0072\u0045\u0061\u0063\u0068'](b => b['\u0063\u006C\u0061\u0073\u0073\u004C\u0069\u0073\u0074']['\u0072\u0065\u006D\u006F\u0076\u0065']("\u0061\u0063\u0074\u0069\u0076\u0065"));
+      btn['\u0063\u006C\u0061\u0073\u0073\u004C\u0069\u0073\u0074']['\u0061\u0064\u0064']("\u0061\u0063\u0074\u0069\u0076\u0065");
+      state['\u006C\u0069\u006D\u0069\u0074'] = parseInt(btn['\u0064\u0061\u0074\u0061\u0073\u0065\u0074']['\u006C\u0069\u006D\u0069\u0074'], 497490 ^ 497496) || 634389 ^ 634389;
+      console['\u006C\u006F\u0067'](`⏱ LÍMITE DE TRANSMISIÓN AJUSTADO: ${state['\u006C\u0069\u006D\u0069\u0074']} segundos.`);
+      if (el['\u0074\u0069\u006D\u0065\u0072\u0054\u0065\u0078\u0074']) {
+        var _0xd4g = (552932 ^ 552934) + (292762 ^ 292754);
+        const m = Math['\u0066\u006C\u006F\u006F\u0072'](state['\u006C\u0069\u006D\u0069\u0074'] / (531021 ^ 531057));
+        _0xd4g = '\u0067\u0065\u006F\u0061\u006F\u006C';
+        let _0x3f_0xc2d;
+        const s = state['\u006C\u0069\u006D\u0069\u0074'] % (881451 ^ 881431);
+        _0x3f_0xc2d = (448022 ^ 448022) + (444816 ^ 444825);
+        el['\u0074\u0069\u006D\u0065\u0072\u0054\u0065\u0078\u0074']['\u0074\u0065\u0078\u0074\u0043\u006F\u006E\u0074\u0065\u006E\u0074'] = `${String(m)['\u0070\u0061\u0064\u0053\u0074\u0061\u0072\u0074'](740690 ^ 740688, "\u0030")}:${String(s)['\u0070\u0061\u0064\u0053\u0074\u0061\u0072\u0074'](323021 ^ 323023, "\u0030")}`;
       }
     });
   });
 }
-
